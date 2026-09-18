@@ -23,7 +23,7 @@ const commonStatusReturn = "HAL_OK：操作成功；HAL_ERROR：参数或外设�
 const timeoutNote = "Timeout 的单位通常由 HAL_GetTick() 决定，默认配置下一般按毫秒理解。具体行为以当前工程 HAL 源码为准。";
 
 const seedData = {
-    schemaVersion: 4,
+    schemaVersion: 5,
     updatedAt: new Date().toISOString(),
     categories: [
         {

@@ -106,5 +106,36 @@ const naturalQueryResult = await evaluate(`({
     targetFound: [...document.querySelectorAll('.function-name')].some(item => item.textContent === 'HAL_TIM_PeriodElapsedCallback')
 })`);
 
-console.log(JSON.stringify({ callbackResult, detailResult, broadResult, naturalQueryResult }, null, 2));
+await evaluate(`new Promise(resolve => {
+    const input = document.querySelector('#searchInput');
+    input.value = '__HAL_TIM_CALC_PERIOD_DITHER';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    setTimeout(() => {
+        const card = [...document.querySelectorAll('.function-card')].find(item => item.querySelector('.function-name')?.textContent === '__HAL_TIM_CALC_PERIOD_DITHER');
+        if (card) {
+            card.open = true;
+            card.scrollIntoView({ block: 'start' });
+        }
+        setTimeout(resolve, 200);
+    }, 350);
+})`);
+const macroResult = await evaluate(`(() => {
+    const card = [...document.querySelectorAll('.function-card')].find(item => item.querySelector('.function-name')?.textContent === '__HAL_TIM_CALC_PERIOD_DITHER');
+    return {
+        countText: document.querySelector('#resultCount')?.textContent,
+        brief: card?.querySelector('.function-brief')?.textContent,
+        params: [...(card?.querySelectorAll('.param-list li') || [])].map(item => item.textContent.trim()),
+        notes: [...(card?.querySelectorAll('.detail-cell.is-wide') || [])].find(cell => cell.querySelector('h4')?.textContent === '@NOTES')?.querySelector('p')?.textContent,
+        example: card?.querySelector('.example-code')?.textContent
+    };
+})()`);
+if (process.argv[3]) {
+    const macroScreenshot = await send("Page.captureScreenshot", {
+        format: "png",
+        captureBeyondViewport: false
+    });
+    fs.writeFileSync(process.argv[3], Buffer.from(macroScreenshot.result.data, "base64"));
+}
+
+console.log(JSON.stringify({ callbackResult, detailResult, broadResult, naturalQueryResult, macroResult }, null, 2));
 socket.close();

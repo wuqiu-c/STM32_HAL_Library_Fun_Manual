@@ -45,6 +45,12 @@ MACRO_PATTERN = re.compile(
     re.MULTILINE,
 )
 
+MACRO_DOC_PATTERN = re.compile(
+    r"(?P<doc>/\*\*.*?\*/)\s*"
+    r"#define\s+(?P<name>__HAL_[A-Z0-9_]+)\s*\((?P<params>[^)]*)\)",
+    re.MULTILINE | re.DOTALL,
+)
+
 MODULE_NAMES = {
     "gpio": "GPIO",
     "dma": "DMA",
@@ -208,6 +214,87 @@ DETAIL_OVERRIDES = {
     },
 }
 
+MACRO_DETAIL_OVERRIDES = {
+    "__HAL_TIM_CALC_PSC": {
+        "brief": "根据定时器输入时钟和目标计数频率计算预分频寄存器 PSC 的值。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "CNTCLK": "期望的计数器时钟频率，单位 Hz。",
+        },
+        "returns": "计算得到的 PSC 寄存器值，范围 0～65535；实际分频系数为 PSC + 1。",
+        "notes": "计算关系为 TIMCLK / CNTCLK - 1。CNTCLK 不应为 0；当 TIMCLK 小于 CNTCLK 时宏返回 0。结果写入 Prescaler 后，通常需产生更新事件才能立即装载。",
+        "example": "uint32_t psc = __HAL_TIM_CALC_PSC(170000000U, 1000000U);",
+    },
+    "__HAL_TIM_CALC_PERIOD": {
+        "brief": "根据定时器输入时钟、预分频值和目标输出频率计算自动重装载值 ARR。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "FREQ": "期望的更新事件或输出信号频率，单位 Hz。",
+        },
+        "returns": "计算得到的 ARR 值，范围 0～65535。",
+        "notes": "边沿对齐向上计数时，频率关系通常为 TIMCLK / ((PSC + 1) × (ARR + 1))。FREQ 不应为 0，并应确认结果未超过当前定时器的计数位宽。",
+        "example": "uint32_t arr = __HAL_TIM_CALC_PERIOD(170000000U, 169U, 1000U);",
+    },
+    "__HAL_TIM_CALC_PERIOD_DITHER": {
+        "brief": "在已启用抖动功能时，根据目标频率计算带小数抖动位的自动重装载值。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "FREQ": "期望的更新事件或输出信号频率，单位 Hz。",
+        },
+        "returns": "带抖动小数位编码的自动重装载值，范围 0～65519。",
+        "notes": "仅在定时器抖动功能已经启用时使用。宏将周期结果按 1/16 计数精度编码；FREQ 不应为 0，写入前还应确认目标定时器支持抖动功能。",
+        "example": "uint32_t arr_dither = __HAL_TIM_CALC_PERIOD_DITHER(170000000U, 169U, 1000U);",
+    },
+    "__HAL_TIM_CALC_PULSE": {
+        "brief": "根据定时器时钟、预分频值和微秒延时计算输出比较寄存器 CCR 的值。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "DELAY": "期望的输出比较有效或无效延时，单位 μs。",
+        },
+        "returns": "计算得到的捕获比较值，范围 0～65535。",
+        "notes": "该宏把微秒时间换算为定时器计数值。结果应与通道的 CCR 位宽和 ARR 周期匹配；若比较值大于 ARR，本周期内可能不会产生匹配事件。",
+        "example": "uint32_t compare = __HAL_TIM_CALC_PULSE(170000000U, 169U, 250U);",
+    },
+    "__HAL_TIM_CALC_PULSE_DITHER": {
+        "brief": "在已启用抖动功能时，将微秒延时换算为带小数抖动位的比较值。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "DELAY": "期望的输出比较有效或无效延时，单位 μs。",
+        },
+        "returns": "带抖动小数位编码的捕获比较值，范围 0～65519。",
+        "notes": "仅在目标定时器已启用抖动功能时使用。结果按 1/16 计数精度编码，并应限制在当前自动重装载周期以内。",
+        "example": "uint32_t compare_dither = __HAL_TIM_CALC_PULSE_DITHER(170000000U, 169U, 250U);",
+    },
+    "__HAL_TIM_CALC_PERIOD_BY_DELAY": {
+        "brief": "根据单脉冲的启动延时和脉宽计算自动重装载值 ARR。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "DELAY": "单脉冲开始前的延时，单位 μs。",
+            "PULSE": "单脉冲持续时间，单位 μs。",
+        },
+        "returns": "延时计数值与脉宽计数值之和，作为单脉冲模式的 ARR，范围 0～65535。",
+        "notes": "用于单脉冲模式，周期由启动延时与有效脉宽共同组成。应同时用相同 TIMCLK 和 PSC 计算 CCR，并检查总计数未超过定时器位宽。",
+        "example": "uint32_t arr = __HAL_TIM_CALC_PERIOD_BY_DELAY(170000000U, 169U, 10U, 20U);",
+    },
+    "__HAL_TIM_CALC_PERIOD_DITHER_BY_DELAY": {
+        "brief": "在抖动模式下，根据单脉冲启动延时和脉宽计算带小数位的 ARR。",
+        "params": {
+            "TIMCLK": "定时器输入时钟频率，单位 Hz。",
+            "PSC": "预分频寄存器 PSC 的值，实际分频系数为 PSC + 1。",
+            "DELAY": "单脉冲开始前的延时，单位 μs。",
+            "PULSE": "单脉冲持续时间，单位 μs。",
+        },
+        "returns": "带抖动小数位编码的单脉冲 ARR，范围 0～65519。",
+        "notes": "仅在已启用定时器抖动功能时使用。返回值由延时和脉宽的 1/16 计数结果相加得到，并应检查未超过抖动模式允许的 ARR 上限。",
+        "example": "uint32_t arr_dither = __HAL_TIM_CALC_PERIOD_DITHER_BY_DELAY(170000000U, 169U, 10U, 20U);",
+    },
+}
+
 
 def clean_doc_lines(doc: str) -> list[str]:
     lines = []
@@ -289,6 +376,203 @@ def chinese_subject(module_id: str, name: str) -> str:
     return f"{MODULE_NAMES[module_id]} 外设"
 
 
+def macro_tail(module_id: str, name: str) -> str:
+    prefix = f"__HAL_{module_id.upper()}_"
+    return name[len(prefix):] if name.startswith(prefix) else name.removeprefix("__HAL_")
+
+
+def macro_target(module_id: str, raw_target: str) -> str:
+    target = raw_target.strip("_")
+    if not target:
+        return f"{MODULE_NAMES[module_id]} 外设"
+
+    target_rules = [
+        ("TAMPER_TIMESTAMP_EXTI", "入侵检测与时间戳 EXTI 线"),
+        ("WAKEUPTIMER_EXTI", "唤醒定时器 EXTI 线"),
+        ("ALARM_EXTI", "闹钟 EXTI 线"),
+        ("AUTORELOAD", "自动重装载寄存器 ARR"),
+        ("CLOCKDIVISION", "时钟分频配置"),
+        ("ICPRESCALER", "输入捕获预分频配置"),
+        ("REPETITIONCOUNTER", "重复计数寄存器 RCR"),
+        ("COMPARE", "捕获比较寄存器 CCR"),
+        ("COUNTER", "计数器 CNT"),
+        ("PRESCALER", "预分频寄存器 PSC"),
+        ("UIFCPY", "更新中断标志复制位 UIFCPY"),
+        ("CAPTUREPOLARITY", "输入捕获极性"),
+        ("DMA_BURST_LENGTH", "DMA 突发传输长度"),
+        ("WRITEPROTECTION", "写保护"),
+        ("SHIFTCONTROL", "时间校准移位控制"),
+        ("REFERENCECLOCKDETECTION", "参考时钟检测"),
+        ("COARSE_CALIB", "粗略数字校准"),
+        ("CALIBRATION_OUTPUT", "校准输出"),
+        ("BYPASS_SHADOW", "影子寄存器旁路"),
+        ("ALARMA", "闹钟 A"),
+        ("ALARMB", "闹钟 B"),
+        ("WAKEUPTIMER", "唤醒定时器"),
+        ("TIMESTAMP", "时间戳功能"),
+        ("TAMPER", "入侵检测功能"),
+        ("BACKUP", "备份域"),
+        ("SYNCHRO", "RTC 寄存器同步"),
+        ("MOE", "主输出使能 MOE"),
+        ("DMA", "DMA 请求"),
+        ("EXTI", "EXTI 线"),
+        ("FLAG", "状态标志"),
+    ]
+    for marker, description in target_rules:
+        if marker in target:
+            return description
+
+    if module_id == "rcc":
+        return f"{target.replace('_', ' ')} 外设"
+    return f"{MODULE_NAMES[module_id]} 的 {target.replace('_', ' ')} 功能"
+
+
+def macro_brief(module_id: str, name: str) -> str:
+    if name in MACRO_DETAIL_OVERRIDES:
+        return str(MACRO_DETAIL_OVERRIDES[name]["brief"])
+
+    special_briefs = {
+        "__HAL_ADC_CHANNEL_INTERNAL_TO_EXTERNAL": "将 ADC 内部通道编号转换为对应的外部通道编号。",
+        "__HAL_ADC_CHANNEL_TO_DECIMAL_NB": "将 ADC 通道常量转换为十进制通道序号。",
+        "__HAL_ADC_COMMON_INSTANCE": "获取当前 ADC 所属的公共控制寄存器实例。",
+        "__HAL_ADC_CONVERT_DATA_RESOLUTION": "在不同 ADC 分辨率之间换算原始转换数据。",
+        "__HAL_ADC_DECIMAL_NB_TO_CHANNEL": "将十进制通道序号转换为 ADC 通道常量。",
+        "__HAL_ADC_DIGITAL_SCALE": "计算指定 ADC 分辨率对应的数字满量程值。",
+        "__HAL_ADC_MULTI_CONV_DATA_MASTER_SLAVE": "从 ADC 多模式数据寄存器中拆分主从 ADC 转换结果。",
+        "__HAL_RCC_CRS_RELOADVALUE_CALCULATE": "根据目标同步频率计算 CRS 时钟恢复的重装载值。",
+        "__HAL_RCC_HSI_CALIBRATIONVALUE_ADJUST": "调整 HSI 内部高速时钟的校准值。",
+        "__HAL_RCC_RTC_CLKPRESCALER": "配置 RTC 使用 HSE 时的时钟预分频值。",
+        "__HAL_RCC_TIMCLKPRESCALER": "配置 APB 定时器内核时钟的预分频规则。",
+        "__HAL_TIM_IS_TIM_COUNTING_DOWN": "判断定时器当前是否处于向下计数方向。",
+        "__HAL_TIM_MOE_DISABLE_UNCONDITIONALLY": "无条件关闭高级定时器主输出使能 MOE。",
+        "__HAL_TIM_SELECT_CCDMAREQUEST": "选择捕获比较 DMA 请求由 CC 事件还是更新事件触发。",
+        "__HAL_UART_FLUSH_DRREGISTER": "清空串口接收数据寄存器中的待读数据。",
+        "__HAL_UART_SEND_REQ": "向串口请求寄存器写入指定的软件请求。",
+        "__HAL_RTC_DAYLIGHT_SAVING_TIME_ADD1H": "将 RTC 当前日历时间增加 1 小时。",
+        "__HAL_RTC_DAYLIGHT_SAVING_TIME_SUB1H": "将 RTC 当前日历时间减少 1 小时。",
+        "__HAL_RTC_IS_CALENDAR_INITIALIZED": "判断 RTC 日历是否已经完成初始化。",
+        "__HAL_IWDG_RELOAD_COUNTER": "重装独立看门狗计数器，防止本周期内产生复位。",
+        "__HAL_IWDG_START": "启动独立看门狗；启动后通常只能由系统复位停止。",
+    }
+    if name in special_briefs:
+        return special_briefs[name]
+
+    tail = macro_tail(module_id, name)
+    if module_id == "rcc":
+        rcc_rules = [
+            ("_IS_CLK_SLEEP_DISABLED", "判断睡眠模式下{target}时钟是否已禁用。"),
+            ("_IS_CLK_SLEEP_ENABLED", "判断睡眠模式下{target}时钟是否已使能。"),
+            ("_CLK_SLEEP_DISABLE", "禁止{target}在处理器睡眠期间继续接收时钟。"),
+            ("_CLK_SLEEP_ENABLE", "允许{target}在处理器睡眠期间继续接收时钟。"),
+            ("_IS_CLK_DISABLED", "判断{target}时钟是否已禁用。"),
+            ("_IS_CLK_ENABLED", "判断{target}时钟是否已使能。"),
+            ("_CLK_DISABLE", "关闭{target}的外设时钟。"),
+            ("_CLK_ENABLE", "开启{target}的外设时钟。"),
+            ("_FORCE_RESET", "将{target}保持在硬件复位状态。"),
+            ("_RELEASE_RESET", "释放{target}的硬件复位。"),
+        ]
+        for suffix, sentence in rcc_rules:
+            if tail == suffix.lstrip("_") or tail.endswith(suffix):
+                target = tail[:-len(suffix)].replace("_", " ") if tail.endswith(suffix) else "RCC"
+                return sentence.format(target=target)
+        if tail.startswith("GET_") and tail.endswith("_SOURCE"):
+            target = tail[4:-7].replace("_", " ")
+            return f"读取 {target} 当前选择的时钟源。"
+        if tail.endswith("_CONFIG"):
+            target = tail[:-7].replace("_", " ")
+            return f"选择 {target} 外设的内核时钟源。"
+        if tail == "GET_FLAG":
+            return "读取指定的 RCC 复位或时钟状态标志。"
+        if tail == "CLEAR_RESET_FLAGS":
+            return "清除 RCC 复位原因标志。"
+        if tail == "ENABLE_IT":
+            return "使能指定的 RCC 中断源。"
+        if tail == "DISABLE_IT":
+            return "禁用指定的 RCC 中断源。"
+        if tail == "CLEAR_IT":
+            return "清除指定的 RCC 中断挂起标志。"
+        if tail == "GET_IT":
+            return "读取指定的 RCC 中断挂起状态。"
+        if tail == "BACKUPRESET_FORCE":
+            return "强制复位 RCC 备份域。"
+        if tail == "BACKUPRESET_RELEASE":
+            return "释放 RCC 备份域复位。"
+
+    if tail.endswith("_EXTI_RISING_IT"):
+        target = macro_target(module_id, tail[:-len("_EXTI_RISING_IT")])
+        return f"判断{target}的 EXTI 上升沿中断是否挂起。"
+    if tail.endswith("_EXTI_FALLING_IT"):
+        target = macro_target(module_id, tail[:-len("_EXTI_FALLING_IT")])
+        return f"判断{target}的 EXTI 下降沿中断是否挂起。"
+
+    action_rules = [
+        ("_EXTI_ENABLE_RISING_FALLING_EDGE", "同时使能{target}的上升沿和下降沿触发。"),
+        ("_EXTI_DISABLE_RISING_FALLING_EDGE", "同时禁用{target}的上升沿和下降沿触发。"),
+        ("_EXTI_ENABLE_RISING_EDGE", "使能{target}的上升沿触发。"),
+        ("_EXTI_DISABLE_RISING_EDGE", "禁用{target}的上升沿触发。"),
+        ("_EXTI_ENABLE_FALLING_EDGE", "使能{target}的下降沿触发。"),
+        ("_EXTI_DISABLE_FALLING_EDGE", "禁用{target}的下降沿触发。"),
+        ("_EXTI_GENERATE_SWIT", "软件触发{target}中断事件。"),
+        ("_EXTI_ENABLE_EVENT", "使能{target}事件请求。"),
+        ("_EXTI_DISABLE_EVENT", "禁用{target}事件请求。"),
+        ("_EXTI_ENABLE_IT", "使能{target}中断请求。"),
+        ("_EXTI_DISABLE_IT", "禁用{target}中断请求。"),
+        ("_EXTI_CLEAR_FLAG", "清除{target}挂起标志。"),
+        ("_EXTI_CLEAR_IT", "清除{target}中断挂起位。"),
+        ("_EXTI_GET_FLAG", "读取{target}挂起标志。"),
+        ("_GET_IT_SOURCE", "判断指定的{target}中断源是否已使能。"),
+        ("_DISABLE_IT", "禁用指定的{target}中断源。"),
+        ("_ENABLE_IT", "使能指定的{target}中断源。"),
+        ("_CLEAR_FLAG", "清除指定的{target}状态标志。"),
+        ("_CLEAR_IT", "清除指定的{target}中断挂起标志。"),
+        ("_GET_FLAG", "读取指定的{target}状态标志。"),
+        ("_GET_IT", "读取指定的{target}中断挂起状态。"),
+        ("_RESET_HANDLE_STATE", "将{target}句柄的软件状态恢复为复位态。"),
+        ("_GENERATE_SWIT", "通过软件产生{target}中断。"),
+        ("_GENERATE_NACK", "控制{target}在下一字节应答阶段发送 NACK。"),
+        ("_DISABLE_DMA", "禁用指定通道的{target}请求。"),
+        ("_ENABLE_DMA", "使能指定通道的{target}请求。"),
+        ("_DISABLE", "禁用{target}。"),
+        ("_ENABLE", "使能{target}。"),
+    ]
+    for suffix, sentence in action_rules:
+        if tail == suffix.lstrip("_") or tail.endswith(suffix):
+            raw_target = tail[:-len(suffix)] if tail.endswith(suffix) else ""
+            target = macro_target(module_id, raw_target)
+            return sentence.format(target=target)
+
+    start_rules = [
+        ("SET_", "设置"),
+        ("GET_", "读取"),
+        ("IS_", "判断"),
+        ("CLEAR_", "清除"),
+        ("SEND_", "发送"),
+        ("FLUSH_", "清空"),
+        ("START", "启动"),
+        ("RELOAD_", "重装载"),
+    ]
+    for prefix, action in start_rules:
+        if tail.startswith(prefix):
+            target = tail[len(prefix):]
+            return f"{action}{macro_target(module_id, target)}。"
+
+    middle_rules = [
+        ("_SET_", "设置"),
+        ("_GET_", "读取"),
+        ("_IS_", "判断"),
+        ("_CLEAR_", "清除"),
+        ("_SEND_", "发送"),
+    ]
+    for marker, action in middle_rules:
+        if marker in tail:
+            _, target = tail.split(marker, 1)
+            return f"{action}{macro_target(module_id, target)}。"
+
+    if tail.startswith("CALC_"):
+        return f"计算{macro_target(module_id, tail[5:])}所需的寄存器值。"
+    return f"执行 {MODULE_NAMES[module_id]} 的 {tail.replace('_', ' ')} 操作。"
+
+
 def chinese_brief(module_id: str, name: str, kind: str) -> str:
     if name in DETAIL_OVERRIDES:
         return DETAIL_OVERRIDES[name]["brief"]
@@ -296,21 +580,7 @@ def chinese_brief(module_id: str, name: str, kind: str) -> str:
     upper_name = name.upper()
 
     if kind == "macro":
-        macro_actions = [
-            ("_SET_", "设置"),
-            ("_GET_", "获取"),
-            ("_ENABLE_", "使能"),
-            ("_DISABLE_", "禁用"),
-            ("_CLEAR_", "清除"),
-            ("_RESET_", "复位"),
-            ("_READ_", "读取"),
-            ("_WRITE_", "写入"),
-            ("_IS_", "判断"),
-        ]
-        for marker, action in macro_actions:
-            if marker in upper_name:
-                return f"通过宏{action}{subject}。"
-        return f"用于直接操作{subject}的常用 HAL 宏。"
+        return macro_brief(module_id, name)
 
     if "MspDeInit" in name:
         return f"执行{subject}的底层硬件反初始化回调。"
@@ -371,8 +641,138 @@ def chinese_brief(module_id: str, name: str, kind: str) -> str:
     return f"提供{subject}相关的 HAL 操作接口。"
 
 
-def chinese_parameter(module_id: str, name: str) -> str:
-    normalized = name.strip().strip("[]").strip("*").upper()
+def normalized_parameter_name(name: str) -> str:
+    return re.sub(r"^_+|_+$", "", re.sub(r"\\\s*", "", name).strip()).upper()
+
+
+def macro_parameter(
+    module_id: str,
+    macro_name: str,
+    parameter_name: str,
+    source_description: str,
+) -> str:
+    normalized = normalized_parameter_name(parameter_name)
+    override = MACRO_DETAIL_OVERRIDES.get(macro_name, {})
+    override_params = override.get("params", {}) if isinstance(override, dict) else {}
+    if normalized in override_params:
+        return str(override_params[normalized])
+
+    if "HANDLE" in normalized:
+        handle_examples = {
+            "dma": "&hdma_usart1_tx",
+            "rtc": "&hrtc",
+            "iwdg": "&hiwdg",
+        }
+        example = handle_examples.get(module_id, f"&h{module_id}1")
+        return f"{MODULE_NAMES[module_id]} 句柄指针，例如 {example}。"
+    if normalized in {"INTERRUPT", "IT"}:
+        return f"要操作的 {MODULE_NAMES[module_id]} 中断源位掩码；多个中断源可按位或组合。"
+    if "FLAG" in normalized:
+        return f"要查询或清除的 {MODULE_NAMES[module_id]} 状态标志位掩码。"
+    if normalized == "CHANNEL" or normalized.endswith("CHANNEL"):
+        channel_examples = {
+            "tim": "TIM_CHANNEL_1",
+            "adc": "ADC_CHANNEL_1",
+            "dac": "DAC_CHANNEL_1",
+            "rtc": "RTC_TAMPER_1",
+        }
+        example = channel_examples.get(module_id, f"{module_id.upper()}_CHANNEL_1")
+        return f"目标 {MODULE_NAMES[module_id]} 通道，例如 {example}。"
+    if normalized in {"COMPARE", "PULSE"}:
+        return "写入捕获比较寄存器 CCR 的计数值，通常应位于 0～ARR 范围内。"
+    if normalized == "COUNTER":
+        return "写入计数器 CNT 的当前计数值。"
+    if normalized in {"AUTORELOAD", "PERIOD"}:
+        return "写入自动重装载寄存器 ARR 的周期计数值。"
+    if normalized in {"PRESCALER", "PSC", "PRESC"}:
+        return "预分频寄存器值；实际分频系数通常为该值加 1。"
+    if normalized == "TIMCLK":
+        return "定时器输入时钟频率，单位 Hz。"
+    if normalized in {"CNTCLK", "COUNTERCLOCK"}:
+        return "期望的计数器时钟频率，单位 Hz。"
+    if normalized in {"FREQ", "FTARGET", "FSYNC"}:
+        return "期望的目标频率，单位 Hz。"
+    if normalized == "DELAY":
+        return "期望的延时时间，单位 μs。"
+    if "EXTI_LINE" in normalized:
+        return "需要操作的 EXTI 线路位掩码。"
+    if normalized == "SOURCE" or "CLKSOURCE" in normalized or "CLOCKSOURCE" in normalized:
+        target = normalized.removesuffix("CLKSOURCE").strip("_")
+        if not target or target == "SOURCE":
+            target = macro_tail(module_id, macro_name)
+            target = re.sub(r"_(?:GET_)?SOURCE$|_CONFIG$", "", target)
+        return f"为 {target.replace('_', ' ')} 选择的时钟源常量。"
+    if normalized in {"STATE", "HAL_STATE"}:
+        return "写入句柄的 HAL 软件状态枚举值。"
+    if normalized in {"DMA", "DMAREQUEST", "DMASOURCE"}:
+        return "要使能或禁用的 DMA 请求源位掩码。"
+    if normalized in {"MODE", "POLARITY", "EDGE"}:
+        return f"{MODULE_NAMES[module_id]} 的{normalized.lower()}选择值。"
+    if "ADC_DATA" in normalized:
+        return "ADC 转换得到的原始数字量。"
+    if "ADC_RESOLUTION" in normalized or normalized == "RESOLUTION":
+        return "ADC 分辨率配置，用于确定满量程数字值。"
+    if "VREFANALOG" in normalized:
+        return "ADC 模拟参考电压，单位 mV。"
+    if "TEMPSENSOR" in normalized:
+        return "芯片温度传感器校准值或当前采样值。"
+    if normalized in {"BKP", "BACKUPREGISTER"}:
+        return "目标 RTC 备份寄存器编号。"
+    if normalized == "TAMPER":
+        return "目标 RTC 入侵检测通道。"
+    if "DAC_CHANNEL" in normalized:
+        return "目标 DAC 输出通道。"
+    if "PLLCLOCKOUT" in normalized:
+        return "要查询、使能或禁用的 PLL 输出通道，例如 PLLP、PLLQ 或 PLLR。"
+    if "PLL" in normalized and ("DIV" in normalized or normalized.endswith(("M", "N", "P", "Q", "R"))):
+        return "PLL 倍频或分频参数，用于计算对应 PLL 输出频率。"
+    if "PLLMUL" in normalized or normalized.endswith("MUL"):
+        return "PLL 倍频系数选择值。"
+    if "PLL" in normalized and "SOURCE" in normalized:
+        return "PLL 输入时钟源选择值。"
+    if "LSEDRIVE" in normalized:
+        return "LSE 低速外部晶振驱动能力等级。"
+    if "MCODIV" in normalized:
+        return "MCO 时钟输出分频系数。"
+    if normalized in {"ADCX", "ADC_INSTANCE", "ADCXY_COMMON"}:
+        return "目标 ADC 实例或 ADC 公共寄存器实例。"
+    if normalized == "DECIMAL_NB":
+        return "十进制表示的 ADC 通道序号。"
+    if normalized == "ADC_MULTI_MASTER_SLAVE":
+        return "ADC 多模式数据寄存器中的主从转换组合值。"
+    if normalized == "CCDMA":
+        return "捕获比较 DMA 请求源选择，决定由 CC 事件或更新事件触发。"
+    if normalized == "CKD":
+        return "定时器数字滤波采样时钟分频配置。"
+    if normalized == "ICPSC":
+        return "输入捕获预分频配置，例如每 1、2、4 或 8 个有效边沿捕获一次。"
+    if normalized == "IT_CLEAR":
+        return "需要清除的串口中断清除位掩码。"
+    if normalized == "REQ":
+        return "要发送的串口软件请求，例如发送数据刷新或接收数据刷新。"
+    if "VALUE" in normalized or normalized.endswith("DATA"):
+        return f"传给 {macro_tail(module_id, macro_name).replace('_', ' ')} 操作的数据值。"
+
+    readable_name = normalized.replace("_", " ")
+    if source_description:
+        if "frequency" in source_description.lower() and "hz" in source_description.lower():
+            return f"{readable_name} 对应的频率值，单位 Hz。"
+        if "voltage" in source_description.lower():
+            return f"{readable_name} 对应的电压值。"
+    return f"{macro_tail(module_id, macro_name).replace('_', ' ')} 操作使用的 {readable_name} 参数。"
+
+
+def chinese_parameter(
+    module_id: str,
+    name: str,
+    owner_name: str = "",
+    source_description: str = "",
+    kind: str = "function",
+) -> str:
+    if kind == "macro":
+        return macro_parameter(module_id, owner_name, name, source_description)
+
+    normalized = normalized_parameter_name(name)
     if "HEADER" in normalized:
         return "报文头配置或输出结构体。"
     if "HANDLE" in normalized or normalized.startswith("H") and len(normalized) <= 8:
@@ -406,9 +806,30 @@ def chinese_parameter(module_id: str, name: str) -> str:
 
 def chinese_return(prototype: str, kind: str, name: str) -> str:
     if kind == "macro":
-        if "_GET_" in name or "_IS_" in name or "_READ_" in name:
-            return "返回对应的寄存器值、配置值或状态。"
-        return "无；宏直接修改寄存器或句柄字段。"
+        override = MACRO_DETAIL_OVERRIDES.get(name)
+        if override:
+            return str(override["returns"])
+        tail = name.upper()
+        return_rules = [
+            ("GET_COUNTER", "返回当前计数器 CNT 的数值。"),
+            ("GET_AUTORELOAD", "返回自动重装载寄存器 ARR 的数值。"),
+            ("GET_COMPARE", "返回指定通道捕获比较寄存器 CCR 的数值。"),
+            ("GET_CLOCKDIVISION", "返回定时器时钟分频位的寄存器编码。"),
+            ("GET_ICPRESCALER", "返回指定通道输入捕获预分频位的寄存器编码。"),
+            ("GET_FLAG", "目标标志置位时返回非 0，否则返回 0。"),
+            ("GET_IT_SOURCE", "目标中断源已使能时返回非 0，否则返回 0。"),
+            ("GET_IT", "目标中断处于挂起状态时返回非 0，否则返回 0。"),
+            ("IS_CLK_ENABLED", "时钟已使能时返回非 0，否则返回 0。"),
+            ("IS_CLK_DISABLED", "时钟已禁用时返回非 0，否则返回 0。"),
+            ("IS_CLK_SLEEP_ENABLED", "睡眠时钟已使能时返回非 0，否则返回 0。"),
+            ("IS_CLK_SLEEP_DISABLED", "睡眠时钟已禁用时返回非 0，否则返回 0。"),
+        ]
+        for marker, description in return_rules:
+            if marker in tail:
+                return description
+        if "_GET_" in tail or tail.startswith("__HAL_RCC_GET_") or "_IS_" in tail:
+            return "返回该配置项对应的寄存器编码值或条件判断结果。"
+        return "无返回值；宏直接修改外设寄存器或 HAL 句柄字段。"
     return_type = prototype.split(name, 1)[0].strip()
     if return_type.endswith("void"):
         return "无。"
@@ -426,10 +847,51 @@ def chinese_notes(
     if name in DETAIL_OVERRIDES:
         return DETAIL_OVERRIDES[name]["notes"]
     if kind == "macro":
-        if name == "__HAL_TIM_SET_COMPARE":
+        override = MACRO_DETAIL_OVERRIDES.get(name)
+        if override:
+            notes = str(override["notes"])
+        elif name == "__HAL_TIM_SET_COMPARE":
             notes = "直接写入指定通道的 CCR 捕获比较寄存器，常用于运行中更新 PWM 占空比。比较值通常应限制在 0 到 ARR 之间；若启用了预装载，新值会在更新事件后生效。"
+        elif name == "__HAL_IWDG_START":
+            notes = "写入启动键后独立看门狗开始计数，通常只能通过芯片复位停止。启动前必须先设置分频和重装载值，并保证程序后续能按周期喂狗。"
+        elif name == "__HAL_IWDG_RELOAD_COUNTER":
+            notes = "该宏写入重装载键以刷新看门狗倒计时。调用周期必须小于按 LSI、预分频和重装载值计算出的超时时间；不要用喂狗掩盖任务卡死。"
+        elif "CLK_SLEEP_ENABLE" in name or "CLK_SLEEP_DISABLE" in name:
+            notes = "该宏只控制处理器睡眠期间的外设时钟，不改变正常运行时的时钟使能状态。是否保留睡眠时钟应结合低功耗功耗预算和外设唤醒需求决定。"
+        elif "CLK_ENABLE" in name:
+            notes = "访问外设寄存器前必须先开启对应总线时钟。时钟使能后可读取一次使能寄存器或执行短暂屏障，确保后续外设访问发生在时钟稳定之后。"
+        elif "CLK_DISABLE" in name:
+            notes = "关闭时钟前应确认外设传输已经结束且不再产生 DMA 或中断请求。关闭后继续访问该外设寄存器不会得到有效结果。"
+        elif "FORCE_RESET" in name or "BACKUPRESET_FORCE" in name:
+            notes = "强制复位会清除该外设的寄存器配置。通常应随后调用对应的 RELEASE_RESET 宏，再重新执行外设初始化。"
+        elif "RELEASE_RESET" in name or "BACKUPRESET_RELEASE" in name:
+            notes = "该宏只释放硬件复位，不会恢复时钟、GPIO、DMA 或 HAL 句柄配置；释放后仍需按正常流程初始化外设。"
+        elif "_CONFIG" in name and module_id == "rcc":
+            notes = "切换外设内核时钟源前，应停止相关外设并确认候选时钟源已经就绪。切换后需要重新核对波特率、采样率或定时参数。"
+        elif "ENABLE_IT" in name:
+            notes = "该宏只打开外设内部中断源；还必须配置对应 NVIC IRQ、优先级和中断服务函数。使能前建议先清除遗留挂起标志。"
+        elif "DISABLE_IT" in name:
+            notes = "该宏只关闭指定的外设内部中断源，不会自动清除已经置位的状态标志或 NVIC 挂起位。"
+        elif "CLEAR_FLAG" in name or "CLEAR_IT" in name:
+            notes = "不同外设的标志清除方式可能是写 0、写 1 或读寄存器序列；应调用本宏完成清除，不要自行对状态寄存器做通用读改写。"
+        elif "CLEAR_" in name:
+            notes = "该宏按目标外设规定的寄存器读写序列清除对应状态。某些错误标志需要先读状态寄存器再读数据寄存器，不能用普通位清零代替。"
+        elif "GET_FLAG" in name or "GET_IT" in name or "_IS_" in name:
+            notes = "该宏读取的是调用瞬间的硬件状态。若标志由中断或硬件异步更新，应在读取后及时处理，并按该外设规定的方法清除。"
+        elif "_EXTI_" in name:
+            notes = "该宏只配置与该功能相连的 EXTI 线路。要真正响应事件，还需配置触发边沿、解除中断屏蔽并在 NVIC 中使能对应 IRQ。"
+        elif "RESET_HANDLE_STATE" in name:
+            notes = "该宏只重置 HAL 句柄中的软件状态与锁，不会复位外设寄存器、停止正在进行的 DMA，也不会清除硬件错误标志。"
+        elif "_SET_" in name:
+            notes = "该宏直接写入对应寄存器字段。调用前应确认外设状态允许修改；带预装载的寄存器可能要等更新事件后才真正生效。"
+        elif "_GET_" in name:
+            notes = "该宏直接读取寄存器字段，返回值通常是原始计数值或位域编码；换算为时间、电压或频率时还需结合当前时钟和配置参数。"
+        elif name.endswith("_ENABLE"):
+            notes = "使能前应先完成时钟、GPIO 和工作参数配置，并清除可能残留的状态标志。宏只改变对应硬件使能位。"
+        elif name.endswith("_DISABLE"):
+            notes = "禁用前应等待当前传输或转换结束。宏只改变对应硬件使能位，不会自动释放 GPIO、DMA 或中断资源。"
         else:
-            notes = "该宏直接访问寄存器或句柄字段，适合对已完成初始化的外设做快速配置。传入表达式应避免自增、函数调用等可能被重复求值的副作用。"
+            notes = f"该宏完成“{macro_tail(module_id, name).replace('_', ' ')}”寄存器操作。调用前应确认 {MODULE_NAMES[module_id]} 已完成初始化，并避免传入带自增或函数调用的表达式，以免宏展开后被重复求值。"
     else:
         if "IRQHandler" in name:
             notes = "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。"
@@ -454,16 +916,103 @@ def chinese_notes(
     return notes
 
 
+def macro_example_argument(module_id: str, macro_name: str, parameter_name: str) -> str:
+    normalized = normalized_parameter_name(parameter_name)
+    handle_names = {
+        "gpio": "GPIOA",
+        "dma": "&hdma_usart1_tx",
+        "adc": "&hadc1",
+        "dac": "&hdac1",
+        "tim": "&htim1",
+        "uart": "&huart1",
+        "i2c": "&hi2c1",
+        "spi": "&hspi1",
+        "can": "&hcan1",
+        "fdcan": "&hfdcan1",
+        "rtc": "&hrtc",
+        "iwdg": "&hiwdg",
+    }
+    interrupt_names = {
+        "dma": "DMA_IT_TC",
+        "adc": "ADC_IT_EOC",
+        "dac": "DAC_IT_DMAUDR1",
+        "tim": "TIM_IT_UPDATE",
+        "uart": "UART_IT_IDLE",
+        "i2c": "I2C_IT_ERRI",
+        "spi": "SPI_IT_RXNE",
+        "can": "CAN_IT_RX_FIFO0_MSG_PENDING",
+        "fdcan": "FDCAN_IT_RX_FIFO0_NEW_MESSAGE",
+        "rtc": "RTC_IT_ALRA",
+        "rcc": "RCC_IT_CSS",
+    }
+    flag_names = {
+        "gpio": "GPIO_PIN_13",
+        "dma": "DMA_FLAG_TCIF0_4",
+        "adc": "ADC_FLAG_EOC",
+        "dac": "DAC_FLAG_DMAUDR1",
+        "tim": "TIM_FLAG_UPDATE",
+        "uart": "UART_FLAG_IDLE",
+        "i2c": "I2C_FLAG_STOPF",
+        "spi": "SPI_FLAG_RXNE",
+        "can": "CAN_FLAG_ERROR",
+        "fdcan": "FDCAN_FLAG_ERROR_PASSIVE",
+        "rtc": "RTC_FLAG_ALRAF",
+        "rcc": "RCC_FLAG_PINRST",
+    }
+    if "HANDLE" in normalized:
+        return handle_names.get(module_id, f"&h{module_id}1")
+    if normalized in {"INTERRUPT", "IT"}:
+        return interrupt_names.get(module_id, f"{module_id.upper()}_IT_UPDATE")
+    if "FLAG" in normalized:
+        return flag_names.get(module_id, f"{module_id.upper()}_FLAG_READY")
+    if "EXTI_LINE" in normalized:
+        return "GPIO_PIN_13"
+    if normalized.endswith("CHANNEL") or normalized == "CHANNEL":
+        return "TIM_CHANNEL_1" if module_id == "tim" else f"{module_id.upper()}_CHANNEL_1"
+    if normalized in {"COMPARE", "PULSE"}:
+        return "500U"
+    if normalized == "COUNTER":
+        return "0U"
+    if normalized in {"AUTORELOAD", "PERIOD"}:
+        return "999U"
+    if normalized in {"PRESCALER", "PSC", "PRESC"}:
+        return "169U"
+    if normalized == "TIMCLK":
+        return "170000000U"
+    if normalized in {"CNTCLK", "FREQ", "FTARGET", "FSYNC"}:
+        return "1000U"
+    if normalized in {"DELAY", "PULSE"}:
+        return "20U"
+    if normalized == "STATE":
+        return "HAL_READY"
+    if normalized == "DMA":
+        return "TIM_DMA_UPDATE" if module_id == "tim" else f"{module_id.upper()}_DMA_REQUEST"
+    variable = re.sub(r"[^a-z0-9]+", "_", normalized.lower()).strip("_")
+    return variable or "value"
+
+
 def make_example(
     name: str,
     params: list[dict[str, str]],
     prototype: str,
     kind: str,
+    module_id: str = "",
 ) -> str:
     if name in DETAIL_OVERRIDES:
         return DETAIL_OVERRIDES[name]["example"]
     if name == "__HAL_TIM_SET_COMPARE":
         return "__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, Tcmp3);"
+    if kind == "macro":
+        override = MACRO_DETAIL_OVERRIDES.get(name)
+        if override:
+            return str(override["example"])
+        arguments = [macro_example_argument(module_id, name, str(param["name"])) for param in params]
+        call = f"{name}({', '.join(arguments)})"
+        if "_GET_FLAG" in name or "_GET_IT" in name or "_IS_" in name:
+            return f"if ({call}) {{\n    // 条件成立时处理对应状态\n}}"
+        if "_GET_" in name or name.startswith("__HAL_RCC_GET_"):
+            return f"uint32_t value = {call};"
+        return f"{call};"
     if kind == "function" and "Callback" in name:
         declaration = prototype.rstrip(";")
         return f"{declaration}\n{{\n    // 在此处理对应事件，保持回调短小\n}}"
@@ -494,17 +1043,36 @@ def extract_source(path: Path, family: str) -> list[dict[str, object]]:
 
 def extract_macros(path: Path, family: str) -> list[dict[str, object]]:
     text = path.read_text(encoding="utf-8", errors="ignore")
+    docs = {
+        match.group("name"): parse_doc(match.group("doc"))
+        for match in MACRO_DOC_PATTERN.finditer(text)
+    }
     macros = []
     for match in MACRO_PATTERN.finditer(text):
         name = match.group("name")
-        parameter_names = [item.strip() for item in match.group("params").split(",") if item.strip()]
+        raw_params = re.sub(r"\\\s*", "", match.group("params"))
+        parameter_names = [re.sub(r"\s+", "", item) for item in raw_params.split(",") if item.strip()]
+        doc = docs.get(name, {"brief": "", "params": [], "returns": [], "notes": []})
+        documented_params = {
+            normalized_parameter_name(str(item["name"])): str(item["description"])
+            for item in doc["params"]
+        }
         macros.append(
             {
                 "name": name,
                 "family": family,
                 "kind": "macro",
                 "prototype": f"#define {name}({', '.join(parameter_names)})",
-                "params": [{"name": item, "description": ""} for item in parameter_names],
+                "brief": doc["brief"],
+                "params": [
+                    {
+                        "name": item,
+                        "description": documented_params.get(normalized_parameter_name(item), ""),
+                    }
+                    for item in parameter_names
+                ],
+                "returns": "; ".join(doc["returns"]),
+                "notes": " ".join(doc["notes"]),
             }
         )
     return macros
@@ -533,7 +1101,13 @@ def merge_records(
         params = [
             {
                 "name": str(param["name"]),
-                "description": chinese_parameter(module_id, str(param["name"])),
+                "description": chinese_parameter(
+                    module_id,
+                    str(param["name"]),
+                    owner_name=name,
+                    source_description=str(param.get("description", "")),
+                    kind=kind,
+                ),
             }
             for param in preferred["params"]
         ]
@@ -548,7 +1122,7 @@ def merge_records(
                 "params": params,
                 "returns": chinese_return(prototype, kind, name),
                 "notes": chinese_notes(module_id, name, kind, different_prototypes),
-                "example": make_example(name, params, prototype, kind),
+                "example": make_example(name, params, prototype, kind, module_id),
                 "families": families,
                 "familyPrototypes": prototype_map,
             }
