@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="可搜索、可编辑并支持本地保存的 STM32 HAL 函数速查手册">
+    <title>STM32 HAL 函数速查手册</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='13' fill='%23081422'/%3E%3Cpath d='M18 18h28v28H18z' fill='none' stroke='%2338bdf8' stroke-width='4'/%3E%3Cpath d='M25 27h14M25 37h8' stroke='%23e2e8f0' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand">
+            <div class="brand-mark" aria-hidden="true">H</div>
+            <div>
+                <h1>STM32 HAL 函数速查</h1>
+                <p>F1 · F4 · G4 常用外设</p>
+            </div>
+        </div>
+
+        <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <input id="searchInput" type="search" placeholder="搜索函数、用途、参数……" autocomplete="off">
+            <kbd>Ctrl K</kbd>
+        </label>
+
+        <div class="top-actions">
+            <div class="family-filter" aria-label="系列筛选">
+                <button class="chip is-active" data-family="ALL" type="button">全部</button>
+                <button class="chip" data-family="F1" type="button">F1</button>
+                <button class="chip" data-family="F4" type="button">F4</button>
+                <button class="chip" data-family="G4" type="button">G4</button>
+            </div>
+            <button id="editModeBtn" class="button button-primary" type="button" aria-pressed="false">进入编辑</button>
+            <button id="dataMenuBtn" class="icon-button" type="button" aria-label="数据管理" title="数据管理">⋮</button>
+        </div>
+    </header>
+
+    <div class="app-shell">
+        <aside class="sidebar" aria-label="外设模块导航">
+            <div class="sidebar-head">
+                <span>外设分类</span>
+                <button id="addModuleBtn" class="small-action edit-only" type="button">＋ 模块</button>
+            </div>
+            <nav id="categoryNav"></nav>
+            <div class="storage-note">
+                <span class="status-dot"></span>
+                <div>
+                    <strong>自动保存到本机</strong>
+                    <small>重要内容请导出 JSON 备份</small>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <section class="module-heading">
+                <div>
+                    <div class="eyebrow" id="categoryLabel">SYSTEM CORE</div>
+                    <h2 id="moduleTitle">GPIO</h2>
+                    <p id="moduleDescription">通用输入输出：初始化、读写与外部中断。</p>
+                </div>
+                <div class="module-actions">
+                    <span id="resultCount" class="result-count"></span>
+                    <button id="manageModeBtn" class="button button-quiet edit-only" type="button" aria-pressed="false">管理</button>
+                    <button id="addFunctionBtn" class="button button-primary edit-only" type="button">＋ 添加函数</button>
+                </div>
+            </section>
+
+            <div id="activeFilters" class="active-filters" hidden></div>
+            <section id="manageToolbar" class="manage-toolbar manage-only" aria-label="函数批量管理">
+                <button id="selectAllBtn" class="button button-quiet" type="button" aria-pressed="false">全选</button>
+                <span id="selectedCount">已选择 0 项</span>
+                <span class="manage-hint">拖动函数最右侧手柄可调整顺序</span>
+                <button id="moduleSettingsBtn" class="button button-quiet" type="button">模块设置</button>
+                <button id="deleteSelectedBtn" class="button button-danger" type="button" disabled>删除所选</button>
+            </section>
+            <section id="functionList" class="function-list" aria-live="polite"></section>
+        </main>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+    <div id="dataMenu" class="popover" hidden>
+        <button id="exportBtn" type="button"><span>⇩</span>导出 JSON 备份</button>
+        <button id="importBtn" type="button"><span>⇧</span>导入 JSON 数据</button>
+        <button id="resetBtn" class="danger-item" type="button"><span>↺</span>恢复初始数据</button>
+    </div>
+
+    <dialog id="functionDialog" class="editor-dialog">
+        <form id="functionForm" method="dialog">
+            <div class="dialog-head">
+                <div>
+                    <span class="eyebrow">FUNCTION EDITOR</span>
+                    <h3 id="functionDialogTitle">添加函数</h3>
+                </div>
+                <button class="dialog-close" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
+            </div>
+            <div class="form-grid">
+                <label class="field field-wide">函数名称<input id="fieldName" required spellcheck="false"></label>
+                <label class="field field-wide">函数原型<textarea id="fieldPrototype" rows="3" required spellcheck="false"></textarea></label>
+                <label class="field field-wide">@brief<textarea id="fieldBrief" rows="2" required></textarea></label>
+                <label class="field field-wide">@param <small>每行一个，格式：参数名 | 说明</small><textarea id="fieldParams" rows="4"></textarea></label>
+                <label class="field">@return<textarea id="fieldReturn" rows="3"></textarea></label>
+                <label class="field">适用系列
+                    <span class="check-row">
+                        <label><input id="familyF1" type="checkbox" value="F1"> F1</label>
+                        <label><input id="familyF4" type="checkbox" value="F4"> F4</label>
+                        <label><input id="familyG4" type="checkbox" value="G4"> G4</label>
+                    </span>
+                </label>
+                <label class="field field-wide">@notes<textarea id="fieldNotes" rows="4"></textarea></label>
+                <label class="field field-wide">@example<textarea id="fieldExample" rows="6" spellcheck="false"></textarea></label>
+            </div>
+            <div class="dialog-actions">
+                <button class="button button-quiet" value="cancel" type="submit" formnovalidate>取消</button>
+                <button id="saveFunctionBtn" class="button button-primary" value="default" type="submit">保存函数</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="moduleDialog" class="editor-dialog compact-dialog">
+        <form id="moduleForm" method="dialog">
+            <div class="dialog-head">
+                <div>
+                    <span class="eyebrow">MODULE EDITOR</span>
+                    <h3 id="moduleDialogTitle">添加模块</h3>
+                </div>
+                <button class="dialog-close" value="cancel" type="submit" formnovalidate aria-label="关闭">×</button>
+            </div>
+            <div class="form-grid">
+                <label class="field">所属分类<select id="moduleCategory"></select></label>
+                <label class="field">模块名称<input id="moduleName" required placeholder="例如 RTC"></label>
+                <label class="field field-wide">模块说明<textarea id="moduleDescriptionField" rows="3" required></textarea></label>
+            </div>
+            <div class="dialog-actions split-actions">
+                <button id="deleteModuleBtn" class="button button-danger" type="button">删除模块</button>
+                <span></span>
+                <button class="button button-quiet" value="cancel" type="submit" formnovalidate>取消</button>
+                <button class="button button-primary" value="default" type="submit">保存模块</button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="confirmDialog" class="confirm-dialog">
+        <form method="dialog">
+            <h3 id="confirmTitle">确认操作</h3>
+            <p id="confirmText"></p>
+            <div class="dialog-actions">
+                <button class="button button-quiet" value="cancel">取消</button>
+                <button class="button button-danger" value="confirm">确认</button>
+            </div>
+        </form>
+    </dialog>
+
+    <input id="fileInput" type="file" accept="application/json,.json" hidden>
+    <script src="./catalog.js"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
