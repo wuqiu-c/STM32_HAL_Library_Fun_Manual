@@ -335,7 +335,7 @@ def parse_doc(doc: str) -> dict[str, object]:
             current_item = None
         elif param_match:
             current_item = {
-                "name": param_match.group(1).strip(),
+                "name": param_match.group(1).strip().rstrip(":"),
                 "description": param_match.group(2).strip(),
             }
             result["params"].append(current_item)
@@ -573,76 +573,299 @@ def macro_brief(module_id: str, name: str) -> str:
     return f"执行 {MODULE_NAMES[module_id]} 的 {tail.replace('_', ' ')} 操作。"
 
 
+FUNCTION_BRIEF_OVERRIDES = {
+    "HAL_ADCEx_Calibration_Start": "启动 ADC 自动自校准，计算并装载校准因子。",
+    "HAL_ADCEx_Calibration_GetValue": "读取 ADC 当前使用的校准因子。",
+    "HAL_ADCEx_Calibration_SetValue": "手动写入 ADC 校准因子，覆盖自动校准结果。",
+    "HAL_ADCEx_DisableInjectedQueue": "禁用 ADC 注入组上下文队列模式。",
+    "HAL_ADCEx_EnableInjectedQueue": "使能 ADC 注入组上下文队列模式。",
+    "HAL_ADCEx_DisableVoltageRegulator": "关闭 ADC 内部稳压器以降低停用期间功耗。",
+    "HAL_ADCEx_EnterADCDeepPowerDownMode": "使 ADC 进入深度掉电模式以获得最低静态功耗。",
+    "HAL_ADCEx_EndOfSamplingCallback": "ADC 采样阶段结束回调，用于区分采样完成与转换完成。",
+    "HAL_ADCEx_InjectedConfigChannel": "配置 ADC 注入组通道、序列位置、采样时间及偏移。",
+    "HAL_ADCEx_InjectedConvCpltCallback": "ADC 注入组转换完成回调。",
+    "HAL_ADCEx_InjectedGetValue": "读取 ADC 注入组指定序列位置的转换结果。",
+    "HAL_ADCEx_InjectedPollForConversion": "阻塞轮询等待 ADC 注入组转换完成或超时。",
+    "HAL_ADCEx_InjectedQueueOverflowCallback": "ADC 注入组上下文队列溢出回调。",
+    "HAL_ADCEx_InjectedStart": "启动 ADC 注入组转换，不启用完成中断。",
+    "HAL_ADCEx_InjectedStart_IT": "使能注入组完成中断并启动 ADC 注入组转换。",
+    "HAL_ADCEx_InjectedStop": "停止 ADC 注入组转换；无常规组转换时同时关闭 ADC。",
+    "HAL_ADCEx_InjectedStop_IT": "停止 ADC 注入组转换并关闭注入组完成中断。",
+    "HAL_ADCEx_MultiModeConfigChannel": "配置多 ADC 主从模式、数据组合及采样延迟。",
+    "HAL_ADCEx_MultiModeGetValue": "读取多 ADC 模式下主从常规组的组合转换结果。",
+    "HAL_ADCEx_MultiModeStart_DMA": "启动多 ADC 常规组转换并通过 DMA 传输组合结果。",
+    "HAL_ADCEx_MultiModeStop_DMA": "停止多 ADC DMA 转换并关闭 DMA 请求。",
+    "HAL_ADCEx_RegularMultiModeStop_DMA": "停止常规组多 ADC DMA 转换，保留仍在运行的注入组。",
+    "HAL_ADCEx_RegularStop": "停止 ADC 常规组转换；注入组空闲时同时关闭 ADC。",
+    "HAL_ADCEx_RegularStop_DMA": "停止 ADC 常规组 DMA 转换并关闭 DMA 请求。",
+    "HAL_ADCEx_RegularStop_IT": "停止 ADC 常规组转换并关闭常规组完成中断。",
+    "HAL_ADC_AnalogWDGConfig": "配置 ADC 模拟看门狗的监测通道及高低阈值。",
+    "HAL_ADC_ConfigChannel": "配置 ADC 常规组通道的序列位置和采样时间。",
+    "HAL_ADC_ConvCpltCallback": "ADC 常规组转换完成回调。",
+    "HAL_ADC_ConvHalfCpltCallback": "ADC 常规组 DMA 缓冲区半传输完成回调。",
+    "HAL_ADC_ErrorCallback": "ADC 中断或 DMA 转换发生错误时的回调。",
+    "HAL_ADC_GetError": "读取 ADC 句柄中记录的错误码位掩码。",
+    "HAL_ADC_GetState": "读取 ADC 句柄的当前运行状态位掩码。",
+    "HAL_ADC_GetValue": "读取 ADC 常规组数据寄存器中的最近一次转换结果。",
+    "HAL_ADC_LevelOutOfWindowCallback": "ADC 模拟看门狗 1 检测到结果越界时的回调。",
+    "HAL_ADC_PollForConversion": "阻塞轮询等待 ADC 常规组转换完成或超时。",
+    "HAL_ADC_PollForEvent": "阻塞轮询等待指定 ADC 事件发生或超时。",
+    "HAL_ADC_Start": "启动 ADC 常规组转换，不启用完成中断或 DMA。",
+    "HAL_ADC_Start_DMA": "启动 ADC 常规组转换并通过 DMA 传输结果。",
+    "HAL_ADC_Start_IT": "使能常规组完成中断并启动 ADC 常规组转换。",
+    "HAL_ADC_StartSampling": "启动 ADC 常规组的采样阶段。",
+    "HAL_ADC_Stop": "停止 ADC 常规组转换并在允许时关闭 ADC。",
+    "HAL_ADC_Stop_DMA": "停止 ADC 常规组 DMA 转换并关闭 DMA 请求。",
+    "HAL_ADC_Stop_IT": "停止 ADC 常规组转换并关闭完成中断。",
+    "HAL_ADC_StopSampling": "结束 ADC 常规组采样阶段并进入转换阶段。",
+}
+
+FUNCTION_NOTES_OVERRIDES = {
+    "HAL_ADCEx_Calibration_Start": "校准前必须停止转换并禁用 ADC，不能与 DMA 或中断转换并发执行。校准期间 HAL 会临时控制 ADC；完成后再启动常规组或注入组转换。",
+    "HAL_ADCEx_Calibration_GetValue": "应在校准完成后读取，并用 SingleDiff 选择单端或差分校准因子。读取值可保存，用于下次启动时快速恢复。",
+    "HAL_ADCEx_Calibration_SetValue": "写入前 ADC 必须已使能且没有转换正在进行。SingleDiff 必须与该校准因子的输入模式一致，否则会降低转换精度。",
+    "HAL_ADCEx_DisableInjectedQueue": "禁用前应确认注入组上下文队列已经处理完毕。关闭队列后，新配置会直接替换当前注入组上下文。",
+    "HAL_ADCEx_EnableInjectedQueue": "队列模式允许依次保存多个注入组上下文。软件必须避免写入速度超过执行速度，并处理队列溢出回调。",
+    "HAL_ADCEx_DisableVoltageRegulator": "只能在 ADC 禁用且没有转换时关闭内部稳压器。再次使用 ADC 前必须重新使能稳压器，并等待数据手册规定的稳定时间。",
+    "HAL_ADCEx_EnterADCDeepPowerDownMode": "进入前必须停止并禁用 ADC。退出深度掉电后，内部稳压器和校准状态可能需要重新建立，不能立即开始转换。",
+    "HAL_ADCEx_InjectedConfigChannel": "配置应在注入组停止或允许更新的状态下完成。序列位置、触发源、采样时间和偏移必须与实际通道及信号源阻抗匹配。",
+    "HAL_ADCEx_InjectedGetValue": "读取指定注入序列位置对应的 JDR 数据寄存器。应在注入转换完成标志置位后读取，并注意结果对齐方式和 ADC 分辨率。",
+    "HAL_ADCEx_InjectedPollForConversion": "该函数阻塞等待注入组转换完成，Timeout 单位为 ms。不适合在中断或高频控制环中调用。",
+    "HAL_ADCEx_InjectedStart": "调用前必须完成注入通道与触发源配置。软件触发模式会启动转换；外部触发模式通常只是使 ADC 进入等待触发状态。",
+    "HAL_ADCEx_InjectedStart_IT": "除注入通道配置外，还必须使能 ADC 对应 NVIC IRQ。转换完成后进入 HAL_ADCEx_InjectedConvCpltCallback()。",
+    "HAL_ADCEx_InjectedStop": "停止注入组时要确认常规组是否仍在运行；常规组活动时 HAL 不应直接关闭整个 ADC。",
+    "HAL_ADCEx_InjectedStop_IT": "停止注入组并关闭相应完成中断。已置位的状态标志仍需按当前系列规定清除。",
+    "HAL_ADCEx_InjectedConvCpltCallback": "由 ADC IRQHandler 在注入组转换完成后调用。回调处于中断上下文，应只读取结果、更新时间戳或设置任务标志。",
+    "HAL_ADCEx_InjectedQueueOverflowCallback": "表示新的注入上下文到来时队列已满。应记录丢失事件、降低配置写入频率或及时消费队列，不能忽略后继续假定序列完整。",
+    "HAL_ADCEx_EndOfSamplingCallback": "该事件只表示采样保持阶段结束，转换结果此时可能尚未就绪。读取结果应等待转换完成事件。",
+    "HAL_ADCEx_MultiModeConfigChannel": "必须明确主 ADC、从 ADC、数据组合格式和采样延迟。各 ADC 的通道序列、采样时间及触发源需要保持兼容。",
+    "HAL_ADCEx_MultiModeStart_DMA": "DMA 通常从主 ADC 的公共数据寄存器读取组合结果。缓冲区宽度和 Length 必须匹配多模式数据格式。",
+    "HAL_ADCEx_MultiModeStop_DMA": "停止前应确认 DMA 与 ADC 状态，避免在 DMA 正在写缓冲区时复用该内存。停止后按需分别处理主从 ADC 状态。",
+    "HAL_ADC_Start": "调用前需完成常规组通道与触发源配置。软件触发模式立即开始；外部触发模式通常进入等待触发状态。",
+    "HAL_ADC_Start_IT": "必须同时配置 ADC 中断源和 NVIC。常规组转换完成后由 HAL_ADC_ConvCpltCallback() 处理。",
+    "HAL_ADC_Start_DMA": "DMA 数据宽度、传输长度和缓冲区类型必须与 ADC 分辨率及数据对齐配置匹配；完成前缓冲区必须保持有效。",
+    "HAL_ADC_PollForConversion": "该函数阻塞等待常规组转换完成，Timeout 单位为 ms。连续转换和 DMA 模式下应确认轮询标志与 EOC 配置一致。",
+    "HAL_ADC_ConfigChannel": "通道采样时间应根据输入源阻抗选择。配置序列位置时要与规则组转换数量保持一致。",
+    "HAL_ADC_AnalogWDGConfig": "高阈值必须大于低阈值，并按当前 ADC 分辨率填写。若启用中断，还需配置 NVIC 并处理越界回调。",
+}
+
+
+FUNCTION_TOKEN_TRANSLATIONS = {
+    "ABORT": "中止",
+    "ADDR": "地址",
+    "ALARM": "闹钟",
+    "ANALOG": "模拟",
+    "BASE": "基本计数",
+    "BREAK": "刹车",
+    "BUFFER": "缓冲区",
+    "CALIBRATION": "校准",
+    "CAPTURE": "捕获",
+    "CHANNEL": "通道",
+    "CLOCK": "时钟",
+    "COMMUT": "换相",
+    "COMPLETE": "完成",
+    "CONV": "转换",
+    "COUNTER": "计数器",
+    "CPLT": "完成",
+    "CRC": "CRC",
+    "DATE": "日期",
+    "DEAD": "死区",
+    "DELAY": "延时",
+    "DIRECTION": "方向",
+    "DMA": "DMA",
+    "ENCODER": "编码器",
+    "ERROR": "错误",
+    "EVENT": "事件",
+    "FIFO": "FIFO",
+    "FILTER": "滤波器",
+    "FREQ": "频率",
+    "FULL": "已满",
+    "HALF": "半传输",
+    "HALL": "霍尔",
+    "IC": "输入捕获",
+    "IDLE": "空闲线",
+    "INDEX": "索引",
+    "INJECTED": "注入组",
+    "INPUT": "输入",
+    "INTERNAL": "内部",
+    "LEVEL": "电平",
+    "LISTEN": "监听",
+    "MASTER": "主机",
+    "MESSAGE": "报文",
+    "MODE": "模式",
+    "MULTI": "多重",
+    "MUX": "复用器",
+    "NOTIFICATION": "通知",
+    "OC": "输出比较",
+    "OF": "",
+    "ONE": "单",
+    "OUT": "越界",
+    "OVERFLOW": "溢出",
+    "PENDING": "挂起",
+    "PERIOD": "周期",
+    "PIN": "引脚",
+    "POWER": "电源",
+    "PULSE": "脉冲",
+    "PWM": "PWM",
+    "QUEUE": "队列",
+    "RECEIVE": "接收",
+    "REGULAR": "常规组",
+    "REQUEST": "请求",
+    "RECEIVER": "接收模式",
+    "RX": "接收",
+    "SAMPLING": "采样",
+    "SENSOR": "传感器",
+    "SEQ": "连续帧",
+    "SLAVE": "从机",
+    "STATE": "状态",
+    "SYNC": "同步",
+    "TIMESTAMP": "时间戳",
+    "TIME": "时间",
+    "TIMEOUT": "超时",
+    "TRANSMIT": "发送",
+    "TRANSMITTER": "发送模式",
+    "TX": "发送",
+    "UNDERRUN": "欠载",
+    "VALUE": "数值",
+    "WAKE": "唤醒",
+    "WATCHDOG": "看门狗",
+    "WINDOW": "窗口",
+}
+
+
+def function_tail(name: str) -> str:
+    return re.sub(r"^HAL_[A-Za-z0-9]+?_", "", name)
+
+
+def split_function_words(value: str) -> list[str]:
+    cleaned = value.replace("_", " ")
+    return [
+        word.upper()
+        for word in re.findall(r"[A-Z]+(?=[A-Z][a-z]|\d|\s|$)|[A-Z]?[a-z]+|\d+", cleaned)
+    ]
+
+
+def function_subject(module_id: str, value: str) -> str:
+    words = split_function_words(value)
+    translated = [FUNCTION_TOKEN_TRANSLATIONS.get(word, word) for word in words]
+    subject = "".join(item for item in translated if item)
+    if not subject:
+        return f"{MODULE_NAMES[module_id]} 外设"
+    if MODULE_NAMES[module_id].lower() not in subject.lower():
+        return f"{MODULE_NAMES[module_id]} {subject}"
+    return subject
+
+
+FUNCTION_VARIANT_TRANSLATIONS = {
+    "HalfDuplex": "串口半双工模式",
+    "LIN": "串口 LIN 模式",
+    "MultiProcessor": "串口多处理器模式",
+    "RS485Ex": "串口 RS-485 模式",
+}
+
+
+def function_variant(name: str) -> str:
+    match = re.match(r"^HAL_([^_]+)_", name)
+    if not match:
+        return ""
+    return FUNCTION_VARIANT_TRANSLATIONS.get(match.group(1), "")
+
+
+def function_brief(module_id: str, name: str) -> str:
+    if name in FUNCTION_BRIEF_OVERRIDES:
+        return FUNCTION_BRIEF_OVERRIDES[name]
+
+    tail = function_tail(name)
+    mode = ""
+    if tail.endswith("_DMA"):
+        tail = tail[:-4]
+        mode = "DMA 方式"
+    elif tail.endswith("_IT"):
+        tail = tail[:-3]
+        mode = "中断方式"
+
+    if tail.endswith("Callback"):
+        event = tail[:-8]
+        return f"{function_subject(module_id, event)}事件回调，由 HAL 中断或 DMA 处理流程调用。"
+    if tail.endswith("MspInit"):
+        target = function_subject(module_id, tail[:-7])
+        return f"初始化 {target} 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。"
+    if tail.endswith("MspDeInit"):
+        target = function_subject(module_id, tail[:-9])
+        return f"释放 {target} 使用的 GPIO、DMA、NVIC 和时钟等底层资源。"
+    if tail.endswith("IRQHandler"):
+        event = tail[:-len("IRQHandler")]
+        return f"处理 {function_subject(module_id, event)}中断标志并分发对应回调。"
+    if "UnRegisterCallback" in tail:
+        return f"取消指定的 {MODULE_NAMES[module_id]} 用户回调并恢复默认弱回调。"
+    if "RegisterCallback" in tail:
+        return f"为指定的 {MODULE_NAMES[module_id]} 事件注册用户回调函数。"
+
+    action_rules = [
+        ("PollFor", "轮询等待"),
+        ("DeInit", "反初始化"),
+        ("Init", "初始化"),
+        ("Deactivate", "停用"),
+        ("Activate", "启用"),
+        ("Disable", "禁用"),
+        ("Enable", "使能"),
+        ("Abort", "中止"),
+        ("Start", "启动"),
+        ("Stop", "停止"),
+        ("Config", "配置"),
+        ("Set", "设置"),
+        ("Get", "读取"),
+        ("Read", "读取"),
+        ("Write", "写入"),
+        ("Clear", "清除"),
+        ("Reset", "复位"),
+        ("Enter", "进入"),
+        ("Exit", "退出"),
+        ("Suspend", "暂停"),
+        ("Resume", "恢复"),
+    ]
+    for marker, action in action_rules:
+        if tail.startswith(marker):
+            target = tail[len(marker):]
+            target_subject = function_subject(module_id, target) if target else function_variant(name)
+            target_subject = target_subject or function_subject(module_id, "")
+            mode_text = f"，使用{mode}" if mode else ""
+            return f"{action}{target_subject}{mode_text}。"
+        if tail.endswith(marker):
+            target = tail[:-len(marker)]
+            target_subject = function_subject(module_id, target) if target else function_variant(name)
+            target_subject = target_subject or function_subject(module_id, "")
+            mode_text = f"，使用{mode}" if mode else ""
+            return f"{action}{target_subject}{mode_text}。"
+
+    communication_rules = [
+        ("TransmitReceive", "同步发送并接收数据"),
+        ("ReceiveToIdle", "接收数据直到缓冲区满或检测到空闲线"),
+        ("Transmit", "发送数据"),
+        ("Receive", "接收数据"),
+    ]
+    for marker, action in communication_rules:
+        if marker in tail:
+            context = tail.replace(marker, "")
+            subject = function_subject(module_id, context)
+            prefix = f"以 {mode}启动" if mode else "以阻塞方式执行"
+            return f"{prefix}{subject}{action}。"
+
+    mode_text = f"，使用{mode}" if mode else ""
+    return f"执行{function_subject(module_id, tail)}操作{mode_text}。"
+
+
 def chinese_brief(module_id: str, name: str, kind: str) -> str:
     if name in DETAIL_OVERRIDES:
         return DETAIL_OVERRIDES[name]["brief"]
-    subject = chinese_subject(module_id, name)
-    upper_name = name.upper()
-
     if kind == "macro":
         return macro_brief(module_id, name)
-
-    if "MspDeInit" in name:
-        return f"执行{subject}的底层硬件反初始化回调。"
-    if "MspInit" in name:
-        return f"执行{subject}的底层硬件初始化回调。"
-    if "UnRegisterCallback" in name:
-        return f"取消注册{subject}的用户回调函数。"
-    if "RegisterCallback" in name:
-        return f"注册{subject}的用户回调函数。"
-    if "Callback" in name:
-        return f"处理{subject}对应的回调事件。"
-    if "IRQHandler" in name:
-        return f"处理{subject}产生的中断。"
-
-    action_rules = [
-        ("TransmitReceive_DMA", "以 DMA 方式启动同步收发"),
-        ("TransmitReceive_IT", "以中断方式启动同步收发"),
-        ("TransmitReceive", "以阻塞方式执行同步收发"),
-        ("ReceiveToIdle_DMA", "以 DMA 和空闲线方式启动接收"),
-        ("ReceiveToIdle_IT", "以中断和空闲线方式启动接收"),
-        ("Transmit_DMA", "以 DMA 方式启动发送"),
-        ("Transmit_IT", "以中断方式启动发送"),
-        ("Transmit", "以阻塞方式执行发送"),
-        ("Receive_DMA", "以 DMA 方式启动接收"),
-        ("Receive_IT", "以中断方式启动接收"),
-        ("Receive", "以阻塞方式执行接收"),
-        ("Start_DMA", "以 DMA 方式启动"),
-        ("Start_IT", "以中断方式启动"),
-        ("Stop_DMA", "停止 DMA 方式的"),
-        ("Stop_IT", "停止中断方式的"),
-        ("DeInit", "反初始化"),
-        ("Init", "初始化"),
-        ("Start", "启动"),
-        ("Stop", "停止"),
-        ("PollFor", "轮询等待"),
-        ("GetState", "获取运行状态"),
-        ("GetError", "获取错误码"),
-        ("Get", "获取"),
-        ("Set", "设置"),
-        ("Read", "读取"),
-        ("Write", "写入"),
-        ("Config", "配置"),
-        ("Enable", "使能"),
-        ("Disable", "禁用"),
-        ("Activate", "启用"),
-        ("Deactivate", "停用"),
-        ("Abort", "中止"),
-        ("Suspend", "暂停"),
-        ("Resume", "恢复"),
-        ("Reset", "复位"),
-        ("Clear", "清除"),
-        ("Lock", "锁定"),
-        ("Unlock", "解锁"),
-    ]
-    for marker, action in action_rules:
-        if marker in name:
-            return f"{action}{subject}。"
-    return f"提供{subject}相关的 HAL 操作接口。"
+    return function_brief(module_id, name)
 
 
 def normalized_parameter_name(name: str) -> str:
-    return re.sub(r"^_+|_+$", "", re.sub(r"\\\s*", "", name).strip()).upper()
+    cleaned = re.sub(r"\\\s*", "", name).strip().rstrip(":")
+    return re.sub(r"^_+|_+$", "", cleaned).upper()
 
 
 def macro_parameter(
@@ -762,6 +985,90 @@ def macro_parameter(
     return f"{macro_tail(module_id, macro_name).replace('_', ' ')} 操作使用的 {readable_name} 参数。"
 
 
+def function_parameter(
+    module_id: str,
+    function_name: str,
+    parameter_name: str,
+    source_description: str,
+) -> str:
+    normalized = normalized_parameter_name(parameter_name)
+    lower_name = normalized.lower()
+    if lower_name.startswith("h") and (
+        module_id in lower_name or "handle" in source_description.lower()
+    ):
+        examples = {
+            "adc": "&hadc1",
+            "dac": "&hdac1",
+            "dma": "&hdma_usart1_tx",
+            "tim": "&htim1",
+            "uart": "&huart1",
+            "i2c": "&hi2c1",
+            "spi": "&hspi1",
+            "can": "&hcan1",
+            "fdcan": "&hfdcan1",
+            "rtc": "&hrtc",
+            "iwdg": "&hiwdg",
+        }
+        return f"{MODULE_NAMES[module_id]} 句柄指针，例如 {examples.get(module_id, '&handle')}。"
+    if normalized == "SINGLEDIFF":
+        return "选择单端或差分输入校准模式，例如 ADC_SINGLE_ENDED。"
+    if normalized == "CALIBRATIONFACTOR":
+        return "要写入 ADC 校准寄存器的校准因子。"
+    if normalized == "INJECTEDRANK":
+        return "要读取的注入组序列位置，例如 ADC_INJECTED_RANK_1。"
+    if normalized == "SCONFIGINJECTED":
+        return "ADC 注入组通道配置结构体，包含通道、序列位置、采样时间和偏移。"
+    if normalized in {"SCONFIG", "CHANNELCONFIG"}:
+        return f"{MODULE_NAMES[module_id]} 通道配置结构体指针。"
+    if normalized == "MULTIMODE":
+        return "多 ADC 主从模式配置结构体，包含工作模式、数据格式和采样延迟。"
+    if "CALLBACKID" in normalized:
+        return "要注册或取消的回调类型标识。"
+    if "CALLBACK" in normalized or normalized.startswith("P") and "CB" in normalized:
+        return "用户回调函数指针；函数签名必须与对应回调类型一致。"
+    if normalized in {"TIMEOUT", "TIMEOUTMS"}:
+        return "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
+    if (
+        normalized in {"PDATA", "ADATA", "BUFFER", "PDATABUFFER"}
+        or normalized.startswith(("PTXDATA", "PRXDATA"))
+        or normalized.endswith("BUFFER")
+    ):
+        if module_id == "adc":
+            return "接收 ADC 转换结果的 uint32_t 缓冲区；DMA 完成前必须保持有效。"
+        if normalized.startswith("PTX"):
+            return "待发送数据缓冲区指针，异步发送完成前必须保持有效。"
+        if normalized.startswith("PRX"):
+            return "接收数据缓冲区指针，异步接收完成前必须保持有效。"
+        if module_id in {"uart", "i2c", "spi"}:
+            return "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
+        return "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
+    if normalized in {"SIZE", "LENGTH", "LEN"}:
+        if module_id == "uart":
+            return "传输字节数。"
+        if module_id == "adc":
+            return "DMA 缓冲区中的 ADC 转换结果数量。"
+        return "本次操作的数据单元数量。"
+    if "CHANNEL" in normalized:
+        return f"目标 {MODULE_NAMES[module_id]} 通道或通道编号。"
+    if "RANK" in normalized:
+        return "通道在转换序列中的位置。"
+    if "EVENT" in normalized:
+        return f"要轮询或处理的 {MODULE_NAMES[module_id]} 事件类型。"
+    if "ERROR" in normalized:
+        return f"要处理或返回的 {MODULE_NAMES[module_id]} 错误码。"
+    if "ADDRESS" in normalized or "ADDR" in normalized:
+        return "目标设备地址或外设内部寄存器地址。"
+    if "MODE" in normalized:
+        return f"{MODULE_NAMES[module_id]} 工作模式选择值。"
+    if "VALUE" in normalized or normalized.endswith("DATA"):
+        return f"{function_subject(module_id, function_tail(function_name))}使用的数据值。"
+    if "PRIORITY" in normalized:
+        return "中断抢占优先级或响应优先级数值。"
+
+    readable_name = re.sub(r"(?<!^)(?=[A-Z])", " ", parameter_name.rstrip(":"))
+    return f"{function_subject(module_id, function_tail(function_name))}使用的 {readable_name} 参数。"
+
+
 def chinese_parameter(
     module_id: str,
     name: str,
@@ -771,6 +1078,9 @@ def chinese_parameter(
 ) -> str:
     if kind == "macro":
         return macro_parameter(module_id, owner_name, name, source_description)
+
+    if owner_name:
+        return function_parameter(module_id, owner_name, name, source_description)
 
     normalized = normalized_parameter_name(name)
     if "HEADER" in normalized:
@@ -833,8 +1143,24 @@ def chinese_return(prototype: str, kind: str, name: str) -> str:
     return_type = prototype.split(name, 1)[0].strip()
     if return_type.endswith("void"):
         return "无。"
+    if name == "HAL_ADCEx_Calibration_GetValue":
+        return "返回指定单端或差分模式的 ADC 校准因子。"
+    if "GetValue" in name:
+        if name.startswith("HAL_ADC"):
+            return "返回 ADC 转换数据寄存器中的原始转换值。"
+        if name.startswith("HAL_DAC"):
+            return "返回 DAC 指定通道当前配置的输出数据值。"
+        return "返回对应数据寄存器中的原始数值。"
+    if "GetState" in name:
+        return "返回 HAL 句柄状态枚举或状态位掩码。"
+    if "GetError" in name:
+        return "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。"
     if "HAL_StatusTypeDef" in return_type:
-        return "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。"
+        if "PollFor" in name:
+            return "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。"
+        if "Calibration" in name:
+            return "HAL_OK 表示校准操作成功；ADC 状态不允许或校准失败时返回 HAL_ERROR。"
+        return "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。"
     return "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。"
 
 
@@ -893,24 +1219,34 @@ def chinese_notes(
         else:
             notes = f"该宏完成“{macro_tail(module_id, name).replace('_', ' ')}”寄存器操作。调用前应确认 {MODULE_NAMES[module_id]} 已完成初始化，并避免传入带自增或函数调用的表达式，以免宏展开后被重复求值。"
     else:
-        if "IRQHandler" in name:
-            notes = "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。"
+        operation = function_brief(module_id, name).rstrip("。")
+        if name in FUNCTION_NOTES_OVERRIDES:
+            notes = FUNCTION_NOTES_OVERRIDES[name]
+        elif "Callback" in name:
+            event = function_subject(module_id, function_tail(name).replace("Callback", ""))
+            notes = f"该回调对应{event}。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。"
+        elif "IRQHandler" in name:
+            notes = f"应在对应 IRQHandler 中调用本函数。它会检查 {MODULE_NAMES[module_id]} 中断源与状态标志，并分发完成、错误等具体回调。"
         elif "_DMA" in name:
-            notes = "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。"
+            notes = f"该接口用于{operation}。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。"
         elif "_IT" in name:
-            notes = "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。"
+            notes = f"该接口用于{operation}。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。"
         elif "PollFor" in name:
-            notes = "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。"
+            notes = f"该接口用于{operation}。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。"
         elif "DeInit" in name:
-            notes = "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。"
+            notes = f"该接口用于{operation}。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。"
         elif "Init" in name:
-            notes = "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。"
+            notes = f"该接口用于{operation}。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。"
+        elif "Start" in name or "Enable" in name or "Activate" in name:
+            notes = f"该接口用于{operation}。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。"
+        elif "Stop" in name or "Disable" in name or "Deactivate" in name:
+            notes = f"该接口用于{operation}。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。"
         elif "Get" in name or "Read" in name:
-            notes = "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。"
+            notes = f"该接口用于{operation}。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。"
         elif "Set" in name or "Config" in name:
-            notes = "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。"
+            notes = f"该接口用于{operation}。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。"
         else:
-            notes = "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。"
+            notes = f"该接口用于{operation}。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。"
     if different_prototypes:
         notes += " F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。"
     return notes
@@ -991,6 +1327,66 @@ def macro_example_argument(module_id: str, macro_name: str, parameter_name: str)
     return variable or "value"
 
 
+def function_example_argument(module_id: str, function_name: str, parameter_name: str) -> str:
+    normalized = normalized_parameter_name(parameter_name)
+    handle_values = {
+        "HADC": "&hadc1",
+        "HDAC": "&hdac1",
+        "HDMA": "&hdma_usart1_tx",
+        "HTIM": "&htim1",
+        "HUART": "&huart1",
+        "HI2C": "&hi2c1",
+        "HSPI": "&hspi1",
+        "HCAN": "&hcan1",
+        "HFDCAN": "&hfdcan1",
+        "HRTC": "&hrtc",
+        "HIWDG": "&hiwdg",
+    }
+    if normalized in handle_values:
+        return handle_values[normalized]
+    if normalized == "SINGLEDIFF":
+        return "ADC_SINGLE_ENDED"
+    if normalized == "CALIBRATIONFACTOR":
+        return "calibration_factor"
+    if normalized == "INJECTEDRANK":
+        return "ADC_INJECTED_RANK_1"
+    if normalized == "SCONFIGINJECTED":
+        return "&adc_injected_config"
+    if normalized == "SCONFIG":
+        return f"&{module_id}_channel_config"
+    if normalized == "MULTIMODE":
+        return "&adc_multimode_config"
+    if normalized in {"TIMEOUT", "TIMEOUTMS"}:
+        return "100U"
+    if normalized.startswith("PTXDATA"):
+        return f"{module_id}_tx_buffer"
+    if normalized.startswith("PRXDATA"):
+        return f"{module_id}_rx_buffer"
+    if (
+        normalized in {"PDATA", "ADATA", "BUFFER", "PDATABUFFER"}
+        or normalized.endswith("BUFFER")
+    ):
+        return f"{module_id}_buffer"
+    if normalized in {"SIZE", "LENGTH", "LEN"}:
+        return f"{module_id.upper()}_BUFFER_LENGTH"
+    if "CALLBACKID" in normalized:
+        return f"HAL_{module_id.upper()}_ERROR_CB_ID"
+    if "CALLBACK" in normalized:
+        return f"{module_id.capitalize()}_UserCallback"
+    if "EVENT" in normalized:
+        return "ADC_AWD_EVENT" if module_id == "adc" else f"{module_id.upper()}_EVENT"
+    if "CHANNEL" in normalized:
+        return "TIM_CHANNEL_1" if module_id == "tim" else f"{module_id.upper()}_CHANNEL_1"
+    variable = re.sub(r"[^a-z0-9]+", "_", normalized.lower()).strip("_")
+    return variable or "value"
+
+
+def function_flag_name(function_name: str) -> str:
+    tail = function_tail(function_name).replace("Callback", "")
+    snake = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", tail).replace("__", "_")
+    return f"{snake.strip('_').lower()}_flag"
+
+
 def make_example(
     name: str,
     params: list[dict[str, str]],
@@ -1015,7 +1411,15 @@ def make_example(
         return f"{call};"
     if kind == "function" and "Callback" in name:
         declaration = prototype.rstrip(";")
-        return f"{declaration}\n{{\n    // 在此处理对应事件，保持回调短小\n}}"
+        return f"{declaration}\n{{\n    {function_flag_name(name)} = 1;\n}}"
+    if kind == "function":
+        arguments = [function_example_argument(module_id, name, str(param["name"])) for param in params]
+        call = f"{name}({', '.join(arguments)})"
+        if "GetValue" in name or "GetState" in name or "GetError" in name:
+            return f"uint32_t value = {call};"
+        if "HAL_StatusTypeDef" in prototype:
+            return f"if ({call} != HAL_OK) {{\n    // 记录错误，并根据应用状态决定是否重试\n}}"
+        return f"{call};"
     names = [param["name"].strip("[]") for param in params]
     return f"{name}({', '.join(names)});"
 

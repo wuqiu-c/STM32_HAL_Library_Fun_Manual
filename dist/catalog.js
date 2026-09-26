@@ -10,16 +10,16 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "GPIOx",
-                    "description": "参数 GPIOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO DEINIT使用的 G P I Ox 参数。"
                 },
                 {
                     "name": "GPIO_Pin",
-                    "description": "参数 GPIO_Pin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO DEINIT使用的 G P I O_ Pin 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_GPIO_DeInit(GPIOx, GPIO_Pin);",
+            "notes": "该接口用于反初始化GPIO 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_GPIO_DeInit(gpiox, gpio_pin);",
             "families": [
                 "F1",
                 "F4",
@@ -35,17 +35,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-exti-callback",
             "name": "HAL_GPIO_EXTI_Callback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "GPIO EXTI事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin);",
             "params": [
                 {
-                    "name": "GPIO_Pin:",
-                    "description": "参数 GPIO_Pin:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "GPIO_Pin",
+                    "description": "GPIO EXTICALLBACK使用的 G P I O_ Pin 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应GPIO EXTI。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)\n{\n    exti_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -61,17 +61,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-exti-irqhandler",
             "name": "HAL_GPIO_EXTI_IRQHandler",
             "kind": "function",
-            "brief": "处理GPIO 外设产生的中断。",
+            "brief": "处理 GPIO EXTI中断标志并分发对应回调。",
             "prototype": "void HAL_GPIO_EXTI_IRQHandler(uint16_t GPIO_Pin);",
             "params": [
                 {
                     "name": "GPIO_Pin",
-                    "description": "参数 GPIO_Pin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO EXTIIRQHANDLER使用的 G P I O_ Pin 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_GPIO_EXTI_IRQHandler(GPIO_Pin);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 GPIO 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_GPIO_EXTI_IRQHandler(gpio_pin);",
             "families": [
                 "F1",
                 "F4",
@@ -92,16 +92,16 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "GPIOx",
-                    "description": "参数 GPIOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO INIT使用的 G P I Ox 参数。"
                 },
                 {
                     "name": "GPIO_Init",
-                    "description": "配置结构体或配置参数。"
+                    "description": "GPIO INIT使用的 G P I O_ Init 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_GPIO_Init(GPIOx, GPIO_Init);",
+            "notes": "该接口用于初始化GPIO 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_GPIO_Init(gpiox, gpio_init);",
             "families": [
                 "F1",
                 "F4",
@@ -117,21 +117,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-lockpin",
             "name": "HAL_GPIO_LockPin",
             "kind": "function",
-            "brief": "锁定引脚。",
+            "brief": "执行GPIO LOCK引脚操作。",
             "prototype": "HAL_StatusTypeDef HAL_GPIO_LockPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);",
             "params": [
                 {
                     "name": "GPIOx",
-                    "description": "参数 GPIOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO LOCK引脚使用的 G P I Ox 参数。"
                 },
                 {
                     "name": "GPIO_Pin",
-                    "description": "参数 GPIO_Pin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO LOCK引脚使用的 G P I O_ Pin 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_GPIO_LockPin(GPIOx, GPIO_Pin);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行GPIO LOCK引脚操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_GPIO_LockPin(gpiox, gpio_pin) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -147,21 +147,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-readpin",
             "name": "HAL_GPIO_ReadPin",
             "kind": "function",
-            "brief": "读取引脚。",
+            "brief": "读取GPIO 引脚。",
             "prototype": "GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);",
             "params": [
                 {
-                    "name": "GPIOx:",
-                    "description": "参数 GPIOx:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "GPIOx",
+                    "description": "GPIO READ引脚使用的 G P I Ox 参数。"
                 },
                 {
-                    "name": "GPIO_Pin:",
-                    "description": "参数 GPIO_Pin:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "GPIO_Pin",
+                    "description": "GPIO READ引脚使用的 G P I O_ Pin 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_GPIO_ReadPin(GPIOx:, GPIO_Pin:);",
+            "notes": "该接口用于读取GPIO 引脚。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_GPIO_ReadPin(gpiox, gpio_pin);",
             "families": [
                 "F1",
                 "F4",
@@ -177,21 +177,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-togglepin",
             "name": "HAL_GPIO_TogglePin",
             "kind": "function",
-            "brief": "提供引脚相关的 HAL 操作接口。",
+            "brief": "执行GPIO TOGGLE引脚操作。",
             "prototype": "void HAL_GPIO_TogglePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin);",
             "params": [
                 {
                     "name": "GPIOx",
-                    "description": "参数 GPIOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO TOGGLE引脚使用的 G P I Ox 参数。"
                 },
                 {
                     "name": "GPIO_Pin",
-                    "description": "参数 GPIO_Pin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO TOGGLE引脚使用的 G P I O_ Pin 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_GPIO_TogglePin(GPIOx, GPIO_Pin);",
+            "notes": "该接口用于执行GPIO TOGGLE引脚操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_GPIO_TogglePin(gpiox, gpio_pin);",
             "families": [
                 "F1",
                 "F4",
@@ -207,25 +207,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-gpio-writepin",
             "name": "HAL_GPIO_WritePin",
             "kind": "function",
-            "brief": "写入引脚。",
+            "brief": "写入GPIO 引脚。",
             "prototype": "void HAL_GPIO_WritePin(GPIO_TypeDef *GPIOx, uint16_t GPIO_Pin, GPIO_PinState PinState);",
             "params": [
                 {
                     "name": "GPIOx",
-                    "description": "参数 GPIOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO WRITE引脚使用的 G P I Ox 参数。"
                 },
                 {
                     "name": "GPIO_Pin",
-                    "description": "参数 GPIO_Pin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "GPIO WRITE引脚使用的 G P I O_ Pin 参数。"
                 },
                 {
                     "name": "PinState",
-                    "description": "待设置或读取的状态。"
+                    "description": "GPIO WRITE引脚使用的 Pin State 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_GPIO_WritePin(GPIOx, GPIO_Pin, PinState);",
+            "notes": "该接口用于写入GPIO 引脚。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_GPIO_WritePin(gpiox, gpio_pin, pinstate);",
             "families": [
                 "F1",
                 "F4",
@@ -378,12 +378,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_Abort(hdma);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止DMA 外设。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_Abort(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -399,17 +399,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-abort-it",
             "name": "HAL_DMA_Abort_IT",
             "kind": "function",
-            "brief": "中止DMA 外设。",
+            "brief": "中止DMA 外设，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_DMA_Abort_IT(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_Abort_IT(hdma);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止DMA 外设，使用中断方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_Abort_IT(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -430,12 +430,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_DeInit(hdma);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化DMA 外设。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_DeInit(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -451,17 +451,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-geterror",
             "name": "HAL_DMA_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取DMA 错误。",
             "prototype": "uint32_t HAL_DMA_GetError(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_GetError(hdma);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取DMA 错误。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "uint32_t value = HAL_DMA_GetError(&hdma_usart1_tx);",
             "families": [
                 "F1",
                 "F4",
@@ -477,17 +477,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-getstate",
             "name": "HAL_DMA_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取DMA 状态。",
             "prototype": "HAL_DMA_StateTypeDef HAL_DMA_GetState(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_GetState(hdma);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取DMA 状态。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "uint32_t value = HAL_DMA_GetState(&hdma_usart1_tx);",
             "families": [
                 "F1",
                 "F4",
@@ -508,12 +508,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_Init(hdma);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化DMA 外设。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_Init(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -529,17 +529,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-irqhandler",
             "name": "HAL_DMA_IRQHandler",
             "kind": "function",
-            "brief": "处理DMA 外设产生的中断。",
+            "brief": "处理 DMA 外设中断标志并分发对应回调。",
             "prototype": "void HAL_DMA_IRQHandler(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_DMA_IRQHandler(hdma);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 DMA 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_DMA_IRQHandler(&hdma_usart1_tx);",
             "families": [
                 "F1",
                 "F4",
@@ -555,25 +555,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-pollfortransfer",
             "name": "HAL_DMA_PollForTransfer",
             "kind": "function",
-            "brief": "轮询等待传输过程。",
+            "brief": "轮询等待DMA TRANSFER。",
             "prototype": "HAL_StatusTypeDef HAL_DMA_PollForTransfer(DMA_HandleTypeDef *hdma, HAL_DMA_LevelCompleteTypeDef CompleteLevel, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "CompleteLevel",
-                    "description": "参数 CompleteLevel，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DMA POLLFORTRANSFER使用的 Complete Level 参数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_DMA_PollForTransfer(hdma, CompleteLevel, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待DMA TRANSFER。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_DMA_PollForTransfer(&hdma_usart1_tx, completelevel, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -589,25 +589,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-registercallback",
             "name": "HAL_DMA_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "DMA REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_DMA_RegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID, void (* pCallback)(DMA_HandleTypeDef *_hdma));",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_StatusTypeDef HAL_DMA_RegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID, void (* pCallback)(DMA_HandleTypeDef *_hdma))\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应DMA REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_StatusTypeDef HAL_DMA_RegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID, void (* pCallback)(DMA_HandleTypeDef *_hdma))\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -628,24 +628,24 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "SrcAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DstAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA START使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_Start(hdma, SrcAddress, DstAddress, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DMA 外设。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_Start(&hdma_usart1_tx, srcaddress, dstaddress, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -661,29 +661,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-start-it",
             "name": "HAL_DMA_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动DMA 外设。",
+            "brief": "启动DMA 外设，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_DMA_Start_IT(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t DataLength);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "SrcAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DstAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA STARTIT使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMA_Start_IT(hdma, SrcAddress, DstAddress, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DMA 外设，使用中断方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMA_Start_IT(&hdma_usart1_tx, srcaddress, dstaddress, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -699,21 +699,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dma-unregistercallback",
             "name": "HAL_DMA_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "DMA UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应DMA UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_DMA_UnRegisterCallback(DMA_HandleTypeDef *hdma, HAL_DMA_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -729,25 +729,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-changememory",
             "name": "HAL_DMAEx_ChangeMemory",
             "kind": "function",
-            "brief": "提供DMA 外设相关的 HAL 操作接口。",
+            "brief": "执行DMA CHANGEMEMORY操作。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_ChangeMemory(DMA_HandleTypeDef *hdma, uint32_t Address, HAL_DMA_MemoryTypeDef memory);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "Address",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "memory",
-                    "description": "参数 memory，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DMA CHANGEMEMORY使用的 memory 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_ChangeMemory(hdma, Address, memory);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DMA CHANGEMEMORY操作。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_ChangeMemory(&hdma_usart1_tx, address, memory) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -759,21 +759,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-configmuxrequestgenerator",
             "name": "HAL_DMAEx_ConfigMuxRequestGenerator",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置DMA 复用器请求GENERATOR。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_ConfigMuxRequestGenerator(DMA_HandleTypeDef *hdma, const HAL_DMA_MuxRequestGeneratorConfigTypeDef *pRequestGeneratorConfig);",
             "params": [
                 {
-                    "name": "hdma:",
-                    "description": "DMA 外设句柄。"
+                    "name": "hdma",
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "pRequestGeneratorConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "DMA CONFIG复用器请求GENERATOR使用的 p Request Generator Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_ConfigMuxRequestGenerator(hdma:, pRequestGeneratorConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置DMA 复用器请求GENERATOR。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_ConfigMuxRequestGenerator(&hdma_usart1_tx, prequestgeneratorconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -785,21 +785,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-configmuxsync",
             "name": "HAL_DMAEx_ConfigMuxSync",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置DMA 复用器同步。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_ConfigMuxSync(DMA_HandleTypeDef *hdma, const HAL_DMA_MuxSyncConfigTypeDef *pSyncConfig);",
             "params": [
                 {
-                    "name": "hdma:",
-                    "description": "DMA 外设句柄。"
+                    "name": "hdma",
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "pSyncConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "DMA CONFIG复用器同步使用的 p Sync Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_ConfigMuxSync(hdma:, pSyncConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置DMA 复用器同步。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_ConfigMuxSync(&hdma_usart1_tx, psyncconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -811,17 +811,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-disablemuxrequestgenerator",
             "name": "HAL_DMAEx_DisableMuxRequestGenerator",
             "kind": "function",
-            "brief": "禁用DMA 外设。",
+            "brief": "禁用DMA 复用器请求GENERATOR。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_DisableMuxRequestGenerator(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
-                    "name": "hdma:",
-                    "description": "DMA 外设句柄。"
+                    "name": "hdma",
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_DisableMuxRequestGenerator(hdma:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用DMA 复用器请求GENERATOR。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_DisableMuxRequestGenerator(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -833,17 +833,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-enablemuxrequestgenerator",
             "name": "HAL_DMAEx_EnableMuxRequestGenerator",
             "kind": "function",
-            "brief": "使能DMA 外设。",
+            "brief": "使能DMA 复用器请求GENERATOR。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_EnableMuxRequestGenerator(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
-                    "name": "hdma:",
-                    "description": "DMA 外设句柄。"
+                    "name": "hdma",
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_EnableMuxRequestGenerator(hdma:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能DMA 复用器请求GENERATOR。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_EnableMuxRequestGenerator(&hdma_usart1_tx) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -855,33 +855,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-multibufferstart",
             "name": "HAL_DMAEx_MultiBufferStart",
             "kind": "function",
-            "brief": "启动双缓冲传输。",
+            "brief": "启动DMA 多重缓冲区。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_MultiBufferStart(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t SecondMemAddress, uint32_t DataLength);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "SrcAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DstAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "SecondMemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA 多重缓冲区START使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_MultiBufferStart(hdma, SrcAddress, DstAddress, SecondMemAddress, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DMA 多重缓冲区。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_MultiBufferStart(&hdma_usart1_tx, srcaddress, dstaddress, secondmemaddress, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -893,33 +893,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-multibufferstart-it",
             "name": "HAL_DMAEx_MultiBufferStart_IT",
             "kind": "function",
-            "brief": "以中断方式启动双缓冲传输。",
+            "brief": "启动DMA 多重缓冲区，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_DMAEx_MultiBufferStart_IT(DMA_HandleTypeDef *hdma, uint32_t SrcAddress, uint32_t DstAddress, uint32_t SecondMemAddress, uint32_t DataLength);",
             "params": [
                 {
                     "name": "hdma",
-                    "description": "DMA 外设句柄。"
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 },
                 {
                     "name": "SrcAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DstAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "SecondMemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA 多重缓冲区STARTIT使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DMAEx_MultiBufferStart_IT(hdma, SrcAddress, DstAddress, SecondMemAddress, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DMA 多重缓冲区，使用中断方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DMAEx_MultiBufferStart_IT(&hdma_usart1_tx, srcaddress, dstaddress, secondmemaddress, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -931,17 +931,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dmaex-mux-irqhandler",
             "name": "HAL_DMAEx_MUX_IRQHandler",
             "kind": "function",
-            "brief": "处理DMA 外设产生的中断。",
+            "brief": "处理 DMA 复用器中断标志并分发对应回调。",
             "prototype": "void HAL_DMAEx_MUX_IRQHandler(DMA_HandleTypeDef *hdma);",
             "params": [
                 {
-                    "name": "hdma:",
-                    "description": "DMA 外设句柄。"
+                    "name": "hdma",
+                    "description": "DMA 句柄指针，例如 &hdma_usart1_tx。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_DMAEx_MUX_IRQHandler(hdma:);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 DMA 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_DMAEx_MUX_IRQHandler(&hdma_usart1_tx);",
             "families": [
                 "G4"
             ],
@@ -1403,11 +1403,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-cortex-clearevent",
             "name": "HAL_CORTEX_ClearEvent",
             "kind": "function",
-            "brief": "清除中断控制器 外设。",
+            "brief": "清除中断控制器 事件。",
             "prototype": "void HAL_CORTEX_ClearEvent(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于清除中断控制器 事件。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
             "example": "HAL_CORTEX_ClearEvent();",
             "families": [
                 "F4"
@@ -1420,17 +1420,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-mpu-configregion",
             "name": "HAL_MPU_ConfigRegion",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置中断控制器 REGION。",
             "prototype": "void HAL_MPU_ConfigRegion(MPU_Region_InitTypeDef *MPU_Init);",
             "params": [
                 {
-                    "name": "MPU_Init:",
-                    "description": "配置结构体或配置参数。"
+                    "name": "MPU_Init",
+                    "description": "中断控制器 CONFIGREGION使用的 M P U_ Init 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_MPU_ConfigRegion(MPU_Init:);",
+            "notes": "该接口用于配置中断控制器 REGION。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_MPU_ConfigRegion(mpu_init);",
             "families": [
                 "F1",
                 "F4",
@@ -1450,7 +1450,7 @@ window.HAL_GENERATED_CATALOG = {
             "prototype": "void HAL_MPU_Disable(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用中断控制器 外设。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_MPU_Disable();",
             "families": [
                 "F1",
@@ -1467,11 +1467,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-mpu-disableregion",
             "name": "HAL_MPU_DisableRegion",
             "kind": "function",
-            "brief": "禁用中断控制器 外设。",
+            "brief": "禁用中断控制器 REGION。",
             "prototype": "void HAL_MPU_DisableRegion(uint32_t RegionNumber);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用中断控制器 REGION。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_MPU_DisableRegion();",
             "families": [
                 "F1",
@@ -1492,13 +1492,13 @@ window.HAL_GENERATED_CATALOG = {
             "prototype": "void HAL_MPU_Enable(uint32_t MPU_Control);",
             "params": [
                 {
-                    "name": "MPU_Control:",
-                    "description": "参数 MPU_Control:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "MPU_Control",
+                    "description": "中断控制器 ENABLE使用的 M P U_ Control 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_MPU_Enable(MPU_Control:);",
+            "notes": "该接口用于使能中断控制器 外设。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "HAL_MPU_Enable(mpu_control);",
             "families": [
                 "F1",
                 "F4",
@@ -1514,11 +1514,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-mpu-enableregion",
             "name": "HAL_MPU_EnableRegion",
             "kind": "function",
-            "brief": "使能中断控制器 外设。",
+            "brief": "使能中断控制器 REGION。",
             "prototype": "void HAL_MPU_EnableRegion(uint32_t RegionNumber);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于使能中断控制器 REGION。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
             "example": "HAL_MPU_EnableRegion();",
             "families": [
                 "F1",
@@ -1535,17 +1535,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-clearpendingirq",
             "name": "HAL_NVIC_ClearPendingIRQ",
             "kind": "function",
-            "brief": "清除中断控制器 外设。",
+            "brief": "清除中断控制器 挂起IRQ。",
             "prototype": "void HAL_NVIC_ClearPendingIRQ(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 CLEAR挂起IRQ使用的 I R Qn 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_NVIC_ClearPendingIRQ(IRQn);",
+            "notes": "该接口用于清除中断控制器 挂起IRQ。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_NVIC_ClearPendingIRQ(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1561,17 +1561,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-disableirq",
             "name": "HAL_NVIC_DisableIRQ",
             "kind": "function",
-            "brief": "禁用中断控制器 外设。",
+            "brief": "禁用中断控制器 IRQ。",
             "prototype": "void HAL_NVIC_DisableIRQ(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 DISABLEIRQ使用的 I R Qn 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_NVIC_DisableIRQ(IRQn);",
+            "notes": "该接口用于禁用中断控制器 IRQ。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "HAL_NVIC_DisableIRQ(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1587,17 +1587,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-enableirq",
             "name": "HAL_NVIC_EnableIRQ",
             "kind": "function",
-            "brief": "使能中断控制器 外设。",
+            "brief": "使能中断控制器 IRQ。",
             "prototype": "void HAL_NVIC_EnableIRQ(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 ENABLEIRQ使用的 I R Qn 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_NVIC_EnableIRQ(IRQn);",
+            "notes": "该接口用于使能中断控制器 IRQ。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "HAL_NVIC_EnableIRQ(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1613,17 +1613,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-getactive",
             "name": "HAL_NVIC_GetActive",
             "kind": "function",
-            "brief": "获取中断控制器 外设。",
+            "brief": "读取中断控制器 ACTIVE。",
             "prototype": "uint32_t HAL_NVIC_GetActive(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 GETACTIVE使用的 I R Qn 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_NVIC_GetActive(IRQn);",
+            "notes": "该接口用于读取中断控制器 ACTIVE。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_NVIC_GetActive(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1639,17 +1639,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-getpendingirq",
             "name": "HAL_NVIC_GetPendingIRQ",
             "kind": "function",
-            "brief": "获取中断控制器 外设。",
+            "brief": "读取中断控制器 挂起IRQ。",
             "prototype": "uint32_t HAL_NVIC_GetPendingIRQ(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 GET挂起IRQ使用的 I R Qn 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_NVIC_GetPendingIRQ(IRQn);",
+            "notes": "该接口用于读取中断控制器 挂起IRQ。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_NVIC_GetPendingIRQ(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1665,29 +1665,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-getpriority",
             "name": "HAL_NVIC_GetPriority",
             "kind": "function",
-            "brief": "获取中断控制器 外设。",
+            "brief": "读取中断控制器 PRIORITY。",
             "prototype": "void HAL_NVIC_GetPriority(IRQn_Type IRQn, uint32_t PriorityGroup, uint32_t *pPreemptPriority, uint32_t *pSubPriority);",
             "params": [
                 {
-                    "name": "IRQn:",
-                    "description": "参数 IRQn:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "IRQn",
+                    "description": "中断控制器 GETPRIORITY使用的 I R Qn 参数。"
                 },
                 {
-                    "name": "PriorityGroup:",
-                    "description": "参数 PriorityGroup:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "PriorityGroup",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 },
                 {
-                    "name": "pPreemptPriority:",
-                    "description": "参数 pPreemptPriority:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "pPreemptPriority",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 },
                 {
-                    "name": "pSubPriority:",
-                    "description": "参数 pSubPriority:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "pSubPriority",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 }
             ],
             "returns": "无。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_NVIC_GetPriority(IRQn:, PriorityGroup:, pPreemptPriority:, pSubPriority:);",
+            "notes": "该接口用于读取中断控制器 PRIORITY。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_NVIC_GetPriority(irqn, prioritygroup, ppreemptpriority, psubpriority);",
             "families": [
                 "F1",
                 "F4",
@@ -1703,11 +1703,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-getprioritygrouping",
             "name": "HAL_NVIC_GetPriorityGrouping",
             "kind": "function",
-            "brief": "获取引脚。",
+            "brief": "读取中断控制器 PRIORITYGROUPING。",
             "prototype": "uint32_t HAL_NVIC_GetPriorityGrouping(void);",
             "params": [],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
+            "notes": "该接口用于读取中断控制器 PRIORITYGROUPING。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
             "example": "HAL_NVIC_GetPriorityGrouping();",
             "families": [
                 "F1",
@@ -1724,17 +1724,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-setpendingirq",
             "name": "HAL_NVIC_SetPendingIRQ",
             "kind": "function",
-            "brief": "设置中断控制器 外设。",
+            "brief": "设置中断控制器 挂起IRQ。",
             "prototype": "void HAL_NVIC_SetPendingIRQ(IRQn_Type IRQn);",
             "params": [
                 {
                     "name": "IRQn",
-                    "description": "参数 IRQn，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "中断控制器 SET挂起IRQ使用的 I R Qn 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_NVIC_SetPendingIRQ(IRQn);",
+            "notes": "该接口用于设置中断控制器 挂起IRQ。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_NVIC_SetPendingIRQ(irqn);",
             "families": [
                 "F1",
                 "F4",
@@ -1750,25 +1750,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-setpriority",
             "name": "HAL_NVIC_SetPriority",
             "kind": "function",
-            "brief": "设置中断控制器 外设。",
+            "brief": "设置中断控制器 PRIORITY。",
             "prototype": "void HAL_NVIC_SetPriority(IRQn_Type IRQn, uint32_t PreemptPriority, uint32_t SubPriority);",
             "params": [
                 {
-                    "name": "IRQn:",
-                    "description": "参数 IRQn:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "IRQn",
+                    "description": "中断控制器 SETPRIORITY使用的 I R Qn 参数。"
                 },
                 {
-                    "name": "PreemptPriority:",
-                    "description": "参数 PreemptPriority:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "PreemptPriority",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 },
                 {
-                    "name": "SubPriority:",
-                    "description": "参数 SubPriority:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "SubPriority",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_NVIC_SetPriority(IRQn:, PreemptPriority:, SubPriority:);",
+            "notes": "该接口用于设置中断控制器 PRIORITY。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_NVIC_SetPriority(irqn, preemptpriority, subpriority);",
             "families": [
                 "F1",
                 "F4",
@@ -1784,17 +1784,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-setprioritygrouping",
             "name": "HAL_NVIC_SetPriorityGrouping",
             "kind": "function",
-            "brief": "设置引脚。",
+            "brief": "设置中断控制器 PRIORITYGROUPING。",
             "prototype": "void HAL_NVIC_SetPriorityGrouping(uint32_t PriorityGroup);",
             "params": [
                 {
-                    "name": "PriorityGroup:",
-                    "description": "参数 PriorityGroup:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "PriorityGroup",
+                    "description": "中断抢占优先级或响应优先级数值。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_NVIC_SetPriorityGrouping(PriorityGroup:);",
+            "notes": "该接口用于设置中断控制器 PRIORITYGROUPING。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_NVIC_SetPriorityGrouping(prioritygroup);",
             "families": [
                 "F1",
                 "F4",
@@ -1810,11 +1810,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-nvic-systemreset",
             "name": "HAL_NVIC_SystemReset",
             "kind": "function",
-            "brief": "复位中断控制器 外设。",
+            "brief": "复位中断控制器 SYSTEM。",
             "prototype": "void HAL_NVIC_SystemReset(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于复位中断控制器 SYSTEM。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
             "example": "HAL_NVIC_SystemReset();",
             "families": [
                 "F1",
@@ -1831,12 +1831,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-systick-callback",
             "name": "HAL_SYSTICK_Callback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "中断控制器 外设事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SYSTICK_Callback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SYSTICK_Callback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应中断控制器 外设。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SYSTICK_Callback(void)\n{\n    _flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -1852,17 +1852,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-systick-clksourceconfig",
             "name": "HAL_SYSTICK_CLKSourceConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置中断控制器 CLKSOURCE。",
             "prototype": "void HAL_SYSTICK_CLKSourceConfig(uint32_t CLKSource);",
             "params": [
                 {
-                    "name": "CLKSource:",
-                    "description": "参数 CLKSource:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "CLKSource",
+                    "description": "中断控制器 CLKSOURCECONFIG使用的 C L K Source 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_SYSTICK_CLKSourceConfig(CLKSource:);",
+            "notes": "该接口用于配置中断控制器 CLKSOURCE。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_SYSTICK_CLKSourceConfig(clksource);",
             "families": [
                 "F1",
                 "F4",
@@ -1878,17 +1878,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-systick-config",
             "name": "HAL_SYSTICK_Config",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置中断控制器 外设。",
             "prototype": "uint32_t HAL_SYSTICK_Config(uint32_t TicksNumb);",
             "params": [
                 {
-                    "name": "TicksNumb:",
-                    "description": "参数 TicksNumb:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "TicksNumb",
+                    "description": "中断控制器 CONFIG使用的 Ticks Numb 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_SYSTICK_Config(TicksNumb:);",
+            "notes": "该接口用于配置中断控制器 外设。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_SYSTICK_Config(ticksnumb);",
             "families": [
                 "F1",
                 "F4",
@@ -1904,11 +1904,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-systick-irqhandler",
             "name": "HAL_SYSTICK_IRQHandler",
             "kind": "function",
-            "brief": "处理中断控制器 外设产生的中断。",
+            "brief": "处理 中断控制器 外设中断标志并分发对应回调。",
             "prototype": "void HAL_SYSTICK_IRQHandler(void);",
             "params": [],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 中断控制器 中断源与状态标志，并分发完成、错误等具体回调。",
             "example": "HAL_SYSTICK_IRQHandler();",
             "families": [
                 "F1",
@@ -1927,21 +1927,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-clockconfig",
             "name": "HAL_RCC_ClockConfig",
             "kind": "function",
-            "brief": "配置时钟配置。",
+            "brief": "配置时钟控制 时钟。",
             "prototype": "HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef *RCC_ClkInitStruct, uint32_t FLatency);",
             "params": [
                 {
                     "name": "RCC_ClkInitStruct",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 时钟CONFIG使用的 R C C_ Clk Init Struct 参数。"
                 },
                 {
                     "name": "FLatency",
-                    "description": "参数 FLatency，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 时钟CONFIG使用的 F Latency 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RCC_ClockConfig(RCC_ClkInitStruct, FLatency);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置时钟控制 时钟。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RCC_ClockConfig(rcc_clkinitstruct, flatency) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -1957,12 +1957,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-csscallback",
             "name": "HAL_RCC_CSSCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 CSS事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCC_CSSCallback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCC_CSSCallback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 CSS。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCC_CSSCallback(void)\n{\n    css_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -1981,9 +1981,9 @@ window.HAL_GENERATED_CATALOG = {
             "brief": "反初始化时钟控制 外设。",
             "prototype": "HAL_StatusTypeDef HAL_RCC_DeInit(void);",
             "params": [],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_RCC_DeInit();",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化时钟控制 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_RCC_DeInit() != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -1999,11 +1999,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-disablecss",
             "name": "HAL_RCC_DisableCSS",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 CSS。",
             "prototype": "void HAL_RCC_DisableCSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用时钟控制 CSS。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_RCC_DisableCSS();",
             "families": [
                 "F1",
@@ -2018,11 +2018,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-disablelsecss",
             "name": "HAL_RCC_DisableLSECSS",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 LSECSS。",
             "prototype": "void HAL_RCC_DisableLSECSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用时钟控制 LSECSS。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_RCC_DisableLSECSS();",
             "families": [
                 "G4"
@@ -2035,11 +2035,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-enablecss",
             "name": "HAL_RCC_EnableCSS",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 CSS。",
             "prototype": "void HAL_RCC_EnableCSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于使能时钟控制 CSS。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
             "example": "HAL_RCC_EnableCSS();",
             "families": [
                 "F1",
@@ -2056,11 +2056,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-enablelsecss",
             "name": "HAL_RCC_EnableLSECSS",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 LSECSS。",
             "prototype": "void HAL_RCC_EnableLSECSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于使能时钟控制 LSECSS。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
             "example": "HAL_RCC_EnableLSECSS();",
             "families": [
                 "G4"
@@ -2073,21 +2073,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-getclockconfig",
             "name": "HAL_RCC_GetClockConfig",
             "kind": "function",
-            "brief": "获取时钟配置。",
+            "brief": "配置时钟控制 GET时钟。",
             "prototype": "void HAL_RCC_GetClockConfig(RCC_ClkInitTypeDef *RCC_ClkInitStruct, uint32_t *pFLatency);",
             "params": [
                 {
                     "name": "RCC_ClkInitStruct",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 GET时钟CONFIG使用的 R C C_ Clk Init Struct 参数。"
                 },
                 {
                     "name": "pFLatency",
-                    "description": "参数 pFLatency，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 GET时钟CONFIG使用的 p F Latency 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RCC_GetClockConfig(RCC_ClkInitStruct, pFLatency);",
+            "notes": "该接口用于配置时钟控制 GET时钟。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RCC_GetClockConfig(rcc_clkinitstruct, pflatency);",
             "families": [
                 "F1",
                 "F4",
@@ -2103,11 +2103,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-gethclkfreq",
             "name": "HAL_RCC_GetHCLKFreq",
             "kind": "function",
-            "brief": "获取时钟控制 外设。",
+            "brief": "读取时钟控制 HCLK频率。",
             "prototype": "uint32_t HAL_RCC_GetHCLKFreq(void);",
             "params": [],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
+            "notes": "该接口用于读取时钟控制 HCLK频率。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
             "example": "HAL_RCC_GetHCLKFreq();",
             "families": [
                 "F1",
@@ -2124,17 +2124,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-getoscconfig",
             "name": "HAL_RCC_GetOscConfig",
             "kind": "function",
-            "brief": "获取配置参数。",
+            "brief": "配置时钟控制 GETOSC。",
             "prototype": "void HAL_RCC_GetOscConfig(RCC_OscInitTypeDef *RCC_OscInitStruct);",
             "params": [
                 {
                     "name": "RCC_OscInitStruct",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 GETOSCCONFIG使用的 R C C_ Osc Init Struct 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RCC_GetOscConfig(RCC_OscInitStruct);",
+            "notes": "该接口用于配置时钟控制 GETOSC。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RCC_GetOscConfig(rcc_oscinitstruct);",
             "families": [
                 "F1",
                 "F4",
@@ -2150,11 +2150,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-getpclk1freq",
             "name": "HAL_RCC_GetPCLK1Freq",
             "kind": "function",
-            "brief": "获取时钟控制 外设。",
+            "brief": "读取时钟控制 PCLK1频率。",
             "prototype": "uint32_t HAL_RCC_GetPCLK1Freq(void);",
             "params": [],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
+            "notes": "该接口用于读取时钟控制 PCLK1频率。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
             "example": "HAL_RCC_GetPCLK1Freq();",
             "families": [
                 "F1",
@@ -2171,11 +2171,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-getpclk2freq",
             "name": "HAL_RCC_GetPCLK2Freq",
             "kind": "function",
-            "brief": "获取时钟控制 外设。",
+            "brief": "读取时钟控制 PCLK2频率。",
             "prototype": "uint32_t HAL_RCC_GetPCLK2Freq(void);",
             "params": [],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
+            "notes": "该接口用于读取时钟控制 PCLK2频率。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
             "example": "HAL_RCC_GetPCLK2Freq();",
             "families": [
                 "F1",
@@ -2192,11 +2192,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-getsysclockfreq",
             "name": "HAL_RCC_GetSysClockFreq",
             "kind": "function",
-            "brief": "获取时钟。",
+            "brief": "读取时钟控制 SYS时钟频率。",
             "prototype": "uint32_t HAL_RCC_GetSysClockFreq(void);",
             "params": [],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
+            "notes": "该接口用于读取时钟控制 SYS时钟频率。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
             "example": "HAL_RCC_GetSysClockFreq();",
             "families": [
                 "F1",
@@ -2213,25 +2213,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-mcoconfig",
             "name": "HAL_RCC_MCOConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置时钟控制 MCO。",
             "prototype": "void HAL_RCC_MCOConfig(uint32_t RCC_MCOx, uint32_t RCC_MCOSource, uint32_t RCC_MCODiv);",
             "params": [
                 {
                     "name": "RCC_MCOx",
-                    "description": "参数 RCC_MCOx，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 MCOCONFIG使用的 R C C_ M C Ox 参数。"
                 },
                 {
                     "name": "RCC_MCOSource",
-                    "description": "参数 RCC_MCOSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 MCOCONFIG使用的 R C C_ M C O Source 参数。"
                 },
                 {
                     "name": "RCC_MCODiv",
-                    "description": "参数 RCC_MCODiv，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 MCOCONFIG使用的 R C C_ M C O Div 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RCC_MCOConfig(RCC_MCOx, RCC_MCOSource, RCC_MCODiv);",
+            "notes": "该接口用于配置时钟控制 MCO。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_RCC_MCOConfig(rcc_mcox, rcc_mcosource, rcc_mcodiv);",
             "families": [
                 "F1",
                 "F4",
@@ -2247,11 +2247,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-nmi-irqhandler",
             "name": "HAL_RCC_NMI_IRQHandler",
             "kind": "function",
-            "brief": "处理时钟控制 外设产生的中断。",
+            "brief": "处理 时钟控制 NMI中断标志并分发对应回调。",
             "prototype": "void HAL_RCC_NMI_IRQHandler(void);",
             "params": [],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 时钟控制 中断源与状态标志，并分发完成、错误等具体回调。",
             "example": "HAL_RCC_NMI_IRQHandler();",
             "families": [
                 "F1",
@@ -2268,17 +2268,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rcc-oscconfig",
             "name": "HAL_RCC_OscConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置时钟控制 OSC。",
             "prototype": "HAL_StatusTypeDef HAL_RCC_OscConfig(const RCC_OscInitTypeDef *RCC_OscInitStruct);",
             "params": [
                 {
                     "name": "RCC_OscInitStruct",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 OSCCONFIG使用的 R C C_ Osc Init Struct 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RCC_OscConfig(RCC_OscInitStruct);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置时钟控制 OSC。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RCC_OscConfig(rcc_oscinitstruct) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -2294,17 +2294,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crs-errorcallback",
             "name": "HAL_RCCEx_CRS_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 CRS错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCCEx_CRS_ErrorCallback(uint32_t Error);",
             "params": [
                 {
                     "name": "Error",
-                    "description": "参数 Error，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要处理或返回的 时钟控制 错误码。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCCEx_CRS_ErrorCallback(uint32_t Error)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 CRS错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCCEx_CRS_ErrorCallback(uint32_t Error)\n{\n    crs_error_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -2316,12 +2316,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crs-expectedsynccallback",
             "name": "HAL_RCCEx_CRS_ExpectedSyncCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 CRSEXPECTED同步事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCCEx_CRS_ExpectedSyncCallback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCCEx_CRS_ExpectedSyncCallback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 CRSEXPECTED同步。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCCEx_CRS_ExpectedSyncCallback(void)\n{\n    crs_expected_sync_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -2333,11 +2333,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crs-irqhandler",
             "name": "HAL_RCCEx_CRS_IRQHandler",
             "kind": "function",
-            "brief": "处理时钟控制 外设产生的中断。",
+            "brief": "处理 时钟控制 CRS中断标志并分发对应回调。",
             "prototype": "void HAL_RCCEx_CRS_IRQHandler(void);",
             "params": [],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 时钟控制 中断源与状态标志，并分发完成、错误等具体回调。",
             "example": "HAL_RCCEx_CRS_IRQHandler();",
             "families": [
                 "G4"
@@ -2350,12 +2350,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crs-syncokcallback",
             "name": "HAL_RCCEx_CRS_SyncOkCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 CRS同步OK事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCCEx_CRS_SyncOkCallback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCCEx_CRS_SyncOkCallback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 CRS同步OK。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCCEx_CRS_SyncOkCallback(void)\n{\n    crs_sync_ok_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -2367,12 +2367,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crs-syncwarncallback",
             "name": "HAL_RCCEx_CRS_SyncWarnCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 CRS同步WARN事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCCEx_CRS_SyncWarnCallback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCCEx_CRS_SyncWarnCallback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 CRS同步WARN。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCCEx_CRS_SyncWarnCallback(void)\n{\n    crs_sync_warn_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -2384,17 +2384,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crsconfig",
             "name": "HAL_RCCEx_CRSConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置时钟控制 CRS。",
             "prototype": "void HAL_RCCEx_CRSConfig(RCC_CRSInitTypeDef const *pInit);",
             "params": [
                 {
                     "name": "pInit",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 CRSCONFIG使用的 p Init 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RCCEx_CRSConfig(pInit);",
+            "notes": "该接口用于配置时钟控制 CRS。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_RCCEx_CRSConfig(pinit);",
             "families": [
                 "G4"
             ],
@@ -2406,17 +2406,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crsgetsynchronizationinfo",
             "name": "HAL_RCCEx_CRSGetSynchronizationInfo",
             "kind": "function",
-            "brief": "获取时钟控制 外设。",
+            "brief": "执行时钟控制 CRSGETSYNCHRONIZATIONINFO操作。",
             "prototype": "void HAL_RCCEx_CRSGetSynchronizationInfo(RCC_CRSSynchroInfoTypeDef *pSynchroInfo);",
             "params": [
                 {
                     "name": "pSynchroInfo",
-                    "description": "参数 pSynchroInfo，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 CRSGETSYNCHRONIZATIONINFO使用的 p Synchro Info 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RCCEx_CRSGetSynchronizationInfo(pSynchroInfo);",
+            "notes": "该接口用于执行时钟控制 CRSGETSYNCHRONIZATIONINFO操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RCCEx_CRSGetSynchronizationInfo(psynchroinfo);",
             "families": [
                 "G4"
             ],
@@ -2428,11 +2428,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crssoftwaresynchronizationgenerate",
             "name": "HAL_RCCEx_CRSSoftwareSynchronizationGenerate",
             "kind": "function",
-            "brief": "提供时钟控制 外设相关的 HAL 操作接口。",
+            "brief": "执行时钟控制 CRSSOFTWARESYNCHRONIZATIONGENERATE操作。",
             "prototype": "void HAL_RCCEx_CRSSoftwareSynchronizationGenerate(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于执行时钟控制 CRSSOFTWARESYNCHRONIZATIONGENERATE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
             "example": "HAL_RCCEx_CRSSoftwareSynchronizationGenerate();",
             "families": [
                 "G4"
@@ -2445,17 +2445,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-crswaitsynchronization",
             "name": "HAL_RCCEx_CRSWaitSynchronization",
             "kind": "function",
-            "brief": "提供时钟控制 外设相关的 HAL 操作接口。",
+            "brief": "执行时钟控制 CRSWAITSYNCHRONIZATION操作。",
             "prototype": "uint32_t HAL_RCCEx_CRSWaitSynchronization(uint32_t Timeout);",
             "params": [
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_CRSWaitSynchronization(Timeout);",
+            "notes": "该接口用于执行时钟控制 CRSWAITSYNCHRONIZATION操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RCCEx_CRSWaitSynchronization(100U);",
             "families": [
                 "G4"
             ],
@@ -2467,11 +2467,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-disablelsco",
             "name": "HAL_RCCEx_DisableLSCO",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 LSCO。",
             "prototype": "void HAL_RCCEx_DisableLSCO(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用时钟控制 LSCO。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_RCCEx_DisableLSCO();",
             "families": [
                 "G4"
@@ -2484,11 +2484,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-disablelsecss",
             "name": "HAL_RCCEx_DisableLSECSS",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 LSECSS。",
             "prototype": "void HAL_RCCEx_DisableLSECSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于禁用时钟控制 LSECSS。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
             "example": "HAL_RCCEx_DisableLSECSS();",
             "families": [
                 "G4"
@@ -2501,12 +2501,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-disablepll2",
             "name": "HAL_RCCEx_DisablePLL2",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 PLL2。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_DisablePLL2(void);",
             "params": [],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_DisablePLL2();",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用时钟控制 PLL2。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RCCEx_DisablePLL2() != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1"
             ],
@@ -2518,12 +2518,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-disableplli2s",
             "name": "HAL_RCCEx_DisablePLLI2S",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 PLLI2S。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_DisablePLLI2S(void);",
             "params": [],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_DisablePLLI2S();",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用时钟控制 PLLI2S。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RCCEx_DisablePLLI2S() != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -2537,12 +2537,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-disablepllsai",
             "name": "HAL_RCCEx_DisablePLLSAI",
             "kind": "function",
-            "brief": "禁用时钟控制 外设。",
+            "brief": "禁用时钟控制 PLLSAI。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_DisablePLLSAI(void);",
             "params": [],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_DisablePLLSAI();",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用时钟控制 PLLSAI。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RCCEx_DisablePLLSAI() != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -2554,17 +2554,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enablelsco",
             "name": "HAL_RCCEx_EnableLSCO",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 LSCO。",
             "prototype": "void HAL_RCCEx_EnableLSCO(uint32_t LSCOSource);",
             "params": [
                 {
                     "name": "LSCOSource",
-                    "description": "参数 LSCOSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 ENABLELSCO使用的 L S C O Source 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_EnableLSCO(LSCOSource);",
+            "notes": "该接口用于使能时钟控制 LSCO。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "HAL_RCCEx_EnableLSCO(lscosource);",
             "families": [
                 "G4"
             ],
@@ -2576,11 +2576,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enablelsecss",
             "name": "HAL_RCCEx_EnableLSECSS",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 LSECSS。",
             "prototype": "void HAL_RCCEx_EnableLSECSS(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
+            "notes": "该接口用于使能时钟控制 LSECSS。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
             "example": "HAL_RCCEx_EnableLSECSS();",
             "families": [
                 "G4"
@@ -2593,11 +2593,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enablelsecss-it",
             "name": "HAL_RCCEx_EnableLSECSS_IT",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 LSECSS，使用中断方式。",
             "prototype": "void HAL_RCCEx_EnableLSECSS_IT(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
+            "notes": "该接口用于使能时钟控制 LSECSS，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
             "example": "HAL_RCCEx_EnableLSECSS_IT();",
             "families": [
                 "G4"
@@ -2610,17 +2610,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enablepll2",
             "name": "HAL_RCCEx_EnablePLL2",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 PLL2。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_EnablePLL2(RCC_PLL2InitTypeDef *PLL2Init);",
             "params": [
                 {
                     "name": "PLL2Init",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 ENABLEPLL2使用的 P L L2 Init 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_EnablePLL2(PLL2Init);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能时钟控制 PLL2。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_RCCEx_EnablePLL2(pll2init) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1"
             ],
@@ -2632,17 +2632,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enableplli2s",
             "name": "HAL_RCCEx_EnablePLLI2S",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 PLLI2S。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_EnablePLLI2S(RCC_PLLI2SInitTypeDef *PLLI2SInit);",
             "params": [
                 {
                     "name": "PLLI2SInit",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 ENABLEPLLI2S使用的 P L L I2 S Init 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_EnablePLLI2S(PLLI2SInit);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能时钟控制 PLLI2S。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_RCCEx_EnablePLLI2S(plli2sinit) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -2656,17 +2656,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-enablepllsai",
             "name": "HAL_RCCEx_EnablePLLSAI",
             "kind": "function",
-            "brief": "使能时钟控制 外设。",
+            "brief": "使能时钟控制 PLLSAI。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_EnablePLLSAI(RCC_PLLSAIInitTypeDef *PLLSAIInit);",
             "params": [
                 {
                     "name": "PLLSAIInit",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 ENABLEPLLSAI使用的 P L L S A I Init 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_EnablePLLSAI(PLLSAIInit);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能时钟控制 PLLSAI。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_RCCEx_EnablePLLSAI(pllsaiinit) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -2678,17 +2678,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-getperiphclkconfig",
             "name": "HAL_RCCEx_GetPeriphCLKConfig",
             "kind": "function",
-            "brief": "获取配置参数。",
+            "brief": "配置时钟控制 GETPERIPHCLK。",
             "prototype": "void HAL_RCCEx_GetPeriphCLKConfig(RCC_PeriphCLKInitTypeDef *PeriphClkInit);",
             "params": [
                 {
                     "name": "PeriphClkInit",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 GETPERIPHCLKCONFIG使用的 Periph Clk Init 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RCCEx_GetPeriphCLKConfig(PeriphClkInit);",
+            "notes": "该接口用于配置时钟控制 GETPERIPHCLK。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RCCEx_GetPeriphCLKConfig(periphclkinit);",
             "families": [
                 "F1",
                 "F4",
@@ -2704,17 +2704,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-getperiphclkfreq",
             "name": "HAL_RCCEx_GetPeriphCLKFreq",
             "kind": "function",
-            "brief": "获取时钟控制 外设。",
+            "brief": "读取时钟控制 PERIPHCLK频率。",
             "prototype": "uint32_t HAL_RCCEx_GetPeriphCLKFreq(uint32_t PeriphClk);",
             "params": [
                 {
                     "name": "PeriphClk",
-                    "description": "参数 PeriphClk，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "时钟控制 GETPERIPHCLK频率使用的 Periph Clk 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RCCEx_GetPeriphCLKFreq(PeriphClk);",
+            "notes": "该接口用于读取时钟控制 PERIPHCLK频率。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RCCEx_GetPeriphCLKFreq(periphclk);",
             "families": [
                 "F1",
                 "F4",
@@ -2730,12 +2730,12 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-lsecss-callback",
             "name": "HAL_RCCEx_LSECSS_Callback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "时钟控制 LSECSS事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RCCEx_LSECSS_Callback(void);",
             "params": [],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RCCEx_LSECSS_Callback(void)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应时钟控制 LSECSS。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RCCEx_LSECSS_Callback(void)\n{\n    lsecss_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -2747,11 +2747,11 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-lsecss-irqhandler",
             "name": "HAL_RCCEx_LSECSS_IRQHandler",
             "kind": "function",
-            "brief": "处理时钟控制 外设产生的中断。",
+            "brief": "处理 时钟控制 LSECSS中断标志并分发对应回调。",
             "prototype": "void HAL_RCCEx_LSECSS_IRQHandler(void);",
             "params": [],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 时钟控制 中断源与状态标志，并分发完成、错误等具体回调。",
             "example": "HAL_RCCEx_LSECSS_IRQHandler();",
             "families": [
                 "G4"
@@ -2764,17 +2764,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-periphclkconfig",
             "name": "HAL_RCCEx_PeriphCLKConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置时钟控制 PERIPHCLK。",
             "prototype": "HAL_StatusTypeDef HAL_RCCEx_PeriphCLKConfig(RCC_PeriphCLKInitTypeDef *PeriphClkInit);",
             "params": [
                 {
                     "name": "PeriphClkInit",
-                    "description": "配置结构体或配置参数。"
+                    "description": "时钟控制 PERIPHCLKCONFIG使用的 Periph Clk Init 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RCCEx_PeriphCLKConfig(PeriphClkInit);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置时钟控制 PERIPHCLK。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RCCEx_PeriphCLKConfig(periphclkinit) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -2790,17 +2790,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rccex-selectlsemode",
             "name": "HAL_RCCEx_SelectLSEMode",
             "kind": "function",
-            "brief": "提供时钟控制 外设相关的 HAL 操作接口。",
+            "brief": "执行时钟控制 SELECTLSE模式操作。",
             "prototype": "void HAL_RCCEx_SelectLSEMode(uint8_t Mode);",
             "params": [
                 {
                     "name": "Mode",
-                    "description": "工作模式选择。"
+                    "description": "时钟控制 工作模式选择值。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RCCEx_SelectLSEMode(Mode);",
+            "notes": "该接口用于执行时钟控制 SELECTLSE模式操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RCCEx_SelectLSEMode(mode);",
             "families": [
                 "F4"
             ],
@@ -24999,21 +24999,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-analogwdgconfig",
             "name": "HAL_ADC_AnalogWDGConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置 ADC 模拟看门狗的监测通道及高低阈值。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_AnalogWDGConfig(ADC_HandleTypeDef* hadc, ADC_AnalogWDGConfTypeDef* AnalogWDGConfig);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
-                    "name": "AnalogWDGConfig:",
-                    "description": "配置结构体或配置参数。"
+                    "name": "AnalogWDGConfig",
+                    "description": "ADC 模拟WDGCONFIG使用的 Analog W D G Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_AnalogWDGConfig(hadc:, AnalogWDGConfig:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "高阈值必须大于低阈值，并按当前 ADC 分辨率填写。若启用中断，还需配置 NVIC 并处理越界回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_AnalogWDGConfig(&hadc1, analogwdgconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25029,21 +25029,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-configchannel",
             "name": "HAL_ADC_ConfigChannel",
             "kind": "function",
-            "brief": "配置外设通道。",
+            "brief": "配置 ADC 常规组通道的序列位置和采样时间。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_ConfigChannel(ADC_HandleTypeDef* hadc, ADC_ChannelConfTypeDef* sConfig);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
-                    "name": "sConfig:",
-                    "description": "配置结构体或配置参数。"
+                    "name": "sConfig",
+                    "description": "ADC 通道配置结构体指针。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_ConfigChannel(hadc:, sConfig:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "通道采样时间应根据输入源阻抗选择。配置序列位置时要与规则组转换数量保持一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_ConfigChannel(&hadc1, &adc_channel_config) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25059,17 +25059,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-convcpltcallback",
             "name": "HAL_ADC_ConvCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 常规组转换完成回调。",
             "prototype": "void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 转换完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    conv_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25085,17 +25085,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-convhalfcpltcallback",
             "name": "HAL_ADC_ConvHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 常规组 DMA 缓冲区半传输完成回调。",
             "prototype": "void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 转换半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "void HAL_ADC_ConvHalfCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    conv_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25116,12 +25116,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_DeInit(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化ADC 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_DeInit(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25137,17 +25137,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-errorcallback",
             "name": "HAL_ADC_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 中断或 DMA 转换发生错误时的回调。",
             "prototype": "void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)\n{\n    error_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25163,17 +25163,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-geterror",
             "name": "HAL_ADC_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取 ADC 句柄中记录的错误码位掩码。",
             "prototype": "uint32_t HAL_ADC_GetError(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_GetError(hadc);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取 ADC 句柄中记录的错误码位掩码。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_ADC_GetError(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25189,17 +25189,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-getstate",
             "name": "HAL_ADC_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取 ADC 句柄的当前运行状态位掩码。",
             "prototype": "uint32_t HAL_ADC_GetState(ADC_HandleTypeDef* hadc);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_GetState(hadc:);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取 ADC 句柄的当前运行状态位掩码。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_ADC_GetState(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25215,17 +25215,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-getvalue",
             "name": "HAL_ADC_GetValue",
             "kind": "function",
-            "brief": "获取ADC 外设。",
+            "brief": "读取 ADC 常规组数据寄存器中的最近一次转换结果。",
             "prototype": "uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef* hadc);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_GetValue(hadc:);",
+            "returns": "返回 ADC 转换数据寄存器中的原始转换值。",
+            "notes": "该接口用于读取 ADC 常规组数据寄存器中的最近一次转换结果。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_ADC_GetValue(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25246,12 +25246,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Init(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化ADC 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Init(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25267,17 +25267,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-irqhandler",
             "name": "HAL_ADC_IRQHandler",
             "kind": "function",
-            "brief": "处理ADC 外设产生的中断。",
+            "brief": "处理 ADC 外设中断标志并分发对应回调。",
             "prototype": "void HAL_ADC_IRQHandler(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_IRQHandler(hadc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 ADC 中断源与状态标志，并分发完成、错误等具体回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_ADC_IRQHandler(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25293,17 +25293,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-leveloutofwindowcallback",
             "name": "HAL_ADC_LevelOutOfWindowCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 模拟看门狗 1 检测到结果越界时的回调。",
             "prototype": "void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 电平越界窗口。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc)\n{\n    level_out_of_window_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25319,17 +25319,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-mspdeinit",
             "name": "HAL_ADC_MspDeInit",
             "kind": "function",
-            "brief": "执行ADC 外设的底层硬件反初始化回调。",
+            "brief": "释放 ADC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_ADC_MspDeInit(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_MspDeInit(hadc);",
+            "notes": "该接口用于释放 ADC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_ADC_MspDeInit(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25345,17 +25345,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-mspinit",
             "name": "HAL_ADC_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 ADC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_ADC_MspInit(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_MspInit(hadc);",
+            "notes": "该接口用于初始化 ADC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_ADC_MspInit(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -25371,21 +25371,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-pollforconversion",
             "name": "HAL_ADC_PollForConversion",
             "kind": "function",
-            "brief": "轮询等待ADC 外设。",
+            "brief": "阻塞轮询等待 ADC 常规组转换完成或超时。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_PollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_PollForConversion(hadc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该函数阻塞等待常规组转换完成，Timeout 单位为 ms。连续转换和 DMA 模式下应确认轮询标志与 EOC 配置一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_PollForConversion(&hadc1, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25401,25 +25401,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-pollforevent",
             "name": "HAL_ADC_PollForEvent",
             "kind": "function",
-            "brief": "轮询等待ADC 外设。",
+            "brief": "阻塞轮询等待指定 ADC 事件发生或超时。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_PollForEvent(ADC_HandleTypeDef *hadc, uint32_t EventType, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "EventType",
-                    "description": "参数 EventType，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要轮询或处理的 ADC 事件类型。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_PollForEvent(hadc, EventType, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于阻塞轮询等待指定 ADC 事件发生或超时。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_PollForEvent(&hadc1, ADC_AWD_EVENT, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25435,25 +25435,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-registercallback",
             "name": "HAL_ADC_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "ADC REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_RegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID, pADC_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_ADC_RegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID, pADC_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应ADC REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_ADC_RegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID, pADC_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25469,17 +25469,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-start",
             "name": "HAL_ADC_Start",
             "kind": "function",
-            "brief": "启动ADC 外设。",
+            "brief": "启动 ADC 常规组转换，不启用完成中断或 DMA。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Start(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Start(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "调用前需完成常规组通道与触发源配置。软件触发模式立即开始；外部触发模式通常进入等待触发状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Start(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25495,25 +25495,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-start-dma",
             "name": "HAL_ADC_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动ADC 外设。",
+            "brief": "启动 ADC 常规组转换并通过 DMA 传输结果。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Start_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, uint32_t Length);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "接收 ADC 转换结果的 uint32_t 缓冲区；DMA 完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA 缓冲区中的 ADC 转换结果数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Start_DMA(hadc, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "DMA 数据宽度、传输长度和缓冲区类型必须与 ADC 分辨率及数据对齐配置匹配；完成前缓冲区必须保持有效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Start_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25529,17 +25529,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-start-it",
             "name": "HAL_ADC_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动ADC 外设。",
+            "brief": "使能常规组完成中断并启动 ADC 常规组转换。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Start_IT(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Start_IT(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "必须同时配置 ADC 中断源和 NVIC。常规组转换完成后由 HAL_ADC_ConvCpltCallback() 处理。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Start_IT(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25555,17 +25555,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-startsampling",
             "name": "HAL_ADC_StartSampling",
             "kind": "function",
-            "brief": "启动ADC 外设。",
+            "brief": "启动 ADC 常规组的采样阶段。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_StartSampling(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADC_StartSampling(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动 ADC 常规组的采样阶段。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_ADC_StartSampling(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25577,17 +25577,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-stop",
             "name": "HAL_ADC_Stop",
             "kind": "function",
-            "brief": "停止ADC 外设。",
+            "brief": "停止 ADC 常规组转换并在允许时关闭 ADC。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Stop(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Stop(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组转换并在允许时关闭 ADC。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Stop(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25603,17 +25603,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-stop-dma",
             "name": "HAL_ADC_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的ADC 外设。",
+            "brief": "停止 ADC 常规组 DMA 转换并关闭 DMA 请求。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Stop_DMA(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Stop_DMA(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组 DMA 转换并关闭 DMA 请求。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Stop_DMA(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25629,17 +25629,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-stop-it",
             "name": "HAL_ADC_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的ADC 外设。",
+            "brief": "停止 ADC 常规组转换并关闭完成中断。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_Stop_IT(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADC_Stop_IT(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组转换并关闭完成中断。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADC_Stop_IT(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25655,17 +25655,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-stopsampling",
             "name": "HAL_ADC_StopSampling",
             "kind": "function",
-            "brief": "停止ADC 外设。",
+            "brief": "结束 ADC 常规组采样阶段并进入转换阶段。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_StopSampling(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADC_StopSampling(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于结束 ADC 常规组采样阶段并进入转换阶段。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_ADC_StopSampling(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25677,21 +25677,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adc-unregistercallback",
             "name": "HAL_ADC_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "ADC UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_ADC_UnRegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_ADC_UnRegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应ADC UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_ADC_UnRegisterCallback(ADC_HandleTypeDef *hadc, HAL_ADC_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25707,21 +25707,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-calibration-getvalue",
             "name": "HAL_ADCEx_Calibration_GetValue",
             "kind": "function",
-            "brief": "获取ADC 外设。",
+            "brief": "读取 ADC 当前使用的校准因子。",
             "prototype": "uint32_t HAL_ADCEx_Calibration_GetValue(const ADC_HandleTypeDef *hadc, uint32_t SingleDiff);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "SingleDiff",
-                    "description": "参数 SingleDiff，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "选择单端或差分输入校准模式，例如 ADC_SINGLE_ENDED。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_ADCEx_Calibration_GetValue(hadc, SingleDiff);",
+            "returns": "返回指定单端或差分模式的 ADC 校准因子。",
+            "notes": "应在校准完成后读取，并用 SingleDiff 选择单端或差分校准因子。读取值可保存，用于下次启动时快速恢复。",
+            "example": "uint32_t value = HAL_ADCEx_Calibration_GetValue(&hadc1, ADC_SINGLE_ENDED);",
             "families": [
                 "G4"
             ],
@@ -25733,25 +25733,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-calibration-setvalue",
             "name": "HAL_ADCEx_Calibration_SetValue",
             "kind": "function",
-            "brief": "设置ADC 外设。",
+            "brief": "手动写入 ADC 校准因子，覆盖自动校准结果。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_Calibration_SetValue(ADC_HandleTypeDef *hadc, uint32_t SingleDiff, uint32_t CalibrationFactor);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "SingleDiff",
-                    "description": "参数 SingleDiff，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "选择单端或差分输入校准模式，例如 ADC_SINGLE_ENDED。"
                 },
                 {
                     "name": "CalibrationFactor",
-                    "description": "参数 CalibrationFactor，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要写入 ADC 校准寄存器的校准因子。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_ADCEx_Calibration_SetValue(hadc, SingleDiff, CalibrationFactor);",
+            "returns": "HAL_OK 表示校准操作成功；ADC 状态不允许或校准失败时返回 HAL_ERROR。",
+            "notes": "写入前 ADC 必须已使能且没有转换正在进行。SingleDiff 必须与该校准因子的输入模式一致，否则会降低转换精度。",
+            "example": "if (HAL_ADCEx_Calibration_SetValue(&hadc1, ADC_SINGLE_ENDED, calibration_factor) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25763,17 +25763,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-calibration-start",
             "name": "HAL_ADCEx_Calibration_Start",
             "kind": "function",
-            "brief": "启动ADC 外设。",
+            "brief": "启动 ADC 自动自校准，计算并装载校准因子。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_Calibration_Start(ADC_HandleTypeDef* hadc);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_Calibration_Start(hadc:);",
+            "returns": "HAL_OK 表示校准操作成功；ADC 状态不允许或校准失败时返回 HAL_ERROR。",
+            "notes": "校准前必须停止转换并禁用 ADC，不能与 DMA 或中断转换并发执行。校准期间 HAL 会临时控制 ADC；完成后再启动常规组或注入组转换。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_Calibration_Start(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "G4"
@@ -25787,17 +25787,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-disableinjectedqueue",
             "name": "HAL_ADCEx_DisableInjectedQueue",
             "kind": "function",
-            "brief": "禁用ADC 外设。",
+            "brief": "禁用 ADC 注入组上下文队列模式。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_DisableInjectedQueue(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADCEx_DisableInjectedQueue(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "禁用前应确认注入组上下文队列已经处理完毕。关闭队列后，新配置会直接替换当前注入组上下文。",
+            "example": "if (HAL_ADCEx_DisableInjectedQueue(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25809,17 +25809,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-disablevoltageregulator",
             "name": "HAL_ADCEx_DisableVoltageRegulator",
             "kind": "function",
-            "brief": "禁用ADC 外设。",
+            "brief": "关闭 ADC 内部稳压器以降低停用期间功耗。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_DisableVoltageRegulator(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADCEx_DisableVoltageRegulator(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "只能在 ADC 禁用且没有转换时关闭内部稳压器。再次使用 ADC 前必须重新使能稳压器，并等待数据手册规定的稳定时间。",
+            "example": "if (HAL_ADCEx_DisableVoltageRegulator(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25831,17 +25831,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-enableinjectedqueue",
             "name": "HAL_ADCEx_EnableInjectedQueue",
             "kind": "function",
-            "brief": "使能ADC 外设。",
+            "brief": "使能 ADC 注入组上下文队列模式。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_EnableInjectedQueue(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADCEx_EnableInjectedQueue(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "队列模式允许依次保存多个注入组上下文。软件必须避免写入速度超过执行速度，并处理队列溢出回调。",
+            "example": "if (HAL_ADCEx_EnableInjectedQueue(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25853,17 +25853,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-endofsamplingcallback",
             "name": "HAL_ADCEx_EndOfSamplingCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 采样阶段结束回调，用于区分采样完成与转换完成。",
             "prototype": "void HAL_ADCEx_EndOfSamplingCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_ADCEx_EndOfSamplingCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该事件只表示采样保持阶段结束，转换结果此时可能尚未就绪。读取结果应等待转换完成事件。",
+            "example": "void HAL_ADCEx_EndOfSamplingCallback(ADC_HandleTypeDef *hadc)\n{\n    end_of_sampling_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -25875,17 +25875,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-enteradcdeeppowerdownmode",
             "name": "HAL_ADCEx_EnterADCDeepPowerDownMode",
             "kind": "function",
-            "brief": "提供ADC 外设相关的 HAL 操作接口。",
+            "brief": "使 ADC 进入深度掉电模式以获得最低静态功耗。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_EnterADCDeepPowerDownMode(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADCEx_EnterADCDeepPowerDownMode(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "进入前必须停止并禁用 ADC。退出深度掉电后，内部稳压器和校准状态可能需要重新建立，不能立即开始转换。",
+            "example": "if (HAL_ADCEx_EnterADCDeepPowerDownMode(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -25897,21 +25897,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedconfigchannel",
             "name": "HAL_ADCEx_InjectedConfigChannel",
             "kind": "function",
-            "brief": "配置外设通道。",
+            "brief": "配置 ADC 注入组通道、序列位置、采样时间及偏移。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedConfigChannel(ADC_HandleTypeDef* hadc, ADC_InjectionConfTypeDef* sConfigInjected);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
-                    "name": "sConfigInjected:",
-                    "description": "配置结构体或配置参数。"
+                    "name": "sConfigInjected",
+                    "description": "ADC 注入组通道配置结构体，包含通道、序列位置、采样时间和偏移。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedConfigChannel(hadc:, sConfigInjected:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "配置应在注入组停止或允许更新的状态下完成。序列位置、触发源、采样时间和偏移必须与实际通道及信号源阻抗匹配。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedConfigChannel(&hadc1, &adc_injected_config) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25927,17 +25927,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedconvcpltcallback",
             "name": "HAL_ADCEx_InjectedConvCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 注入组转换完成回调。",
             "prototype": "void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "由 ADC IRQHandler 在注入组转换完成后调用。回调处于中断上下文，应只读取结果、更新时间戳或设置任务标志。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "void HAL_ADCEx_InjectedConvCpltCallback(ADC_HandleTypeDef *hadc)\n{\n    injected_conv_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -25953,21 +25953,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedgetvalue",
             "name": "HAL_ADCEx_InjectedGetValue",
             "kind": "function",
-            "brief": "获取ADC 外设。",
+            "brief": "读取 ADC 注入组指定序列位置的转换结果。",
             "prototype": "uint32_t HAL_ADCEx_InjectedGetValue(ADC_HandleTypeDef* hadc, uint32_t InjectedRank);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
-                    "name": "InjectedRank:",
-                    "description": "参数 InjectedRank:，具体含义以当前系列 HAL 头文件为准。"
+                    "name": "InjectedRank",
+                    "description": "要读取的注入组序列位置，例如 ADC_INJECTED_RANK_1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedGetValue(hadc:, InjectedRank:);",
+            "returns": "返回 ADC 转换数据寄存器中的原始转换值。",
+            "notes": "读取指定注入序列位置对应的 JDR 数据寄存器。应在注入转换完成标志置位后读取，并注意结果对齐方式和 ADC 分辨率。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_ADCEx_InjectedGetValue(&hadc1, ADC_INJECTED_RANK_1);",
             "families": [
                 "F1",
                 "F4",
@@ -25983,21 +25983,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedpollforconversion",
             "name": "HAL_ADCEx_InjectedPollForConversion",
             "kind": "function",
-            "brief": "轮询等待ADC 外设。",
+            "brief": "阻塞轮询等待 ADC 注入组转换完成或超时。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedPollForConversion(ADC_HandleTypeDef *hadc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedPollForConversion(hadc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该函数阻塞等待注入组转换完成，Timeout 单位为 ms。不适合在中断或高频控制环中调用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedPollForConversion(&hadc1, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26013,17 +26013,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedqueueoverflowcallback",
             "name": "HAL_ADCEx_InjectedQueueOverflowCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 注入组上下文队列溢出回调。",
             "prototype": "void HAL_ADCEx_InjectedQueueOverflowCallback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_ADCEx_InjectedQueueOverflowCallback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "表示新的注入上下文到来时队列已满。应记录丢失事件、降低配置写入频率或及时消费队列，不能忽略后继续假定序列完整。",
+            "example": "void HAL_ADCEx_InjectedQueueOverflowCallback(ADC_HandleTypeDef *hadc)\n{\n    injected_queue_overflow_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -26035,17 +26035,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedstart",
             "name": "HAL_ADCEx_InjectedStart",
             "kind": "function",
-            "brief": "启动ADC 外设。",
+            "brief": "启动 ADC 注入组转换，不启用完成中断。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedStart(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedStart(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "调用前必须完成注入通道与触发源配置。软件触发模式会启动转换；外部触发模式通常只是使 ADC 进入等待触发状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedStart(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26061,17 +26061,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedstart-it",
             "name": "HAL_ADCEx_InjectedStart_IT",
             "kind": "function",
-            "brief": "以中断方式启动ADC 外设。",
+            "brief": "使能注入组完成中断并启动 ADC 注入组转换。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedStart_IT(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedStart_IT(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "除注入通道配置外，还必须使能 ADC 对应 NVIC IRQ。转换完成后进入 HAL_ADCEx_InjectedConvCpltCallback()。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedStart_IT(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26087,17 +26087,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedstop",
             "name": "HAL_ADCEx_InjectedStop",
             "kind": "function",
-            "brief": "停止ADC 外设。",
+            "brief": "停止 ADC 注入组转换；无常规组转换时同时关闭 ADC。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedStop(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedStop(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "停止注入组时要确认常规组是否仍在运行；常规组活动时 HAL 不应直接关闭整个 ADC。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedStop(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26113,17 +26113,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-injectedstop-it",
             "name": "HAL_ADCEx_InjectedStop_IT",
             "kind": "function",
-            "brief": "停止中断方式的ADC 外设。",
+            "brief": "停止 ADC 注入组转换并关闭注入组完成中断。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_InjectedStop_IT(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_InjectedStop_IT(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "停止注入组并关闭相应完成中断。已置位的状态标志仍需按当前系列规定清除。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_InjectedStop_IT(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26139,17 +26139,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-leveloutofwindow2callback",
             "name": "HAL_ADCEx_LevelOutOfWindow2Callback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 电平越界窗口2事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_ADCEx_LevelOutOfWindow2Callback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_ADCEx_LevelOutOfWindow2Callback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 电平越界窗口2。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_ADCEx_LevelOutOfWindow2Callback(ADC_HandleTypeDef *hadc)\n{\n    level_out_of_window2_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -26161,17 +26161,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-leveloutofwindow3callback",
             "name": "HAL_ADCEx_LevelOutOfWindow3Callback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "ADC 电平越界窗口3事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_ADCEx_LevelOutOfWindow3Callback(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_ADCEx_LevelOutOfWindow3Callback(ADC_HandleTypeDef *hadc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应ADC 电平越界窗口3。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_ADCEx_LevelOutOfWindow3Callback(ADC_HandleTypeDef *hadc)\n{\n    level_out_of_window3_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -26183,21 +26183,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-multimodeconfigchannel",
             "name": "HAL_ADCEx_MultiModeConfigChannel",
             "kind": "function",
-            "brief": "配置外设通道。",
+            "brief": "配置多 ADC 主从模式、数据组合及采样延迟。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_MultiModeConfigChannel(ADC_HandleTypeDef* hadc, ADC_MultiModeTypeDef* multimode);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
-                    "name": "multimode:",
-                    "description": "工作模式选择。"
+                    "name": "multimode",
+                    "description": "多 ADC 主从模式配置结构体，包含工作模式、数据格式和采样延迟。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_MultiModeConfigChannel(hadc:, multimode:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "必须明确主 ADC、从 ADC、数据组合格式和采样延迟。各 ADC 的通道序列、采样时间及触发源需要保持兼容。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_MultiModeConfigChannel(&hadc1, &adc_multimode_config) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26213,17 +26213,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-multimodegetvalue",
             "name": "HAL_ADCEx_MultiModeGetValue",
             "kind": "function",
-            "brief": "获取ADC 外设。",
+            "brief": "读取多 ADC 模式下主从常规组的组合转换结果。",
             "prototype": "uint32_t HAL_ADCEx_MultiModeGetValue(ADC_HandleTypeDef* hadc);",
             "params": [
                 {
-                    "name": "hadc:",
-                    "description": "ADC 外设句柄。"
+                    "name": "hadc",
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_MultiModeGetValue(hadc:);",
+            "returns": "返回 ADC 转换数据寄存器中的原始转换值。",
+            "notes": "该接口用于读取多 ADC 模式下主从常规组的组合转换结果。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_ADCEx_MultiModeGetValue(&hadc1);",
             "families": [
                 "F1",
                 "F4",
@@ -26239,25 +26239,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-multimodestart-dma",
             "name": "HAL_ADCEx_MultiModeStart_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动ADC 外设。",
+            "brief": "启动多 ADC 常规组转换并通过 DMA 传输组合结果。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_MultiModeStart_DMA(ADC_HandleTypeDef *hadc, uint32_t *pData, uint32_t Length);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "接收 ADC 转换结果的 uint32_t 缓冲区；DMA 完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "DMA 缓冲区中的 ADC 转换结果数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_MultiModeStart_DMA(hadc, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "DMA 通常从主 ADC 的公共数据寄存器读取组合结果。缓冲区宽度和 Length 必须匹配多模式数据格式。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_MultiModeStart_DMA(&hadc1, adc_buffer, ADC_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26273,17 +26273,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-multimodestop-dma",
             "name": "HAL_ADCEx_MultiModeStop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的ADC 外设。",
+            "brief": "停止多 ADC DMA 转换并关闭 DMA 请求。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_MultiModeStop_DMA(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_ADCEx_MultiModeStop_DMA(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "停止前应确认 DMA 与 ADC 状态，避免在 DMA 正在写缓冲区时复用该内存。停止后按需分别处理主从 ADC 状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_ADCEx_MultiModeStop_DMA(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -26299,17 +26299,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-regularmultimodestop-dma",
             "name": "HAL_ADCEx_RegularMultiModeStop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的ADC 外设。",
+            "brief": "停止常规组多 ADC DMA 转换，保留仍在运行的注入组。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_RegularMultiModeStop_DMA(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_ADCEx_RegularMultiModeStop_DMA(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止常规组多 ADC DMA 转换，保留仍在运行的注入组。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_ADCEx_RegularMultiModeStop_DMA(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -26321,17 +26321,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-regularstop",
             "name": "HAL_ADCEx_RegularStop",
             "kind": "function",
-            "brief": "停止ADC 外设。",
+            "brief": "停止 ADC 常规组转换；注入组空闲时同时关闭 ADC。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_RegularStop(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_ADCEx_RegularStop(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组转换；注入组空闲时同时关闭 ADC。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_ADCEx_RegularStop(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -26343,17 +26343,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-regularstop-dma",
             "name": "HAL_ADCEx_RegularStop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的ADC 外设。",
+            "brief": "停止 ADC 常规组 DMA 转换并关闭 DMA 请求。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_RegularStop_DMA(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_ADCEx_RegularStop_DMA(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组 DMA 转换并关闭 DMA 请求。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_ADCEx_RegularStop_DMA(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -26365,17 +26365,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-adcex-regularstop-it",
             "name": "HAL_ADCEx_RegularStop_IT",
             "kind": "function",
-            "brief": "停止中断方式的ADC 外设。",
+            "brief": "停止 ADC 常规组转换并关闭常规组完成中断。",
             "prototype": "HAL_StatusTypeDef HAL_ADCEx_RegularStop_IT(ADC_HandleTypeDef *hadc);",
             "params": [
                 {
                     "name": "hadc",
-                    "description": "ADC 外设句柄。"
+                    "description": "ADC 句柄指针，例如 &hadc1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_ADCEx_RegularStop_IT(hadc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止 ADC 常规组转换并关闭常规组完成中断。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_ADCEx_RegularStop_IT(&hadc1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -27024,25 +27024,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-configchannel",
             "name": "HAL_DAC_ConfigChannel",
             "kind": "function",
-            "brief": "配置外设通道。",
+            "brief": "配置DAC 通道。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_ConfigChannel(DAC_HandleTypeDef *hdac, const DAC_ChannelConfTypeDef *sConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "DAC 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_DAC_ConfigChannel(hdac, sConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置DAC 通道。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_DAC_ConfigChannel(&hdac1, &dac_channel_config, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27058,17 +27058,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-convcpltcallbackch1",
             "name": "HAL_DAC_ConvCpltCallbackCh1",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 转换完成CALLBACKCH1操作。",
             "prototype": "void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 转换完成CH1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DAC_ConvCpltCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    conv_cplt_ch1_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27084,17 +27084,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-convhalfcpltcallbackch1",
             "name": "HAL_DAC_ConvHalfCpltCallbackCh1",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 转换半传输完成CALLBACKCH1操作。",
             "prototype": "void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 转换半传输完成CH1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DAC_ConvHalfCpltCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    conv_half_cplt_ch1_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27115,12 +27115,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_DAC_DeInit(hdac);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化DAC 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_DAC_DeInit(&hdac1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27136,17 +27136,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-dmaunderruncallbackch1",
             "name": "HAL_DAC_DMAUnderrunCallbackCh1",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC DMA欠载CALLBACKCH1操作。",
             "prototype": "void HAL_DAC_DMAUnderrunCallbackCh1(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "void HAL_DAC_DMAUnderrunCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC DMA欠载CH1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DAC_DMAUnderrunCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    dmaunderrun_ch1_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27162,17 +27162,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-errorcallbackch1",
             "name": "HAL_DAC_ErrorCallbackCh1",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 错误CALLBACKCH1操作。",
             "prototype": "void HAL_DAC_ErrorCallbackCh1(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DAC_ErrorCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 错误CH1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DAC_ErrorCallbackCh1(DAC_HandleTypeDef *hdac)\n{\n    error_ch1_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27188,17 +27188,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-geterror",
             "name": "HAL_DAC_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取DAC 错误。",
             "prototype": "uint32_t HAL_DAC_GetError(const DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_DAC_GetError(hdac);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取DAC 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_DAC_GetError(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27214,17 +27214,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-getstate",
             "name": "HAL_DAC_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取DAC 状态。",
             "prototype": "HAL_DAC_StateTypeDef HAL_DAC_GetState(const DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_DAC_GetState(hdac);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取DAC 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_DAC_GetState(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27240,21 +27240,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-getvalue",
             "name": "HAL_DAC_GetValue",
             "kind": "function",
-            "brief": "获取DAC 外设。",
+            "brief": "读取DAC 数值。",
             "prototype": "uint32_t HAL_DAC_GetValue(const DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_DAC_GetValue(hdac, Channel);",
+            "returns": "返回 DAC 指定通道当前配置的输出数据值。",
+            "notes": "该接口用于读取DAC 数值。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_DAC_GetValue(&hdac1, DAC_CHANNEL_1);",
             "families": [
                 "F1",
                 "F4",
@@ -27275,12 +27275,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_DAC_Init(hdac);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化DAC 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_DAC_Init(&hdac1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27296,17 +27296,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-irqhandler",
             "name": "HAL_DAC_IRQHandler",
             "kind": "function",
-            "brief": "处理DAC 外设产生的中断。",
+            "brief": "处理 DAC 外设中断标志并分发对应回调。",
             "prototype": "void HAL_DAC_IRQHandler(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_DAC_IRQHandler(hdac);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 DAC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_DAC_IRQHandler(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27322,17 +27322,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-mspdeinit",
             "name": "HAL_DAC_MspDeInit",
             "kind": "function",
-            "brief": "执行DAC 外设的底层硬件反初始化回调。",
+            "brief": "释放 DAC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_DAC_MspDeInit(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_DAC_MspDeInit(hdac);",
+            "notes": "该接口用于释放 DAC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_DAC_MspDeInit(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27348,17 +27348,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-mspinit",
             "name": "HAL_DAC_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 DAC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_DAC_MspInit(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_DAC_MspInit(hdac);",
+            "notes": "该接口用于初始化 DAC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_DAC_MspInit(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27374,25 +27374,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-registercallback",
             "name": "HAL_DAC_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "DAC REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_RegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID, pDAC_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_DAC_RegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID, pDAC_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应DAC REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_DAC_RegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID, pDAC_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27408,29 +27408,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-setvalue",
             "name": "HAL_DAC_SetValue",
             "kind": "function",
-            "brief": "设置DAC 外设。",
+            "brief": "设置DAC 数值。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_SetValue(DAC_HandleTypeDef *hdac, uint32_t Channel, uint32_t Alignment, uint32_t Data);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "Alignment",
-                    "description": "参数 Alignment，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC SET数值使用的 Alignment 参数。"
                 },
                 {
                     "name": "Data",
-                    "description": "待设置的数据或数值。"
+                    "description": "DAC SET数值使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_DAC_SetValue(hdac, Channel, Alignment, Data);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置DAC 数值。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_DAC_SetValue(&hdac1, DAC_CHANNEL_1, alignment, data) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27451,16 +27451,16 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DAC_Start(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DAC 外设。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_DAC_Start(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27476,33 +27476,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-start-dma",
             "name": "HAL_DAC_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动DAC 外设。",
+            "brief": "启动DAC 外设，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_Start_DMA(DAC_HandleTypeDef *hdac, uint32_t Channel, const uint32_t *pData, uint32_t Length, uint32_t Alignment);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Alignment",
-                    "description": "参数 Alignment，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC STARTDMA使用的 Alignment 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DAC_Start_DMA(hdac, Channel, pData, Length, Alignment);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DAC 外设，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, dac_buffer, DAC_BUFFER_LENGTH, alignment) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27523,16 +27523,16 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DAC_Stop(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止DAC 外设。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_DAC_Stop(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27548,21 +27548,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-stop-dma",
             "name": "HAL_DAC_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的DAC 外设。",
+            "brief": "停止DAC 外设，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_Stop_DMA(DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DAC_Stop_DMA(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止DAC 外设，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DAC_Stop_DMA(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27578,21 +27578,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dac-unregistercallback",
             "name": "HAL_DAC_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "DAC UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_DAC_UnRegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_DAC_UnRegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应DAC UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_DAC_UnRegisterCallback(DAC_HandleTypeDef *hdac, HAL_DAC_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27608,17 +27608,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-convcpltcallbackch2",
             "name": "HAL_DACEx_ConvCpltCallbackCh2",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 转换完成CALLBACKCH2操作。",
             "prototype": "void HAL_DACEx_ConvCpltCallbackCh2(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DACEx_ConvCpltCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 转换完成CH2。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DACEx_ConvCpltCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    conv_cplt_ch2_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27634,17 +27634,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-convhalfcpltcallbackch2",
             "name": "HAL_DACEx_ConvHalfCpltCallbackCh2",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 转换半传输完成CALLBACKCH2操作。",
             "prototype": "void HAL_DACEx_ConvHalfCpltCallbackCh2(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DACEx_ConvHalfCpltCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 转换半传输完成CH2。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DACEx_ConvHalfCpltCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    conv_half_cplt_ch2_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27660,17 +27660,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dmaunderruncallbackch2",
             "name": "HAL_DACEx_DMAUnderrunCallbackCh2",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC DMA欠载CALLBACKCH2操作。",
             "prototype": "void HAL_DACEx_DMAUnderrunCallbackCh2(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "void HAL_DACEx_DMAUnderrunCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC DMA欠载CH2。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DACEx_DMAUnderrunCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    dmaunderrun_ch2_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27686,17 +27686,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualgetvalue",
             "name": "HAL_DACEx_DualGetValue",
             "kind": "function",
-            "brief": "获取DAC 外设。",
+            "brief": "执行DAC DUALGET数值操作。",
             "prototype": "uint32_t HAL_DACEx_DualGetValue(const DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_DACEx_DualGetValue(hdac);",
+            "returns": "返回 DAC 指定通道当前配置的输出数据值。",
+            "notes": "该接口用于执行DAC DUALGET数值操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_DACEx_DualGetValue(&hdac1);",
             "families": [
                 "F1",
                 "F4",
@@ -27712,29 +27712,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualsetvalue",
             "name": "HAL_DACEx_DualSetValue",
             "kind": "function",
-            "brief": "设置DAC 外设。",
+            "brief": "执行DAC DUALSET数值操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_DualSetValue(DAC_HandleTypeDef *hdac, uint32_t Alignment, uint32_t Data1, uint32_t Data2);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Alignment",
-                    "description": "参数 Alignment，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC DUALSET数值使用的 Alignment 参数。"
                 },
                 {
                     "name": "Data1",
-                    "description": "待设置的数据或数值。"
+                    "description": "DAC DUALSET数值使用的 Data1 参数。"
                 },
                 {
                     "name": "Data2",
-                    "description": "待设置的数据或数值。"
+                    "description": "DAC DUALSET数值使用的 Data2 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_DACEx_DualSetValue(hdac, Alignment, Data1, Data2);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC DUALSET数值操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_DACEx_DualSetValue(&hdac1, alignment, data1, data2) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27750,17 +27750,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualstart",
             "name": "HAL_DACEx_DualStart",
             "kind": "function",
-            "brief": "启动DAC 外设。",
+            "brief": "启动DAC DUAL。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_DualStart(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_DualStart(hdac);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DAC DUAL。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_DACEx_DualStart(&hdac1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27776,33 +27776,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualstart-dma",
             "name": "HAL_DACEx_DualStart_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动DAC 外设。",
+            "brief": "启动DAC DUAL，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_DualStart_DMA(DAC_HandleTypeDef *hdac, uint32_t Channel, const uint32_t *pData, uint32_t Length, uint32_t Alignment);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Alignment",
-                    "description": "参数 Alignment，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC DUALSTARTDMA使用的 Alignment 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DACEx_DualStart_DMA(hdac, Channel, pData, Length, Alignment);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动DAC DUAL，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DACEx_DualStart_DMA(&hdac1, DAC_CHANNEL_1, dac_buffer, DAC_BUFFER_LENGTH, alignment) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -27814,17 +27814,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualstop",
             "name": "HAL_DACEx_DualStop",
             "kind": "function",
-            "brief": "停止DAC 外设。",
+            "brief": "停止DAC DUAL。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_DualStop(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_DualStop(hdac);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止DAC DUAL。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_DACEx_DualStop(&hdac1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27840,21 +27840,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-dualstop-dma",
             "name": "HAL_DACEx_DualStop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的DAC 外设。",
+            "brief": "停止DAC DUAL，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_DualStop_DMA(DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_DACEx_DualStop_DMA(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止DAC DUAL，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_DACEx_DualStop_DMA(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -27866,17 +27866,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-errorcallbackch2",
             "name": "HAL_DACEx_ErrorCallbackCh2",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "执行DAC 错误CALLBACKCH2操作。",
             "prototype": "void HAL_DACEx_ErrorCallbackCh2(DAC_HandleTypeDef *hdac);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_DACEx_ErrorCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应DAC 错误CH2。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_DACEx_ErrorCallbackCh2(DAC_HandleTypeDef *hdac)\n{\n    error_ch2_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27892,21 +27892,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-gettrimoffset",
             "name": "HAL_DACEx_GetTrimOffset",
             "kind": "function",
-            "brief": "获取DAC 外设。",
+            "brief": "读取DAC TRIMOFFSET。",
             "prototype": "uint32_t HAL_DACEx_GetTrimOffset(const DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_DACEx_GetTrimOffset(hdac, Channel);",
+            "notes": "该接口用于读取DAC TRIMOFFSET。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_DACEx_GetTrimOffset(&hdac1, DAC_CHANNEL_1);",
             "families": [
                 "G4"
             ],
@@ -27918,25 +27918,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-noisewavegenerate",
             "name": "HAL_DACEx_NoiseWaveGenerate",
             "kind": "function",
-            "brief": "提供DAC 外设相关的 HAL 操作接口。",
+            "brief": "执行DAC NOISEWAVEGENERATE操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_NoiseWaveGenerate(DAC_HandleTypeDef *hdac, uint32_t Channel, uint32_t Amplitude);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "Amplitude",
-                    "description": "参数 Amplitude，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC NOISEWAVEGENERATE使用的 Amplitude 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_NoiseWaveGenerate(hdac, Channel, Amplitude);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC NOISEWAVEGENERATE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_NoiseWaveGenerate(&hdac1, DAC_CHANNEL_1, amplitude) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -27952,21 +27952,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-sawtoothwavedatareset",
             "name": "HAL_DACEx_SawtoothWaveDataReset",
             "kind": "function",
-            "brief": "复位DAC 外设。",
+            "brief": "复位DAC SAWTOOTHWAVEDATA。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_SawtoothWaveDataReset(DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_SawtoothWaveDataReset(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于复位DAC SAWTOOTHWAVEDATA。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_SawtoothWaveDataReset(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -27978,21 +27978,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-sawtoothwavedatastep",
             "name": "HAL_DACEx_SawtoothWaveDataStep",
             "kind": "function",
-            "brief": "提供DAC 外设相关的 HAL 操作接口。",
+            "brief": "执行DAC SAWTOOTHWAVEDATASTEP操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_SawtoothWaveDataStep(DAC_HandleTypeDef *hdac, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_SawtoothWaveDataStep(hdac, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC SAWTOOTHWAVEDATASTEP操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_SawtoothWaveDataStep(&hdac1, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -28004,33 +28004,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-sawtoothwavegenerate",
             "name": "HAL_DACEx_SawtoothWaveGenerate",
             "kind": "function",
-            "brief": "提供DAC 外设相关的 HAL 操作接口。",
+            "brief": "执行DAC SAWTOOTHWAVEGENERATE操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_SawtoothWaveGenerate(DAC_HandleTypeDef *hdac, uint32_t Channel, uint32_t Polarity, uint32_t ResetData, uint32_t StepData);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "Polarity",
-                    "description": "参数 Polarity，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC SAWTOOTHWAVEGENERATE使用的 Polarity 参数。"
                 },
                 {
                     "name": "ResetData",
-                    "description": "待设置的数据或数值。"
+                    "description": "DAC SAWTOOTHWAVEGENERATE使用的数据值。"
                 },
                 {
                     "name": "StepData",
-                    "description": "数据缓冲区指针。"
+                    "description": "DAC SAWTOOTHWAVEGENERATE使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_SawtoothWaveGenerate(hdac, Channel, Polarity, ResetData, StepData);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC SAWTOOTHWAVEGENERATE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_SawtoothWaveGenerate(&hdac1, DAC_CHANNEL_1, polarity, resetdata, stepdata) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -28042,25 +28042,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-selfcalibrate",
             "name": "HAL_DACEx_SelfCalibrate",
             "kind": "function",
-            "brief": "提供DAC 外设相关的 HAL 操作接口。",
+            "brief": "执行DAC SELFCALIBRATE操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_SelfCalibrate(DAC_HandleTypeDef *hdac, DAC_ChannelConfTypeDef *sConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "DAC 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_SelfCalibrate(hdac, sConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC SELFCALIBRATE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_SelfCalibrate(&hdac1, &dac_channel_config, DAC_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -28072,29 +28072,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-setusertrimming",
             "name": "HAL_DACEx_SetUserTrimming",
             "kind": "function",
-            "brief": "设置DAC 外设。",
+            "brief": "设置DAC USERTRIMMING。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_SetUserTrimming(DAC_HandleTypeDef *hdac, DAC_ChannelConfTypeDef *sConfig, uint32_t Channel, uint32_t NewTrimmingValue);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "DAC 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "NewTrimmingValue",
-                    "description": "待设置的数据或数值。"
+                    "description": "DAC SETUSERTRIMMING使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_DACEx_SetUserTrimming(hdac, sConfig, Channel, NewTrimmingValue);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置DAC USERTRIMMING。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_DACEx_SetUserTrimming(&hdac1, &dac_channel_config, DAC_CHANNEL_1, newtrimmingvalue) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -28106,25 +28106,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-dacex-trianglewavegenerate",
             "name": "HAL_DACEx_TriangleWaveGenerate",
             "kind": "function",
-            "brief": "提供DAC 外设相关的 HAL 操作接口。",
+            "brief": "执行DAC TRIANGLEWAVEGENERATE操作。",
             "prototype": "HAL_StatusTypeDef HAL_DACEx_TriangleWaveGenerate(DAC_HandleTypeDef *hdac, uint32_t Channel, uint32_t Amplitude);",
             "params": [
                 {
                     "name": "hdac",
-                    "description": "DAC 外设句柄。"
+                    "description": "DAC 句柄指针，例如 &hdac1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 DAC 通道或通道编号。"
                 },
                 {
                     "name": "Amplitude",
-                    "description": "参数 Amplitude，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "DAC TRIANGLEWAVEGENERATE使用的 Amplitude 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_DACEx_TriangleWaveGenerate(hdac, Channel, Amplitude);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行DAC TRIANGLEWAVEGENERATE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_DACEx_TriangleWaveGenerate(&hdac1, DAC_CHANNEL_1, amplitude) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28378,17 +28378,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-deinit",
             "name": "HAL_TIM_Base_DeInit",
             "kind": "function",
-            "brief": "反初始化定时器基本计数单元。",
+            "brief": "反初始化定时器 基本计数。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_Base_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 基本计数。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_Base_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28404,17 +28404,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-getstate",
             "name": "HAL_TIM_Base_GetState",
             "kind": "function",
-            "brief": "获取运行状态定时器基本计数单元。",
+            "brief": "执行定时器 基本计数GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_Base_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_Base_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 基本计数GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_Base_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -28430,17 +28430,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-init",
             "name": "HAL_TIM_Base_Init",
             "kind": "function",
-            "brief": "初始化定时器基本计数单元。",
+            "brief": "初始化定时器 基本计数。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Init(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_Base_Init(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 基本计数。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_Base_Init(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28456,17 +28456,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-mspdeinit",
             "name": "HAL_TIM_Base_MspDeInit",
             "kind": "function",
-            "brief": "执行定时器基本计数单元的底层硬件反初始化回调。",
+            "brief": "释放 定时器 基本计数 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_Base_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_Base_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 基本计数 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_Base_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -28482,17 +28482,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-mspinit",
             "name": "HAL_TIM_Base_MspInit",
             "kind": "function",
-            "brief": "执行定时器基本计数单元的底层硬件初始化回调。",
+            "brief": "初始化 定时器 基本计数 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_Base_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_Base_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 基本计数 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_Base_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -28508,17 +28508,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-start",
             "name": "HAL_TIM_Base_Start",
             "kind": "function",
-            "brief": "启动定时器基本计数单元。",
+            "brief": "启动定时器 基本计数。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Start(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_Base_Start(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 基本计数。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_Base_Start(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28534,25 +28534,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-start-dma",
             "name": "HAL_TIM_Base_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动定时器基本计数单元。",
+            "brief": "启动定时器 基本计数，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Start_DMA(TIM_HandleTypeDef *htim, const uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_Base_Start_DMA(htim, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 基本计数，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_Base_Start_DMA(&htim1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28568,17 +28568,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-start-it",
             "name": "HAL_TIM_Base_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动定时器基本计数单元。",
+            "brief": "启动定时器 基本计数，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Start_IT(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_Base_Start_IT(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 基本计数，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_Base_Start_IT(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28594,17 +28594,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-stop",
             "name": "HAL_TIM_Base_Stop",
             "kind": "function",
-            "brief": "停止定时器基本计数单元。",
+            "brief": "停止定时器 基本计数。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Stop(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_Base_Stop(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 基本计数。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_Base_Stop(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28620,17 +28620,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-stop-dma",
             "name": "HAL_TIM_Base_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的定时器基本计数单元。",
+            "brief": "停止定时器 基本计数，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Stop_DMA(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_Base_Stop_DMA(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 基本计数，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_Base_Stop_DMA(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28646,17 +28646,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-base-stop-it",
             "name": "HAL_TIM_Base_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的定时器基本计数单元。",
+            "brief": "停止定时器 基本计数，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Base_Stop_IT(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_Base_Stop_IT(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 基本计数，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_Base_Stop_IT(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28672,21 +28672,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-configclocksource",
             "name": "HAL_TIM_ConfigClockSource",
             "kind": "function",
-            "brief": "配置时钟源。",
+            "brief": "配置定时器 时钟SOURCE。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_ConfigClockSource(TIM_HandleTypeDef *htim, const TIM_ClockConfigTypeDef *sClockSourceConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sClockSourceConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 CONFIG时钟SOURCE使用的 s Clock Source Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_ConfigClockSource(htim, sClockSourceConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 时钟SOURCE。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_ConfigClockSource(&htim1, sclocksourceconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28702,25 +28702,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-configocrefclear",
             "name": "HAL_TIM_ConfigOCrefClear",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 OCREFCLEAR。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_ConfigOCrefClear(TIM_HandleTypeDef *htim, const TIM_ClearInputConfigTypeDef *sClearInputConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sClearInputConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 CONFIGOCREFCLEAR使用的 s Clear Input Config 参数。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_ConfigOCrefClear(htim, sClearInputConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 OCREFCLEAR。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_ConfigOCrefClear(&htim1, sclearinputconfig, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28736,21 +28736,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-configti1input",
             "name": "HAL_TIM_ConfigTI1Input",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 TI1输入。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_ConfigTI1Input(TIM_HandleTypeDef *htim, uint32_t TI1_Selection);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "TI1_Selection",
-                    "description": "参数 TI1_Selection，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIGTI1输入使用的 T I1_ Selection 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_ConfigTI1Input(htim, TI1_Selection);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 TI1输入。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_ConfigTI1Input(&htim1, ti1_selection) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28766,37 +28766,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-multireadstart",
             "name": "HAL_TIM_DMABurst_MultiReadStart",
             "kind": "function",
-            "brief": "启动定时器 外设。",
+            "brief": "启动定时器 DMABURST多重READ。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_MultiReadStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress, uint32_t BurstRequestSrc, uint32_t *BurstBuffer, uint32_t BurstLength, uint32_t DataLength);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstBaseAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURST多重READSTART使用的 Burst Request Src 参数。"
                 },
                 {
                     "name": "BurstBuffer",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "BurstLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURST多重READSTART使用的 Burst Length 参数。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURST多重READSTART使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_MultiReadStart(htim, BurstBaseAddress, BurstRequestSrc, BurstBuffer, BurstLength, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 DMABURST多重READ。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_MultiReadStart(&htim1, burstbaseaddress, burstrequestsrc, tim_buffer, burstlength, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28812,37 +28812,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-multiwritestart",
             "name": "HAL_TIM_DMABurst_MultiWriteStart",
             "kind": "function",
-            "brief": "启动定时器 外设。",
+            "brief": "启动定时器 DMABURST多重WRITE。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_MultiWriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress, uint32_t BurstRequestSrc, const uint32_t *BurstBuffer, uint32_t BurstLength, uint32_t DataLength);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstBaseAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURST多重WRITESTART使用的 Burst Request Src 参数。"
                 },
                 {
                     "name": "BurstBuffer",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "BurstLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURST多重WRITESTART使用的 Burst Length 参数。"
                 },
                 {
                     "name": "DataLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURST多重WRITESTART使用的 Data Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_MultiWriteStart(htim, BurstBaseAddress, BurstRequestSrc, BurstBuffer, BurstLength, DataLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 DMABURST多重WRITE。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_MultiWriteStart(&htim1, burstbaseaddress, burstrequestsrc, tim_buffer, burstlength, datalength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28858,33 +28858,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-readstart",
             "name": "HAL_TIM_DMABurst_ReadStart",
             "kind": "function",
-            "brief": "启动定时器 外设。",
+            "brief": "启动定时器 DMABURSTREAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_ReadStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress, uint32_t BurstRequestSrc, uint32_t *BurstBuffer, uint32_t BurstLength);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstBaseAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURSTREADSTART使用的 Burst Request Src 参数。"
                 },
                 {
                     "name": "BurstBuffer",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "BurstLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURSTREADSTART使用的 Burst Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_ReadStart(htim, BurstBaseAddress, BurstRequestSrc, BurstBuffer, BurstLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 DMABURSTREAD。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_ReadStart(&htim1, burstbaseaddress, burstrequestsrc, tim_buffer, burstlength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28900,21 +28900,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-readstop",
             "name": "HAL_TIM_DMABurst_ReadStop",
             "kind": "function",
-            "brief": "停止定时器 外设。",
+            "brief": "停止定时器 DMABURSTREAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_ReadStop(TIM_HandleTypeDef *htim, uint32_t BurstRequestSrc);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURSTREADSTOP使用的 Burst Request Src 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_ReadStop(htim, BurstRequestSrc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 DMABURSTREAD。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_ReadStop(&htim1, burstrequestsrc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28930,33 +28930,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-writestart",
             "name": "HAL_TIM_DMABurst_WriteStart",
             "kind": "function",
-            "brief": "启动定时器 外设。",
+            "brief": "启动定时器 DMABURSTWRITE。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_WriteStart(TIM_HandleTypeDef *htim, uint32_t BurstBaseAddress, uint32_t BurstRequestSrc, const uint32_t *BurstBuffer, uint32_t BurstLength);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstBaseAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURSTWRITESTART使用的 Burst Request Src 参数。"
                 },
                 {
                     "name": "BurstBuffer",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "BurstLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "定时器 DMABURSTWRITESTART使用的 Burst Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_WriteStart(htim, BurstBaseAddress, BurstRequestSrc, BurstBuffer, BurstLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 DMABURSTWRITE。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_WriteStart(&htim1, burstbaseaddress, burstrequestsrc, tim_buffer, burstlength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -28972,21 +28972,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburst-writestop",
             "name": "HAL_TIM_DMABurst_WriteStop",
             "kind": "function",
-            "brief": "停止定时器 外设。",
+            "brief": "停止定时器 DMABURSTWRITE。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_DMABurst_WriteStop(TIM_HandleTypeDef *htim, uint32_t BurstRequestSrc);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BurstRequestSrc",
-                    "description": "参数 BurstRequestSrc，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DMABURSTWRITESTOP使用的 Burst Request Src 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurst_WriteStop(htim, BurstRequestSrc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 DMABURSTWRITE。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_DMABurst_WriteStop(&htim1, burstrequestsrc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29002,17 +29002,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-dmaburststate",
             "name": "HAL_TIM_DMABurstState",
             "kind": "function",
-            "brief": "提供运行状态相关的 HAL 操作接口。",
+            "brief": "执行定时器 DMABURST状态操作。",
             "prototype": "HAL_TIM_DMABurstStateTypeDef HAL_TIM_DMABurstState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_DMABurstState(htim);",
+            "notes": "该接口用于执行定时器 DMABURST状态操作。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "HAL_TIM_DMABurstState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29028,17 +29028,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-deinit",
             "name": "HAL_TIM_Encoder_DeInit",
             "kind": "function",
-            "brief": "反初始化编码器接口。",
+            "brief": "反初始化定时器 编码器。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_Encoder_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 编码器。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_Encoder_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29054,17 +29054,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-getstate",
             "name": "HAL_TIM_Encoder_GetState",
             "kind": "function",
-            "brief": "获取运行状态编码器接口。",
+            "brief": "执行定时器 编码器GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_Encoder_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_Encoder_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 编码器GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_Encoder_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29080,21 +29080,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-init",
             "name": "HAL_TIM_Encoder_Init",
             "kind": "function",
-            "brief": "初始化编码器接口。",
+            "brief": "初始化定时器 编码器。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Init(TIM_HandleTypeDef *htim, const TIM_Encoder_InitTypeDef *sConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_Encoder_Init(htim, sConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 编码器。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_Encoder_Init(&htim1, &tim_channel_config) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29110,17 +29110,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-mspdeinit",
             "name": "HAL_TIM_Encoder_MspDeInit",
             "kind": "function",
-            "brief": "执行编码器接口的底层硬件反初始化回调。",
+            "brief": "释放 定时器 编码器 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_Encoder_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_Encoder_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 编码器 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_Encoder_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29136,17 +29136,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-mspinit",
             "name": "HAL_TIM_Encoder_MspInit",
             "kind": "function",
-            "brief": "执行编码器接口的底层硬件初始化回调。",
+            "brief": "初始化 定时器 编码器 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_Encoder_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 编码器 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_Encoder_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29162,21 +29162,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-start",
             "name": "HAL_TIM_Encoder_Start",
             "kind": "function",
-            "brief": "启动编码器接口。",
+            "brief": "启动定时器 编码器。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_Encoder_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 编码器。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29192,33 +29192,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-start-dma",
             "name": "HAL_TIM_Encoder_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动编码器接口。",
+            "brief": "启动定时器 编码器，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t *pData1, uint32_t *pData2, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData1",
-                    "description": "数据缓冲区指针。"
+                    "description": "定时器 编码器STARTDMA使用的 p Data1 参数。"
                 },
                 {
                     "name": "pData2",
-                    "description": "数据缓冲区指针。"
+                    "description": "定时器 编码器STARTDMA使用的 p Data2 参数。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_Encoder_Start_DMA(htim, Channel, pData1, pData2, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 编码器，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_Encoder_Start_DMA(&htim1, TIM_CHANNEL_1, pdata1, pdata2, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29234,21 +29234,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-start-it",
             "name": "HAL_TIM_Encoder_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动编码器接口。",
+            "brief": "启动定时器 编码器，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_Encoder_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 编码器，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_Encoder_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29264,21 +29264,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-stop",
             "name": "HAL_TIM_Encoder_Stop",
             "kind": "function",
-            "brief": "停止编码器接口。",
+            "brief": "停止定时器 编码器。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_Encoder_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 编码器。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_Encoder_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29294,21 +29294,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-stop-dma",
             "name": "HAL_TIM_Encoder_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的编码器接口。",
+            "brief": "停止定时器 编码器，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_Encoder_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 编码器，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_Encoder_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29324,21 +29324,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-encoder-stop-it",
             "name": "HAL_TIM_Encoder_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的编码器接口。",
+            "brief": "停止定时器 编码器，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_Encoder_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_Encoder_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 编码器，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_Encoder_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29359,7 +29359,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -29380,21 +29380,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-generateevent",
             "name": "HAL_TIM_GenerateEvent",
             "kind": "function",
-            "brief": "提供定时器 外设相关的 HAL 操作接口。",
+            "brief": "执行定时器 GENERATE事件操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_GenerateEvent(TIM_HandleTypeDef *htim, uint32_t EventSource);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "EventSource",
-                    "description": "参数 EventSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要轮询或处理的 定时器 事件类型。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_GenerateEvent(htim, EventSource);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 GENERATE事件操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_TIM_GenerateEvent(&htim1, TIM_EVENT) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29410,17 +29410,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-getactivechannel",
             "name": "HAL_TIM_GetActiveChannel",
             "kind": "function",
-            "brief": "获取外设通道。",
+            "brief": "读取定时器 ACTIVE通道。",
             "prototype": "HAL_TIM_ActiveChannel HAL_TIM_GetActiveChannel(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_GetActiveChannel(htim);",
+            "notes": "该接口用于读取定时器 ACTIVE通道。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_TIM_GetActiveChannel(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29436,21 +29436,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-getchannelstate",
             "name": "HAL_TIM_GetChannelState",
             "kind": "function",
-            "brief": "获取外设通道。",
+            "brief": "读取定时器 通道状态。",
             "prototype": "HAL_TIM_ChannelStateTypeDef HAL_TIM_GetChannelState(const TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_GetChannelState(htim, Channel);",
+            "notes": "该接口用于读取定时器 通道状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_TIM_GetChannelState(&htim1, TIM_CHANNEL_1);",
             "families": [
                 "F1",
                 "F4",
@@ -29471,7 +29471,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -29497,7 +29497,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -29518,25 +29518,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-configchannel",
             "name": "HAL_TIM_IC_ConfigChannel",
             "kind": "function",
-            "brief": "配置输入捕获。",
+            "brief": "执行定时器 输入捕获CONFIG通道操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_ConfigChannel(TIM_HandleTypeDef *htim, const TIM_IC_InitTypeDef *sConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_IC_ConfigChannel(htim, sConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 输入捕获CONFIG通道操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_IC_ConfigChannel(&htim1, &tim_channel_config, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29552,17 +29552,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-deinit",
             "name": "HAL_TIM_IC_DeInit",
             "kind": "function",
-            "brief": "反初始化输入捕获。",
+            "brief": "反初始化定时器 输入捕获。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_IC_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 输入捕获。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_IC_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29578,17 +29578,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-getstate",
             "name": "HAL_TIM_IC_GetState",
             "kind": "function",
-            "brief": "获取运行状态输入捕获。",
+            "brief": "执行定时器 输入捕获GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_IC_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_IC_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 输入捕获GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_IC_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29604,17 +29604,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-init",
             "name": "HAL_TIM_IC_Init",
             "kind": "function",
-            "brief": "初始化输入捕获。",
+            "brief": "初始化定时器 输入捕获。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Init(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_IC_Init(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 输入捕获。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_IC_Init(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29630,17 +29630,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-mspdeinit",
             "name": "HAL_TIM_IC_MspDeInit",
             "kind": "function",
-            "brief": "执行输入捕获的底层硬件反初始化回调。",
+            "brief": "释放 定时器 输入捕获 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_IC_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_IC_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 输入捕获 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_IC_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29656,17 +29656,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-mspinit",
             "name": "HAL_TIM_IC_MspInit",
             "kind": "function",
-            "brief": "执行输入捕获的底层硬件初始化回调。",
+            "brief": "初始化 定时器 输入捕获 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_IC_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_IC_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 输入捕获 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_IC_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29682,21 +29682,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-start",
             "name": "HAL_TIM_IC_Start",
             "kind": "function",
-            "brief": "启动输入捕获。",
+            "brief": "启动定时器 输入捕获。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_IC_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输入捕获。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_IC_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29712,29 +29712,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-start-dma",
             "name": "HAL_TIM_IC_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动输入捕获。",
+            "brief": "启动定时器 输入捕获，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_IC_Start_DMA(htim, Channel, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输入捕获，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_IC_Start_DMA(&htim1, TIM_CHANNEL_1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29750,21 +29750,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-start-it",
             "name": "HAL_TIM_IC_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动输入捕获。",
+            "brief": "启动定时器 输入捕获，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_IC_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输入捕获，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_IC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29780,21 +29780,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-stop",
             "name": "HAL_TIM_IC_Stop",
             "kind": "function",
-            "brief": "停止输入捕获。",
+            "brief": "停止定时器 输入捕获。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_IC_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输入捕获。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_IC_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29810,21 +29810,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-stop-dma",
             "name": "HAL_TIM_IC_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的输入捕获。",
+            "brief": "停止定时器 输入捕获，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_IC_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输入捕获，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_IC_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29840,21 +29840,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-ic-stop-it",
             "name": "HAL_TIM_IC_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的输入捕获。",
+            "brief": "停止定时器 输入捕获，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_IC_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_IC_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输入捕获，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_IC_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29870,17 +29870,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-irqhandler",
             "name": "HAL_TIM_IRQHandler",
             "kind": "function",
-            "brief": "处理定时器 外设产生的中断。",
+            "brief": "处理 定时器 外设中断标志并分发对应回调。",
             "prototype": "void HAL_TIM_IRQHandler(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_TIM_IRQHandler(htim);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 定时器 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_TIM_IRQHandler(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -29896,25 +29896,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-configchannel",
             "name": "HAL_TIM_OC_ConfigChannel",
             "kind": "function",
-            "brief": "配置输出比较。",
+            "brief": "执行定时器 输出比较CONFIG通道操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_ConfigChannel(TIM_HandleTypeDef *htim, const TIM_OC_InitTypeDef *sConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_OC_ConfigChannel(htim, sConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 输出比较CONFIG通道操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_OC_ConfigChannel(&htim1, &tim_channel_config, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29930,17 +29930,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-deinit",
             "name": "HAL_TIM_OC_DeInit",
             "kind": "function",
-            "brief": "反初始化输出比较。",
+            "brief": "反初始化定时器 输出比较。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_OC_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 输出比较。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_OC_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -29961,7 +29961,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -29982,17 +29982,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-getstate",
             "name": "HAL_TIM_OC_GetState",
             "kind": "function",
-            "brief": "获取运行状态输出比较。",
+            "brief": "执行定时器 输出比较GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_OC_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_OC_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 输出比较GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_OC_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30008,17 +30008,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-init",
             "name": "HAL_TIM_OC_Init",
             "kind": "function",
-            "brief": "初始化输出比较。",
+            "brief": "初始化定时器 输出比较。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Init(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_OC_Init(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 输出比较。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_OC_Init(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30034,17 +30034,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-mspdeinit",
             "name": "HAL_TIM_OC_MspDeInit",
             "kind": "function",
-            "brief": "执行输出比较的底层硬件反初始化回调。",
+            "brief": "释放 定时器 输出比较 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_OC_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_OC_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 输出比较 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_OC_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30060,17 +30060,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-mspinit",
             "name": "HAL_TIM_OC_MspInit",
             "kind": "function",
-            "brief": "执行输出比较的底层硬件初始化回调。",
+            "brief": "初始化 定时器 输出比较 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_OC_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_OC_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 输出比较 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_OC_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30086,21 +30086,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-start",
             "name": "HAL_TIM_OC_Start",
             "kind": "function",
-            "brief": "启动输出比较。",
+            "brief": "启动定时器 输出比较。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_OC_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输出比较。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_OC_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30116,29 +30116,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-start-dma",
             "name": "HAL_TIM_OC_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动输出比较。",
+            "brief": "启动定时器 输出比较，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, const uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_OC_Start_DMA(htim, Channel, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输出比较，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_OC_Start_DMA(&htim1, TIM_CHANNEL_1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30154,21 +30154,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-start-it",
             "name": "HAL_TIM_OC_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动输出比较。",
+            "brief": "启动定时器 输出比较，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_OC_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 输出比较，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_OC_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30184,21 +30184,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-stop",
             "name": "HAL_TIM_OC_Stop",
             "kind": "function",
-            "brief": "停止输出比较。",
+            "brief": "停止定时器 输出比较。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_OC_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输出比较。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_OC_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30214,21 +30214,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-stop-dma",
             "name": "HAL_TIM_OC_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的输出比较。",
+            "brief": "停止定时器 输出比较，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_OC_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输出比较，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_OC_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30244,21 +30244,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-oc-stop-it",
             "name": "HAL_TIM_OC_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的输出比较。",
+            "brief": "停止定时器 输出比较，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OC_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_OC_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 输出比较，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_OC_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30274,29 +30274,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-configchannel",
             "name": "HAL_TIM_OnePulse_ConfigChannel",
             "kind": "function",
-            "brief": "配置单脉冲模式。",
+            "brief": "执行定时器 单脉冲CONFIG通道操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_ConfigChannel(TIM_HandleTypeDef *htim, TIM_OnePulse_InitTypeDef *sConfig, uint32_t OutputChannel, uint32_t InputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "InputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_OnePulse_ConfigChannel(htim, sConfig, OutputChannel, InputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 单脉冲CONFIG通道操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_OnePulse_ConfigChannel(&htim1, &tim_channel_config, TIM_CHANNEL_1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30312,17 +30312,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-deinit",
             "name": "HAL_TIM_OnePulse_DeInit",
             "kind": "function",
-            "brief": "反初始化单脉冲模式。",
+            "brief": "反初始化定时器 单脉冲。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_OnePulse_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 单脉冲。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_OnePulse_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30338,17 +30338,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-getstate",
             "name": "HAL_TIM_OnePulse_GetState",
             "kind": "function",
-            "brief": "获取运行状态单脉冲模式。",
+            "brief": "执行定时器 单脉冲GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_OnePulse_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_OnePulse_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 单脉冲GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_OnePulse_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30364,21 +30364,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-init",
             "name": "HAL_TIM_OnePulse_Init",
             "kind": "function",
-            "brief": "初始化单脉冲模式。",
+            "brief": "初始化定时器 单脉冲。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_Init(TIM_HandleTypeDef *htim, uint32_t OnePulseMode);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OnePulseMode",
-                    "description": "工作模式选择。"
+                    "description": "定时器 工作模式选择值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_OnePulse_Init(htim, OnePulseMode);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 单脉冲。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_OnePulse_Init(&htim1, onepulsemode) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30394,17 +30394,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-mspdeinit",
             "name": "HAL_TIM_OnePulse_MspDeInit",
             "kind": "function",
-            "brief": "执行单脉冲模式的底层硬件反初始化回调。",
+            "brief": "释放 定时器 单脉冲 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_OnePulse_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_OnePulse_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 单脉冲 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_OnePulse_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30420,17 +30420,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-mspinit",
             "name": "HAL_TIM_OnePulse_MspInit",
             "kind": "function",
-            "brief": "执行单脉冲模式的底层硬件初始化回调。",
+            "brief": "初始化 定时器 单脉冲 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_OnePulse_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_OnePulse_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 单脉冲 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_OnePulse_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30446,21 +30446,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-start",
             "name": "HAL_TIM_OnePulse_Start",
             "kind": "function",
-            "brief": "启动单脉冲模式。",
+            "brief": "启动定时器 单脉冲。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_Start(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_OnePulse_Start(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 单脉冲。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_OnePulse_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30476,21 +30476,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-start-it",
             "name": "HAL_TIM_OnePulse_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动单脉冲模式。",
+            "brief": "启动定时器 单脉冲，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_Start_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_OnePulse_Start_IT(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 单脉冲，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_OnePulse_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30506,21 +30506,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-stop",
             "name": "HAL_TIM_OnePulse_Stop",
             "kind": "function",
-            "brief": "停止单脉冲模式。",
+            "brief": "停止定时器 单脉冲。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_Stop(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_OnePulse_Stop(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 单脉冲。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_OnePulse_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30536,21 +30536,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-onepulse-stop-it",
             "name": "HAL_TIM_OnePulse_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的单脉冲模式。",
+            "brief": "停止定时器 单脉冲，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_OnePulse_Stop_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_OnePulse_Stop_IT(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 单脉冲，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_OnePulse_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30571,7 +30571,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -30597,7 +30597,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -30618,25 +30618,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-configchannel",
             "name": "HAL_TIM_PWM_ConfigChannel",
             "kind": "function",
-            "brief": "配置PWM 输出。",
+            "brief": "执行定时器 PWMCONFIG通道操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_ConfigChannel(TIM_HandleTypeDef *htim, const TIM_OC_InitTypeDef *sConfig, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_PWM_ConfigChannel(htim, sConfig, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 PWMCONFIG通道操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_PWM_ConfigChannel(&htim1, &tim_channel_config, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30652,17 +30652,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-deinit",
             "name": "HAL_TIM_PWM_DeInit",
             "kind": "function",
-            "brief": "反初始化PWM 输出。",
+            "brief": "反初始化定时器 PWM。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_PWM_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 PWM。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIM_PWM_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30678,17 +30678,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-getstate",
             "name": "HAL_TIM_PWM_GetState",
             "kind": "function",
-            "brief": "获取运行状态PWM 输出。",
+            "brief": "执行定时器 PWMGET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIM_PWM_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_PWM_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 PWMGET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIM_PWM_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30704,17 +30704,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-init",
             "name": "HAL_TIM_PWM_Init",
             "kind": "function",
-            "brief": "初始化PWM 输出。",
+            "brief": "初始化定时器 PWM。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Init(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_PWM_Init(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 PWM。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIM_PWM_Init(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30730,17 +30730,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-mspdeinit",
             "name": "HAL_TIM_PWM_MspDeInit",
             "kind": "function",
-            "brief": "执行PWM 输出的底层硬件反初始化回调。",
+            "brief": "释放 定时器 PWM 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIM_PWM_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIM_PWM_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 PWM 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIM_PWM_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30756,17 +30756,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-mspinit",
             "name": "HAL_TIM_PWM_MspInit",
             "kind": "function",
-            "brief": "执行PWM 输出的底层硬件初始化回调。",
+            "brief": "初始化 定时器 PWM 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIM_PWM_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIM_PWM_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 PWM 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIM_PWM_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -30787,7 +30787,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -30813,7 +30813,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -30834,21 +30834,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-start",
             "name": "HAL_TIM_PWM_Start",
             "kind": "function",
-            "brief": "启动PWM 输出。",
+            "brief": "启动定时器 PWM。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_PWM_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWM。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30864,29 +30864,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-start-dma",
             "name": "HAL_TIM_PWM_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动PWM 输出。",
+            "brief": "启动定时器 PWM，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, const uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_PWM_Start_DMA(htim, Channel, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWM，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30902,21 +30902,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-start-it",
             "name": "HAL_TIM_PWM_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动PWM 输出。",
+            "brief": "启动定时器 PWM，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_PWM_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWM，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_PWM_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30932,21 +30932,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-stop",
             "name": "HAL_TIM_PWM_Stop",
             "kind": "function",
-            "brief": "停止PWM 输出。",
+            "brief": "停止定时器 PWM。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIM_PWM_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWM。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIM_PWM_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30962,21 +30962,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-stop-dma",
             "name": "HAL_TIM_PWM_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的PWM 输出。",
+            "brief": "停止定时器 PWM，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIM_PWM_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWM，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIM_PWM_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -30992,21 +30992,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-pwm-stop-it",
             "name": "HAL_TIM_PWM_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的PWM 输出。",
+            "brief": "停止定时器 PWM，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_PWM_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_PWM_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWM，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_PWM_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31022,21 +31022,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-readcapturedvalue",
             "name": "HAL_TIM_ReadCapturedValue",
             "kind": "function",
-            "brief": "读取输入捕获值。",
+            "brief": "读取定时器 CAPTURED数值。",
             "prototype": "uint32_t HAL_TIM_ReadCapturedValue(const TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIM_ReadCapturedValue(htim, Channel);",
+            "notes": "该接口用于读取定时器 CAPTURED数值。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_TIM_ReadCapturedValue(&htim1, TIM_CHANNEL_1);",
             "families": [
                 "F1",
                 "F4",
@@ -31057,18 +31057,18 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
             "notes": "仅在 USE_HAL_TIM_REGISTER_CALLBACKS 设为 1 时可用。回调编号必须与函数指针类型匹配，注册时还要满足 HAL 对句柄状态的要求。",
             "example": "HAL_TIM_RegisterCallback(&htim1,\n                         HAL_TIM_PERIOD_ELAPSED_CB_ID,\n                         Timer_PeriodCallback);",
             "families": [
@@ -31086,21 +31086,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-slaveconfigsynchro",
             "name": "HAL_TIM_SlaveConfigSynchro",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "执行定时器 从机CONFIGSYNCHRO操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sSlaveConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 从机CONFIGSYNCHRO使用的 s Slave Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIM_SlaveConfigSynchro(htim, sSlaveConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 从机CONFIGSYNCHRO操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIM_SlaveConfigSynchro(&htim1, sslaveconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31116,21 +31116,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-tim-slaveconfigsynchro-it",
             "name": "HAL_TIM_SlaveConfigSynchro_IT",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "执行定时器 从机CONFIGSYNCHRO操作，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIM_SlaveConfigSynchro_IT(TIM_HandleTypeDef *htim, const TIM_SlaveConfigTypeDef *sSlaveConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sSlaveConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 从机CONFIGSYNCHROIT使用的 s Slave Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIM_SlaveConfigSynchro_IT(htim, sSlaveConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 从机CONFIGSYNCHRO操作，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIM_SlaveConfigSynchro_IT(&htim1, sslaveconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31151,7 +31151,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31177,7 +31177,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31203,14 +31203,14 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
             "notes": "仅在 USE_HAL_TIM_REGISTER_CALLBACKS 设为 1 时可用。取消前应确认没有并发中断正在使用该回调。",
             "example": "HAL_TIM_UnRegisterCallback(&htim1,\n                           HAL_TIM_PERIOD_ELAPSED_CB_ID);",
             "families": [
@@ -31232,8 +31232,8 @@ window.HAL_GENERATED_CATALOG = {
             "prototype": "void HAL_TIMEx_Break2Callback(TIM_HandleTypeDef *htim);",
             "params": [
                 {
-                    "name": "htim:",
-                    "description": "定时器 外设句柄。"
+                    "name": "htim",
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31255,7 +31255,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31281,7 +31281,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31307,7 +31307,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31328,21 +31328,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configasymmetricaldeadtime",
             "name": "HAL_TIMEx_ConfigAsymmetricalDeadTime",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 ASYMMETRICAL死区时间。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigAsymmetricalDeadTime(TIM_HandleTypeDef *htim, uint32_t FallingDeadtime);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "FallingDeadtime",
-                    "description": "参数 FallingDeadtime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIGASYMMETRICAL死区时间使用的 Falling Deadtime 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigAsymmetricalDeadTime(htim, FallingDeadtime);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 ASYMMETRICAL死区时间。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigAsymmetricalDeadTime(&htim1, fallingdeadtime) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31354,21 +31354,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configbreakdeadtime",
             "name": "HAL_TIMEx_ConfigBreakDeadTime",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 刹车死区时间。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigBreakDeadTime(TIM_HandleTypeDef *htim, const TIM_BreakDeadTimeConfigTypeDef *sBreakDeadTimeConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sBreakDeadTimeConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 CONFIG刹车死区时间使用的 s Break Dead Time Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigBreakDeadTime(htim, sBreakDeadTimeConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 刹车死区时间。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigBreakDeadTime(&htim1, sbreakdeadtimeconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31384,25 +31384,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configbreakinput",
             "name": "HAL_TIMEx_ConfigBreakInput",
             "kind": "function",
-            "brief": "配置刹车输入。",
+            "brief": "配置定时器 刹车输入。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigBreakInput(TIM_HandleTypeDef *htim, uint32_t BreakInput, const TIMEx_BreakInputConfigTypeDef *sBreakInputConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BreakInput",
-                    "description": "参数 BreakInput，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG刹车输入使用的 Break Input 参数。"
                 },
                 {
                     "name": "sBreakInputConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 CONFIG刹车输入使用的 s Break Input Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigBreakInput(htim, BreakInput, sBreakInputConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 刹车输入。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigBreakInput(&htim1, breakinput, sbreakinputconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31414,25 +31414,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configcommutevent",
             "name": "HAL_TIMEx_ConfigCommutEvent",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 换相事件。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigCommutEvent(TIM_HandleTypeDef *htim, uint32_t InputTrigger, uint32_t CommutationSource);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "InputTrigger",
-                    "description": "参数 InputTrigger，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件使用的 Input Trigger 参数。"
                 },
                 {
                     "name": "CommutationSource",
-                    "description": "参数 CommutationSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件使用的 Commutation Source 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigCommutEvent(htim, InputTrigger, CommutationSource);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 换相事件。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigCommutEvent(&htim1, inputtrigger, commutationsource) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31448,25 +31448,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configcommutevent-dma",
             "name": "HAL_TIMEx_ConfigCommutEvent_DMA",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 换相事件，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigCommutEvent_DMA(TIM_HandleTypeDef *htim, uint32_t InputTrigger, uint32_t CommutationSource);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "InputTrigger",
-                    "description": "参数 InputTrigger，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件DMA使用的 Input Trigger 参数。"
                 },
                 {
                     "name": "CommutationSource",
-                    "description": "参数 CommutationSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件DMA使用的 Commutation Source 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_ConfigCommutEvent_DMA(htim, InputTrigger, CommutationSource);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 换相事件，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_ConfigCommutEvent_DMA(&htim1, inputtrigger, commutationsource) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31482,25 +31482,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configcommutevent-it",
             "name": "HAL_TIMEx_ConfigCommutEvent_IT",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 换相事件，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigCommutEvent_IT(TIM_HandleTypeDef *htim, uint32_t InputTrigger, uint32_t CommutationSource);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "InputTrigger",
-                    "description": "参数 InputTrigger，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件IT使用的 Input Trigger 参数。"
                 },
                 {
                     "name": "CommutationSource",
-                    "description": "参数 CommutationSource，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG换相事件IT使用的 Commutation Source 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_ConfigCommutEvent_IT(htim, InputTrigger, CommutationSource);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 换相事件，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_ConfigCommutEvent_IT(&htim1, inputtrigger, commutationsource) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -31516,21 +31516,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configdeadtime",
             "name": "HAL_TIMEx_ConfigDeadTime",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 死区时间。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigDeadTime(TIM_HandleTypeDef *htim, uint32_t Deadtime);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Deadtime",
-                    "description": "参数 Deadtime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG死区时间使用的 Deadtime 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigDeadTime(htim, Deadtime);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 死区时间。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigDeadTime(&htim1, deadtime) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31542,21 +31542,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configencoderindex",
             "name": "HAL_TIMEx_ConfigEncoderIndex",
             "kind": "function",
-            "brief": "配置编码器接口。",
+            "brief": "配置定时器 编码器索引。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigEncoderIndex(TIM_HandleTypeDef *htim, TIMEx_EncoderIndexConfigTypeDef *sEncoderIndexConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sEncoderIndexConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 CONFIG编码器索引使用的 s Encoder Index Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigEncoderIndex(htim, sEncoderIndexConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 编码器索引。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigEncoderIndex(&htim1, sencoderindexconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31568,21 +31568,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-configslavemodepreload",
             "name": "HAL_TIMEx_ConfigSlaveModePreload",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 从机模式PRELOAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ConfigSlaveModePreload(TIM_HandleTypeDef *htim, uint32_t Source);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Source",
-                    "description": "参数 Source，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 CONFIG从机模式PRELOAD使用的 Source 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_ConfigSlaveModePreload(htim, Source);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 从机模式PRELOAD。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_ConfigSlaveModePreload(&htim1, source) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31599,7 +31599,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31616,17 +31616,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disableasymmetricaldeadtime",
             "name": "HAL_TIMEx_DisableAsymmetricalDeadTime",
             "kind": "function",
-            "brief": "禁用时间。",
+            "brief": "禁用定时器 ASYMMETRICAL死区时间。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisableAsymmetricalDeadTime(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisableAsymmetricalDeadTime(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 ASYMMETRICAL死区时间。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DisableAsymmetricalDeadTime(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31638,17 +31638,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disabledeadtimepreload",
             "name": "HAL_TIMEx_DisableDeadTimePreload",
             "kind": "function",
-            "brief": "禁用时间。",
+            "brief": "禁用定时器 死区时间PRELOAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisableDeadTimePreload(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisableDeadTimePreload(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 死区时间PRELOAD。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DisableDeadTimePreload(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31660,17 +31660,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disableencoderfirstindex",
             "name": "HAL_TIMEx_DisableEncoderFirstIndex",
             "kind": "function",
-            "brief": "禁用编码器接口。",
+            "brief": "禁用定时器 编码器FIRST索引。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisableEncoderFirstIndex(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisableEncoderFirstIndex(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 编码器FIRST索引。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DisableEncoderFirstIndex(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31682,17 +31682,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disableencoderindex",
             "name": "HAL_TIMEx_DisableEncoderIndex",
             "kind": "function",
-            "brief": "禁用编码器接口。",
+            "brief": "禁用定时器 编码器索引。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisableEncoderIndex(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisableEncoderIndex(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 编码器索引。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DisableEncoderIndex(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31704,17 +31704,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disableslavemodepreload",
             "name": "HAL_TIMEx_DisableSlaveModePreload",
             "kind": "function",
-            "brief": "禁用时间。",
+            "brief": "禁用定时器 从机模式PRELOAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisableSlaveModePreload(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisableSlaveModePreload(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 从机模式PRELOAD。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DisableSlaveModePreload(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31726,21 +31726,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-disarmbreakinput",
             "name": "HAL_TIMEx_DisarmBreakInput",
             "kind": "function",
-            "brief": "提供刹车输入相关的 HAL 操作接口。",
+            "brief": "执行定时器 DISARM刹车输入操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DisarmBreakInput(TIM_HandleTypeDef *htim, uint32_t BreakInput);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BreakInput",
-                    "description": "参数 BreakInput，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 DISARM刹车输入使用的 Break Input 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DisarmBreakInput(htim, BreakInput);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 DISARM刹车输入操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_TIMEx_DisarmBreakInput(&htim1, breakinput) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31752,17 +31752,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ditheringdisable",
             "name": "HAL_TIMEx_DitheringDisable",
             "kind": "function",
-            "brief": "禁用时间。",
+            "brief": "禁用定时器 DITHERING。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DitheringDisable(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DitheringDisable(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用定时器 DITHERING。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_DitheringDisable(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31774,17 +31774,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ditheringenable",
             "name": "HAL_TIMEx_DitheringEnable",
             "kind": "function",
-            "brief": "使能时间。",
+            "brief": "使能定时器 DITHERING。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_DitheringEnable(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_DitheringEnable(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 DITHERING。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_DitheringEnable(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31796,17 +31796,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-enableasymmetricaldeadtime",
             "name": "HAL_TIMEx_EnableAsymmetricalDeadTime",
             "kind": "function",
-            "brief": "使能时间。",
+            "brief": "使能定时器 ASYMMETRICAL死区时间。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_EnableAsymmetricalDeadTime(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_EnableAsymmetricalDeadTime(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 ASYMMETRICAL死区时间。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_EnableAsymmetricalDeadTime(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31818,17 +31818,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-enabledeadtimepreload",
             "name": "HAL_TIMEx_EnableDeadTimePreload",
             "kind": "function",
-            "brief": "使能时间。",
+            "brief": "使能定时器 死区时间PRELOAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_EnableDeadTimePreload(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_EnableDeadTimePreload(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 死区时间PRELOAD。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_EnableDeadTimePreload(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31840,17 +31840,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-enableencoderfirstindex",
             "name": "HAL_TIMEx_EnableEncoderFirstIndex",
             "kind": "function",
-            "brief": "使能编码器接口。",
+            "brief": "使能定时器 编码器FIRST索引。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_EnableEncoderFirstIndex(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_EnableEncoderFirstIndex(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 编码器FIRST索引。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_EnableEncoderFirstIndex(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31862,17 +31862,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-enableencoderindex",
             "name": "HAL_TIMEx_EnableEncoderIndex",
             "kind": "function",
-            "brief": "使能编码器接口。",
+            "brief": "使能定时器 编码器索引。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_EnableEncoderIndex(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_EnableEncoderIndex(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 编码器索引。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_EnableEncoderIndex(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31884,17 +31884,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-enableslavemodepreload",
             "name": "HAL_TIMEx_EnableSlaveModePreload",
             "kind": "function",
-            "brief": "使能时间。",
+            "brief": "使能定时器 从机模式PRELOAD。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_EnableSlaveModePreload(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_EnableSlaveModePreload(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能定时器 从机模式PRELOAD。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_EnableSlaveModePreload(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31911,7 +31911,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -31928,21 +31928,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-getchannelnstate",
             "name": "HAL_TIMEx_GetChannelNState",
             "kind": "function",
-            "brief": "获取外设通道。",
+            "brief": "读取定时器 通道N状态。",
             "prototype": "HAL_TIM_ChannelStateTypeDef HAL_TIMEx_GetChannelNState(const TIM_HandleTypeDef *htim, uint32_t ChannelN);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "ChannelN",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIMEx_GetChannelNState(htim, ChannelN);",
+            "notes": "该接口用于读取定时器 通道N状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_TIMEx_GetChannelNState(&htim1, TIM_CHANNEL_1);",
             "families": [
                 "F1",
                 "F4",
@@ -31958,21 +31958,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-groupchannel5",
             "name": "HAL_TIMEx_GroupChannel5",
             "kind": "function",
-            "brief": "提供外设通道相关的 HAL 操作接口。",
+            "brief": "执行定时器 GROUP通道5操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_GroupChannel5(TIM_HandleTypeDef *htim, uint32_t Channels);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channels",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_GroupChannel5(htim, Channels);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 GROUP通道5操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_TIMEx_GroupChannel5(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -31984,17 +31984,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-deinit",
             "name": "HAL_TIMEx_HallSensor_DeInit",
             "kind": "function",
-            "brief": "反初始化霍尔传感器接口。",
+            "brief": "反初始化定时器 霍尔传感器。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_DeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIMEx_HallSensor_DeInit(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化定时器 霍尔传感器。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_TIMEx_HallSensor_DeInit(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32010,17 +32010,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-getstate",
             "name": "HAL_TIMEx_HallSensor_GetState",
             "kind": "function",
-            "brief": "获取运行状态霍尔传感器接口。",
+            "brief": "执行定时器 霍尔传感器GET状态操作。",
             "prototype": "HAL_TIM_StateTypeDef HAL_TIMEx_HallSensor_GetState(const TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_TIMEx_HallSensor_GetState(htim);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于执行定时器 霍尔传感器GET状态操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_TIMEx_HallSensor_GetState(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -32036,21 +32036,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-init",
             "name": "HAL_TIMEx_HallSensor_Init",
             "kind": "function",
-            "brief": "初始化霍尔传感器接口。",
+            "brief": "初始化定时器 霍尔传感器。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Init(TIM_HandleTypeDef *htim, const TIM_HallSensor_InitTypeDef *sConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 通道配置结构体指针。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIMEx_HallSensor_Init(htim, sConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化定时器 霍尔传感器。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_TIMEx_HallSensor_Init(&htim1, &tim_channel_config) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32066,17 +32066,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-mspdeinit",
             "name": "HAL_TIMEx_HallSensor_MspDeInit",
             "kind": "function",
-            "brief": "执行霍尔传感器接口的底层硬件反初始化回调。",
+            "brief": "释放 定时器 霍尔传感器 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_TIMEx_HallSensor_MspDeInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_TIMEx_HallSensor_MspDeInit(htim);",
+            "notes": "该接口用于释放 定时器 霍尔传感器 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_TIMEx_HallSensor_MspDeInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -32092,17 +32092,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-mspinit",
             "name": "HAL_TIMEx_HallSensor_MspInit",
             "kind": "function",
-            "brief": "执行霍尔传感器接口的底层硬件初始化回调。",
+            "brief": "初始化 定时器 霍尔传感器 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_TIMEx_HallSensor_MspInit(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_TIMEx_HallSensor_MspInit(htim);",
+            "notes": "该接口用于初始化 定时器 霍尔传感器 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_TIMEx_HallSensor_MspInit(&htim1);",
             "families": [
                 "F1",
                 "F4",
@@ -32118,17 +32118,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-start",
             "name": "HAL_TIMEx_HallSensor_Start",
             "kind": "function",
-            "brief": "启动霍尔传感器接口。",
+            "brief": "启动定时器 霍尔传感器。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_HallSensor_Start(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 霍尔传感器。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_HallSensor_Start(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32144,25 +32144,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-start-dma",
             "name": "HAL_TIMEx_HallSensor_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动霍尔传感器接口。",
+            "brief": "启动定时器 霍尔传感器，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start_DMA(TIM_HandleTypeDef *htim, uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_HallSensor_Start_DMA(htim, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 霍尔传感器，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_HallSensor_Start_DMA(&htim1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32178,17 +32178,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-start-it",
             "name": "HAL_TIMEx_HallSensor_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动霍尔传感器接口。",
+            "brief": "启动定时器 霍尔传感器，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Start_IT(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_HallSensor_Start_IT(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 霍尔传感器，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_HallSensor_Start_IT(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32204,17 +32204,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-stop",
             "name": "HAL_TIMEx_HallSensor_Stop",
             "kind": "function",
-            "brief": "停止霍尔传感器接口。",
+            "brief": "停止定时器 霍尔传感器。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_HallSensor_Stop(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 霍尔传感器。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_HallSensor_Stop(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32230,17 +32230,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-stop-dma",
             "name": "HAL_TIMEx_HallSensor_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的霍尔传感器接口。",
+            "brief": "停止定时器 霍尔传感器，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop_DMA(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_HallSensor_Stop_DMA(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 霍尔传感器，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_HallSensor_Stop_DMA(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32256,17 +32256,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-hallsensor-stop-it",
             "name": "HAL_TIMEx_HallSensor_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的霍尔传感器接口。",
+            "brief": "停止定时器 霍尔传感器，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_HallSensor_Stop_IT(TIM_HandleTypeDef *htim);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_HallSensor_Stop_IT(htim);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 霍尔传感器，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_HallSensor_Stop_IT(&htim1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32287,7 +32287,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -32304,21 +32304,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-masterconfigsynchronization",
             "name": "HAL_TIMEx_MasterConfigSynchronization",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "执行定时器 主机CONFIGSYNCHRONIZATION操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_MasterConfigSynchronization(TIM_HandleTypeDef *htim, const TIM_MasterConfigTypeDef *sMasterConfig);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "sMasterConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "定时器 主机CONFIGSYNCHRONIZATION使用的 s Master Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_MasterConfigSynchronization(htim, sMasterConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 主机CONFIGSYNCHRONIZATION操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_MasterConfigSynchronization(&htim1, smasterconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32334,25 +32334,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-oc-configpulseoncompare",
             "name": "HAL_TIMEx_OC_ConfigPulseOnCompare",
             "kind": "function",
-            "brief": "配置捕获比较值。",
+            "brief": "执行定时器 输出比较CONFIG脉冲ONCOMPARE操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OC_ConfigPulseOnCompare(TIM_HandleTypeDef *htim, uint32_t PulseWidthPrescaler, uint32_t PulseWidth);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "PulseWidthPrescaler",
-                    "description": "参数 PulseWidthPrescaler，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 输出比较CONFIG脉冲ONCOMPARE使用的 Pulse Width Prescaler 参数。"
                 },
                 {
                     "name": "PulseWidth",
-                    "description": "参数 PulseWidth，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 输出比较CONFIG脉冲ONCOMPARE使用的 Pulse Width 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_OC_ConfigPulseOnCompare(htim, PulseWidthPrescaler, PulseWidth);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 输出比较CONFIG脉冲ONCOMPARE操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_OC_ConfigPulseOnCompare(&htim1, pulsewidthprescaler, pulsewidth) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -32364,21 +32364,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-start",
             "name": "HAL_TIMEx_OCN_Start",
             "kind": "function",
-            "brief": "启动时间。",
+            "brief": "启动定时器 OCN。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_OCN_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 OCN。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_OCN_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32394,29 +32394,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-start-dma",
             "name": "HAL_TIMEx_OCN_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动时间。",
+            "brief": "启动定时器 OCN，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, const uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_OCN_Start_DMA(htim, Channel, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 OCN，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_OCN_Start_DMA(&htim1, TIM_CHANNEL_1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32432,21 +32432,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-start-it",
             "name": "HAL_TIMEx_OCN_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动时间。",
+            "brief": "启动定时器 OCN，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_OCN_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 OCN，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_OCN_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32462,21 +32462,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-stop",
             "name": "HAL_TIMEx_OCN_Stop",
             "kind": "function",
-            "brief": "停止时间。",
+            "brief": "停止定时器 OCN。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_OCN_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 OCN。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_OCN_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32492,21 +32492,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-stop-dma",
             "name": "HAL_TIMEx_OCN_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的时间。",
+            "brief": "停止定时器 OCN，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_OCN_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 OCN，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_OCN_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32522,21 +32522,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-ocn-stop-it",
             "name": "HAL_TIMEx_OCN_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的时间。",
+            "brief": "停止定时器 OCN，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OCN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_OCN_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 OCN，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_OCN_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32552,21 +32552,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-onepulsen-start",
             "name": "HAL_TIMEx_OnePulseN_Start",
             "kind": "function",
-            "brief": "启动单脉冲模式。",
+            "brief": "启动定时器 单脉冲N。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Start(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_OnePulseN_Start(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 单脉冲N。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_OnePulseN_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32582,21 +32582,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-onepulsen-start-it",
             "name": "HAL_TIMEx_OnePulseN_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动单脉冲模式。",
+            "brief": "启动定时器 单脉冲N，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Start_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_OnePulseN_Start_IT(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 单脉冲N，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_OnePulseN_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32612,21 +32612,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-onepulsen-stop",
             "name": "HAL_TIMEx_OnePulseN_Stop",
             "kind": "function",
-            "brief": "停止单脉冲模式。",
+            "brief": "停止定时器 单脉冲N。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_OnePulseN_Stop(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 单脉冲N。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_OnePulseN_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32642,21 +32642,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-onepulsen-stop-it",
             "name": "HAL_TIMEx_OnePulseN_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的单脉冲模式。",
+            "brief": "停止定时器 单脉冲N，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_OnePulseN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t OutputChannel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "OutputChannel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_OnePulseN_Stop_IT(htim, OutputChannel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 单脉冲N，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_OnePulseN_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32672,21 +32672,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-start",
             "name": "HAL_TIMEx_PWMN_Start",
             "kind": "function",
-            "brief": "启动PWM 输出。",
+            "brief": "启动定时器 PWMN。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Start(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_PWMN_Start(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWMN。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_TIMEx_PWMN_Start(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32702,29 +32702,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-start-dma",
             "name": "HAL_TIMEx_PWMN_Start_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动PWM 输出。",
+            "brief": "启动定时器 PWMN，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Start_DMA(TIM_HandleTypeDef *htim, uint32_t Channel, const uint32_t *pData, uint16_t Length);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "Length",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_PWMN_Start_DMA(htim, Channel, pData, Length);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWMN，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_PWMN_Start_DMA(&htim1, TIM_CHANNEL_1, tim_buffer, TIM_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32740,21 +32740,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-start-it",
             "name": "HAL_TIMEx_PWMN_Start_IT",
             "kind": "function",
-            "brief": "以中断方式启动PWM 输出。",
+            "brief": "启动定时器 PWMN，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Start_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_PWMN_Start_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动定时器 PWMN，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_PWMN_Start_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32770,21 +32770,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-stop",
             "name": "HAL_TIMEx_PWMN_Stop",
             "kind": "function",
-            "brief": "停止PWM 输出。",
+            "brief": "停止定时器 PWMN。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_PWMN_Stop(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWMN。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_TIMEx_PWMN_Stop(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32800,21 +32800,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-stop-dma",
             "name": "HAL_TIMEx_PWMN_Stop_DMA",
             "kind": "function",
-            "brief": "停止 DMA 方式的PWM 输出。",
+            "brief": "停止定时器 PWMN，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop_DMA(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_TIMEx_PWMN_Stop_DMA(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWMN，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_TIMEx_PWMN_Stop_DMA(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32830,21 +32830,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-pwmn-stop-it",
             "name": "HAL_TIMEx_PWMN_Stop_IT",
             "kind": "function",
-            "brief": "停止中断方式的PWM 输出。",
+            "brief": "停止定时器 PWMN，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_PWMN_Stop_IT(TIM_HandleTypeDef *htim, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_TIMEx_PWMN_Stop_IT(htim, Channel);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止定时器 PWMN，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_TIMEx_PWMN_Stop_IT(&htim1, TIM_CHANNEL_1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32860,21 +32860,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-rearmbreakinput",
             "name": "HAL_TIMEx_ReArmBreakInput",
             "kind": "function",
-            "brief": "提供刹车输入相关的 HAL 操作接口。",
+            "brief": "执行定时器 REARM刹车输入操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_ReArmBreakInput(const TIM_HandleTypeDef *htim, uint32_t BreakInput);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "BreakInput",
-                    "description": "参数 BreakInput，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 REARM刹车输入使用的 Break Input 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_ReArmBreakInput(htim, BreakInput);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 REARM刹车输入操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_TIMEx_ReArmBreakInput(&htim1, breakinput) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -32886,21 +32886,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-remapconfig",
             "name": "HAL_TIMEx_RemapConfig",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置定时器 REMAP。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_RemapConfig(TIM_HandleTypeDef *htim, uint32_t Remap);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Remap",
-                    "description": "参数 Remap，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 REMAPCONFIG使用的 Remap 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_TIMEx_RemapConfig(htim, Remap);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置定时器 REMAP。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_TIMEx_RemapConfig(&htim1, remap) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -32916,25 +32916,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-timex-tiselection",
             "name": "HAL_TIMEx_TISelection",
             "kind": "function",
-            "brief": "提供时间相关的 HAL 操作接口。",
+            "brief": "执行定时器 TISELECTION操作。",
             "prototype": "HAL_StatusTypeDef HAL_TIMEx_TISelection(TIM_HandleTypeDef *htim, uint32_t TISelection, uint32_t Channel);",
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 },
                 {
                     "name": "Channel",
-                    "description": "目标外设通道。"
+                    "description": "目标 定时器 通道或通道编号。"
                 },
                 {
                     "name": "TISelection",
-                    "description": "参数 TISelection，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "定时器 TISELECTION使用的 T I Selection 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_TIMEx_TISelection(htim, Channel, TISelection);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行定时器 TISELECTION操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_TIMEx_TISelection(&htim1, TIM_CHANNEL_1, tiselection) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -32951,7 +32951,7 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "htim",
-                    "description": "定时器 外设句柄。"
+                    "description": "定时器 句柄指针，例如 &htim1。"
                 }
             ],
             "returns": "无。",
@@ -34114,17 +34114,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-halfduplex-enablereceiver",
             "name": "HAL_HalfDuplex_EnableReceiver",
             "kind": "function",
-            "brief": "以阻塞方式执行接收半双工模式。",
+            "brief": "使能串口 接收模式。",
             "prototype": "HAL_StatusTypeDef HAL_HalfDuplex_EnableReceiver(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_HalfDuplex_EnableReceiver(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 接收模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_HalfDuplex_EnableReceiver(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34140,17 +34140,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-halfduplex-enabletransmitter",
             "name": "HAL_HalfDuplex_EnableTransmitter",
             "kind": "function",
-            "brief": "以阻塞方式执行发送半双工模式。",
+            "brief": "使能串口 发送模式。",
             "prototype": "HAL_StatusTypeDef HAL_HalfDuplex_EnableTransmitter(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_HalfDuplex_EnableTransmitter(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 发送模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_HalfDuplex_EnableTransmitter(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34166,17 +34166,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-halfduplex-init",
             "name": "HAL_HalfDuplex_Init",
             "kind": "function",
-            "brief": "初始化半双工模式。",
+            "brief": "初始化串口半双工模式。",
             "prototype": "HAL_StatusTypeDef HAL_HalfDuplex_Init(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_HalfDuplex_Init(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化串口半双工模式。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_HalfDuplex_Init(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34192,21 +34192,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-lin-init",
             "name": "HAL_LIN_Init",
             "kind": "function",
-            "brief": "初始化串口 外设。",
+            "brief": "初始化串口 LIN 模式。",
             "prototype": "HAL_StatusTypeDef HAL_LIN_Init(UART_HandleTypeDef *huart, uint32_t BreakDetectLength);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "BreakDetectLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "串口 INIT使用的 Break Detect Length 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_LIN_Init(huart, BreakDetectLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化串口 LIN 模式。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_LIN_Init(&huart1, breakdetectlength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34222,17 +34222,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-lin-sendbreak",
             "name": "HAL_LIN_SendBreak",
             "kind": "function",
-            "brief": "提供串口 外设相关的 HAL 操作接口。",
+            "brief": "执行串口 SEND刹车操作。",
             "prototype": "HAL_StatusTypeDef HAL_LIN_SendBreak(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_LIN_SendBreak(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行串口 SEND刹车操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_LIN_SendBreak(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34248,17 +34248,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessor-disablemutemode",
             "name": "HAL_MultiProcessor_DisableMuteMode",
             "kind": "function",
-            "brief": "禁用串口 外设。",
+            "brief": "禁用串口 MUTE模式。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessor_DisableMuteMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_MultiProcessor_DisableMuteMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用串口 MUTE模式。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_MultiProcessor_DisableMuteMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34270,17 +34270,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessor-enablemutemode",
             "name": "HAL_MultiProcessor_EnableMuteMode",
             "kind": "function",
-            "brief": "使能串口 外设。",
+            "brief": "使能串口 MUTE模式。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessor_EnableMuteMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_MultiProcessor_EnableMuteMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 MUTE模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_MultiProcessor_EnableMuteMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34292,17 +34292,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessor-entermutemode",
             "name": "HAL_MultiProcessor_EnterMuteMode",
             "kind": "function",
-            "brief": "提供串口 外设相关的 HAL 操作接口。",
+            "brief": "进入串口 MUTE模式。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessor_EnterMuteMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_MultiProcessor_EnterMuteMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于进入串口 MUTE模式。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_MultiProcessor_EnterMuteMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34318,17 +34318,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessor-exitmutemode",
             "name": "HAL_MultiProcessor_ExitMuteMode",
             "kind": "function",
-            "brief": "提供串口 外设相关的 HAL 操作接口。",
+            "brief": "退出串口 MUTE模式。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessor_ExitMuteMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_MultiProcessor_ExitMuteMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于退出串口 MUTE模式。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_MultiProcessor_ExitMuteMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -34342,25 +34342,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessor-init",
             "name": "HAL_MultiProcessor_Init",
             "kind": "function",
-            "brief": "初始化串口 外设。",
+            "brief": "初始化串口多处理器模式。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessor_Init(UART_HandleTypeDef *huart, uint8_t Address, uint32_t WakeUpMethod);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "Address",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "WakeUpMethod",
-                    "description": "参数 WakeUpMethod，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 INIT使用的 Wake Up Method 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_MultiProcessor_Init(huart, Address, WakeUpMethod);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化串口多处理器模式。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_MultiProcessor_Init(&huart1, address, wakeupmethod) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34376,21 +34376,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-multiprocessorex-addresslength-set",
             "name": "HAL_MultiProcessorEx_AddressLength_Set",
             "kind": "function",
-            "brief": "设置串口 外设。",
+            "brief": "设置串口 ADDRESSLENGTH。",
             "prototype": "HAL_StatusTypeDef HAL_MultiProcessorEx_AddressLength_Set(UART_HandleTypeDef *huart, uint32_t AddressLength);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "AddressLength",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_MultiProcessorEx_AddressLength_Set(huart, AddressLength);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置串口 ADDRESSLENGTH。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_MultiProcessorEx_AddressLength_Set(&huart1, addresslength) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34402,29 +34402,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rs485ex-init",
             "name": "HAL_RS485Ex_Init",
             "kind": "function",
-            "brief": "初始化串口 外设。",
+            "brief": "初始化串口 RS-485 模式。",
             "prototype": "HAL_StatusTypeDef HAL_RS485Ex_Init(UART_HandleTypeDef *huart, uint32_t Polarity, uint32_t AssertionTime, uint32_t DeassertionTime);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "Polarity",
-                    "description": "参数 Polarity，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 INIT使用的 Polarity 参数。"
                 },
                 {
                     "name": "AssertionTime",
-                    "description": "参数 AssertionTime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 INIT使用的 Assertion Time 参数。"
                 },
                 {
                     "name": "DeassertionTime",
-                    "description": "参数 DeassertionTime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 INIT使用的 Deassertion Time 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_RS485Ex_Init(huart, Polarity, AssertionTime, DeassertionTime);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化串口 RS-485 模式。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_RS485Ex_Init(&huart1, polarity, assertiontime, deassertiontime) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34441,12 +34441,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_Abort(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 外设。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UART_Abort(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34462,17 +34462,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-abort-it",
             "name": "HAL_UART_Abort_IT",
             "kind": "function",
-            "brief": "中止串口 外设。",
+            "brief": "中止串口 外设，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Abort_IT(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UART_Abort_IT(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 外设，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UART_Abort_IT(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34488,17 +34488,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-abortcpltcallback",
             "name": "HAL_UART_AbortCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 中止完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_AbortCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_AbortCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 中止完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_AbortCpltCallback(UART_HandleTypeDef *huart)\n{\n    abort_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34514,17 +34514,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-abortreceive",
             "name": "HAL_UART_AbortReceive",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "中止串口 接收。",
             "prototype": "HAL_StatusTypeDef HAL_UART_AbortReceive(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_AbortReceive(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 接收。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UART_AbortReceive(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34540,17 +34540,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-abortreceive-it",
             "name": "HAL_UART_AbortReceive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "中止串口 接收，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_UART_AbortReceive_IT(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UART_AbortReceive_IT(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 接收，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UART_AbortReceive_IT(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34566,17 +34566,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-abortreceivecpltcallback",
             "name": "HAL_UART_AbortReceiveCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 中止接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 中止接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_AbortReceiveCpltCallback(UART_HandleTypeDef *huart)\n{\n    abort_receive_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34592,17 +34592,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-aborttransmit",
             "name": "HAL_UART_AbortTransmit",
             "kind": "function",
-            "brief": "以阻塞方式执行发送发送过程。",
+            "brief": "中止串口 发送。",
             "prototype": "HAL_StatusTypeDef HAL_UART_AbortTransmit(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_AbortTransmit(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 发送。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UART_AbortTransmit(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34618,17 +34618,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-aborttransmit-it",
             "name": "HAL_UART_AbortTransmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "中止串口 发送，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_UART_AbortTransmit_IT(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UART_AbortTransmit_IT(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止串口 发送，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UART_AbortTransmit_IT(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34644,17 +34644,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-aborttransmitcpltcallback",
             "name": "HAL_UART_AbortTransmitCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 中止发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 中止发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_AbortTransmitCpltCallback(UART_HandleTypeDef *huart)\n{\n    abort_transmit_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34675,12 +34675,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_UART_DeInit(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化串口 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_UART_DeInit(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34696,17 +34696,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-disablereceivertimeout",
             "name": "HAL_UART_DisableReceiverTimeout",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "禁用串口 接收模式超时。",
             "prototype": "HAL_StatusTypeDef HAL_UART_DisableReceiverTimeout(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_DisableReceiverTimeout(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用串口 接收模式超时。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_UART_DisableReceiverTimeout(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34718,17 +34718,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-dmapause",
             "name": "HAL_UART_DMAPause",
             "kind": "function",
-            "brief": "提供串口 外设相关的 HAL 操作接口。",
+            "brief": "执行串口 DMAPAUSE操作。",
             "prototype": "HAL_StatusTypeDef HAL_UART_DMAPause(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UART_DMAPause(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行串口 DMAPAUSE操作。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UART_DMAPause(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34744,17 +34744,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-dmaresume",
             "name": "HAL_UART_DMAResume",
             "kind": "function",
-            "brief": "恢复串口 外设。",
+            "brief": "恢复串口 DMA。",
             "prototype": "HAL_StatusTypeDef HAL_UART_DMAResume(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UART_DMAResume(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于恢复串口 DMA。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UART_DMAResume(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34770,17 +34770,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-dmastop",
             "name": "HAL_UART_DMAStop",
             "kind": "function",
-            "brief": "停止串口 外设。",
+            "brief": "停止串口 DMA。",
             "prototype": "HAL_StatusTypeDef HAL_UART_DMAStop(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UART_DMAStop(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止串口 DMA。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UART_DMAStop(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34796,17 +34796,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-enablereceivertimeout",
             "name": "HAL_UART_EnableReceiverTimeout",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "使能串口 接收模式超时。",
             "prototype": "HAL_StatusTypeDef HAL_UART_EnableReceiverTimeout(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_EnableReceiverTimeout(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 接收模式超时。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_UART_EnableReceiverTimeout(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -34818,17 +34818,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-errorcallback",
             "name": "HAL_UART_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)\n{\n    error_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34844,17 +34844,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-geterror",
             "name": "HAL_UART_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取串口 错误。",
             "prototype": "uint32_t HAL_UART_GetError(const UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_UART_GetError(huart);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取串口 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_UART_GetError(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -34870,17 +34870,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-getstate",
             "name": "HAL_UART_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取串口 状态。",
             "prototype": "HAL_UART_StateTypeDef HAL_UART_GetState(const UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_UART_GetState(huart);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取串口 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_UART_GetState(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -34901,12 +34901,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_UART_Init(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化串口 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_UART_Init(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -34922,17 +34922,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-irqhandler",
             "name": "HAL_UART_IRQHandler",
             "kind": "function",
-            "brief": "处理串口 外设产生的中断。",
+            "brief": "处理 串口 外设中断标志并分发对应回调。",
             "prototype": "void HAL_UART_IRQHandler(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_UART_IRQHandler(huart);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 串口 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_UART_IRQHandler(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -34948,17 +34948,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-mspdeinit",
             "name": "HAL_UART_MspDeInit",
             "kind": "function",
-            "brief": "执行串口 外设的底层硬件反初始化回调。",
+            "brief": "释放 串口 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_UART_MspDeInit(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_UART_MspDeInit(huart);",
+            "notes": "该接口用于释放 串口 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_UART_MspDeInit(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -34974,17 +34974,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-mspinit",
             "name": "HAL_UART_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 串口 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_UART_MspInit(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_UART_MspInit(huart);",
+            "notes": "该接口用于初始化 串口 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_UART_MspInit(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -35000,29 +35000,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-receive",
             "name": "HAL_UART_Receive",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "以阻塞方式执行串口 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Receive(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_Receive(huart, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行串口 外设接收数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UART_Receive(&huart1, uart_buffer, UART_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35038,25 +35038,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-receive-dma",
             "name": "HAL_UART_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动串口 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Receive_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UART_Receive_DMA(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动串口 外设接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UART_Receive_DMA(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35072,25 +35072,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-receive-it",
             "name": "HAL_UART_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动串口 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Receive_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UART_Receive_IT(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动串口 外设接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UART_Receive_IT(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35106,21 +35106,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-receivertimeout-config",
             "name": "HAL_UART_ReceiverTimeout_Config",
             "kind": "function",
-            "brief": "以阻塞方式执行接收配置参数。",
+            "brief": "配置串口 接收模式超时。",
             "prototype": "void HAL_UART_ReceiverTimeout_Config(UART_HandleTypeDef *huart, uint32_t TimeoutValue);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "TimeoutValue",
-                    "description": "最大等待时间。"
+                    "description": "串口 接收模式超时CONFIG使用的数据值。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_UART_ReceiverTimeout_Config(huart, TimeoutValue);",
+            "notes": "该接口用于配置串口 接收模式超时。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_UART_ReceiverTimeout_Config(&huart1, timeoutvalue);",
             "families": [
                 "G4"
             ],
@@ -35132,25 +35132,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-registercallback",
             "name": "HAL_UART_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "串口 REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_UART_RegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID, pUART_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_UART_RegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID, pUART_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应串口 REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_UART_RegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID, pUART_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35166,21 +35166,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-registerrxeventcallback",
             "name": "HAL_UART_RegisterRxEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 REGISTER接收事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(UART_HandleTypeDef *huart, pUART_RxEventCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(UART_HandleTypeDef *huart, pUART_RxEventCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应串口 REGISTER接收事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_UART_RegisterRxEventCallback(UART_HandleTypeDef *huart, pUART_RxEventCallbackTypeDef pCallback)\n{\n    register_rx_event_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35196,17 +35196,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-rxcpltcallback",
             "name": "HAL_UART_RxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)\n{\n    rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35222,17 +35222,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-rxhalfcpltcallback",
             "name": "HAL_UART_RxHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 接收半传输完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 接收半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)\n{\n    rx_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35248,29 +35248,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-transmit",
             "name": "HAL_UART_Transmit",
             "kind": "function",
-            "brief": "以阻塞方式执行发送发送过程。",
+            "brief": "以阻塞方式执行串口 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Transmit(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UART_Transmit(huart, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行串口 外设发送数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UART_Transmit(&huart1, uart_buffer, UART_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35286,25 +35286,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-transmit-dma",
             "name": "HAL_UART_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动串口 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Transmit_DMA(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UART_Transmit_DMA(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动串口 外设发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UART_Transmit_DMA(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35320,25 +35320,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-transmit-it",
             "name": "HAL_UART_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动串口 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_UART_Transmit_IT(UART_HandleTypeDef *huart, const uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UART_Transmit_IT(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动串口 外设发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UART_Transmit_IT(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35354,17 +35354,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-txcpltcallback",
             "name": "HAL_UART_TxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)\n{\n    tx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35380,17 +35380,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-txhalfcpltcallback",
             "name": "HAL_UART_TxHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 发送半传输完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 发送半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)\n{\n    tx_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35406,21 +35406,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-unregistercallback",
             "name": "HAL_UART_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "串口 UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_UART_UnRegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_UART_UnRegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应串口 UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_UART_UnRegisterCallback(UART_HandleTypeDef *huart, HAL_UART_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35436,17 +35436,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uart-unregisterrxeventcallback",
             "name": "HAL_UART_UnRegisterRxEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 UNREGISTER接收事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应串口 UNREGISTER接收事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_UART_UnRegisterRxEventCallback(UART_HandleTypeDef *huart)\n{\n    un_register_rx_event_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35462,17 +35462,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-disablefifomode",
             "name": "HAL_UARTEx_DisableFifoMode",
             "kind": "function",
-            "brief": "禁用FIFO。",
+            "brief": "禁用串口 FIFO模式。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_DisableFifoMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UARTEx_DisableFifoMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用串口 FIFO模式。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_UARTEx_DisableFifoMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35484,17 +35484,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-disablestopmode",
             "name": "HAL_UARTEx_DisableStopMode",
             "kind": "function",
-            "brief": "停止串口 外设。",
+            "brief": "禁用串口 STOP模式。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_DisableStopMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UARTEx_DisableStopMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用串口 STOP模式。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_UARTEx_DisableStopMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35506,17 +35506,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-enablefifomode",
             "name": "HAL_UARTEx_EnableFifoMode",
             "kind": "function",
-            "brief": "使能FIFO。",
+            "brief": "使能串口 FIFO模式。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_EnableFifoMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UARTEx_EnableFifoMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 FIFO模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_UARTEx_EnableFifoMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35528,17 +35528,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-enablestopmode",
             "name": "HAL_UARTEx_EnableStopMode",
             "kind": "function",
-            "brief": "停止串口 外设。",
+            "brief": "使能串口 STOP模式。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_EnableStopMode(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UARTEx_EnableStopMode(huart);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能串口 STOP模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_UARTEx_EnableStopMode(&huart1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35550,17 +35550,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-getrxeventtype",
             "name": "HAL_UARTEx_GetRxEventType",
             "kind": "function",
-            "brief": "获取串口 外设。",
+            "brief": "读取串口 接收事件TYPE。",
             "prototype": "HAL_UART_RxEventTypeTypeDef HAL_UARTEx_GetRxEventType(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_UARTEx_GetRxEventType(huart);",
+            "notes": "该接口用于读取串口 接收事件TYPE。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_UARTEx_GetRxEventType(&huart1);",
             "families": [
                 "F1",
                 "F4",
@@ -35576,33 +35576,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-receivetoidle",
             "name": "HAL_UARTEx_ReceiveToIdle",
             "kind": "function",
-            "brief": "以阻塞方式执行接收空闲线接收。",
+            "brief": "以阻塞方式执行串口 外设接收数据直到缓冲区满或检测到空闲线。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size, uint16_t *RxLen, uint32_t Timeout);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 },
                 {
                     "name": "RxLen",
-                    "description": "参数 RxLen，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 接收TO空闲线使用的 Rx Len 参数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_UARTEx_ReceiveToIdle(huart, pData, Size, RxLen, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行串口 外设接收数据直到缓冲区满或检测到空闲线。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_UARTEx_ReceiveToIdle(&huart1, uart_buffer, UART_BUFFER_LENGTH, rxlen, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35618,25 +35618,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-receivetoidle-dma",
             "name": "HAL_UARTEx_ReceiveToIdle_DMA",
             "kind": "function",
-            "brief": "以 DMA 和空闲线方式启动接收空闲线接收。",
+            "brief": "以 DMA 方式启动串口 外设接收数据直到缓冲区满或检测到空闲线。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_DMA(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_UARTEx_ReceiveToIdle_DMA(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动串口 外设接收数据直到缓冲区满或检测到空闲线。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_UARTEx_ReceiveToIdle_DMA(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35652,25 +35652,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-receivetoidle-it",
             "name": "HAL_UARTEx_ReceiveToIdle_IT",
             "kind": "function",
-            "brief": "以中断和空闲线方式启动接收空闲线接收。",
+            "brief": "以 中断方式启动串口 外设接收数据直到缓冲区满或检测到空闲线。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_ReceiveToIdle_IT(UART_HandleTypeDef *huart, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_UARTEx_ReceiveToIdle_IT(huart, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动串口 外设接收数据直到缓冲区满或检测到空闲线。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_UARTEx_ReceiveToIdle_IT(&huart1, uart_buffer, UART_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35686,21 +35686,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-rxeventcallback",
             "name": "HAL_UARTEx_RxEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 接收事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "传输字节数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 接收事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)\n{\n    rx_event_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -35716,17 +35716,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-rxfifofullcallback",
             "name": "HAL_UARTEx_RxFifoFullCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "串口 接收FIFO已满事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UARTEx_RxFifoFullCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UARTEx_RxFifoFullCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 接收FIFO已满。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UARTEx_RxFifoFullCallback(UART_HandleTypeDef *huart)\n{\n    rx_fifo_full_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -35738,21 +35738,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-setrxfifothreshold",
             "name": "HAL_UARTEx_SetRxFifoThreshold",
             "kind": "function",
-            "brief": "设置FIFO。",
+            "brief": "设置串口 接收FIFOTHRESHOLD。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_SetRxFifoThreshold(UART_HandleTypeDef *huart, uint32_t Threshold);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "Threshold",
-                    "description": "参数 Threshold，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 SET接收FIFOTHRESHOLD使用的 Threshold 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_UARTEx_SetRxFifoThreshold(huart, Threshold);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置串口 接收FIFOTHRESHOLD。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_UARTEx_SetRxFifoThreshold(&huart1, threshold) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35764,21 +35764,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-settxfifothreshold",
             "name": "HAL_UARTEx_SetTxFifoThreshold",
             "kind": "function",
-            "brief": "设置FIFO。",
+            "brief": "设置串口 发送FIFOTHRESHOLD。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_SetTxFifoThreshold(UART_HandleTypeDef *huart, uint32_t Threshold);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "Threshold",
-                    "description": "参数 Threshold，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 SET发送FIFOTHRESHOLD使用的 Threshold 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_UARTEx_SetTxFifoThreshold(huart, Threshold);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置串口 发送FIFOTHRESHOLD。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_UARTEx_SetTxFifoThreshold(&huart1, threshold) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35790,21 +35790,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-stopmodewakeupsourceconfig",
             "name": "HAL_UARTEx_StopModeWakeUpSourceConfig",
             "kind": "function",
-            "brief": "停止配置参数。",
+            "brief": "停止串口 模式唤醒UPSOURCECONFIG。",
             "prototype": "HAL_StatusTypeDef HAL_UARTEx_StopModeWakeUpSourceConfig(UART_HandleTypeDef *huart, UART_WakeUpTypeDef WakeUpSelection);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 },
                 {
                     "name": "WakeUpSelection",
-                    "description": "参数 WakeUpSelection，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "串口 STOP模式唤醒UPSOURCECONFIG使用的 Wake Up Selection 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_UARTEx_StopModeWakeUpSourceConfig(huart, WakeUpSelection);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止串口 模式唤醒UPSOURCECONFIG。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_UARTEx_StopModeWakeUpSourceConfig(&huart1, wakeupselection) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -35816,17 +35816,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-txfifoemptycallback",
             "name": "HAL_UARTEx_TxFifoEmptyCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "串口 发送FIFOEMPTY事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UARTEx_TxFifoEmptyCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UARTEx_TxFifoEmptyCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 发送FIFOEMPTY。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UARTEx_TxFifoEmptyCallback(UART_HandleTypeDef *huart)\n{\n    tx_fifo_empty_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -35838,17 +35838,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-uartex-wakeupcallback",
             "name": "HAL_UARTEx_WakeupCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "串口 WAKEUP事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart);",
             "params": [
                 {
                     "name": "huart",
-                    "description": "串口 外设句柄。"
+                    "description": "串口 句柄指针，例如 &huart1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应串口 WAKEUP。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_UARTEx_WakeupCallback(UART_HandleTypeDef *huart)\n{\n    wakeup_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -36502,17 +36502,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-abortcpltcallback",
             "name": "HAL_I2C_AbortCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 中止完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 中止完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_AbortCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    abort_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36528,25 +36528,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-addrcallback",
             "name": "HAL_I2C_AddrCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 地址事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "TransferDirection",
-                    "description": "参数 TransferDirection，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 地址CALLBACK使用的 Transfer Direction 参数。"
                 },
                 {
                     "name": "AddrMatchCode",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 地址。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_AddrCallback(I2C_HandleTypeDef *hi2c, uint8_t TransferDirection, uint16_t AddrMatchCode)\n{\n    addr_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36567,12 +36567,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_I2C_DeInit(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化I²C 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_I2C_DeInit(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36588,17 +36588,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-disablelisten-it",
             "name": "HAL_I2C_DisableListen_IT",
             "kind": "function",
-            "brief": "禁用I²C 外设。",
+            "brief": "禁用I²C 监听，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_DisableListen_IT(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_DisableListen_IT(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用I²C 监听，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_DisableListen_IT(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36614,17 +36614,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-enablelisten-it",
             "name": "HAL_I2C_EnableListen_IT",
             "kind": "function",
-            "brief": "使能I²C 外设。",
+            "brief": "使能I²C 监听，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_EnableListen_IT(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_EnableListen_IT(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能I²C 监听，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_EnableListen_IT(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36640,21 +36640,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-er-irqhandler",
             "name": "HAL_I2C_ER_IRQHandler",
             "kind": "function",
-            "brief": "处理I²C 外设产生的中断。",
+            "brief": "处理 I²C ER中断标志并分发对应回调。",
             "prototype": "void HAL_I2C_ER_IRQHandler(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_I2C_ER_IRQHandler(hi2c, hi2c);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 I²C 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_I2C_ER_IRQHandler(&hi2c1, &hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -36670,17 +36670,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-errorcallback",
             "name": "HAL_I2C_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_ErrorCallback(I2C_HandleTypeDef *hi2c)\n{\n    error_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36696,17 +36696,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-ev-irqhandler",
             "name": "HAL_I2C_EV_IRQHandler",
             "kind": "function",
-            "brief": "处理I²C 外设产生的中断。",
+            "brief": "处理 I²C EV中断标志并分发对应回调。",
             "prototype": "void HAL_I2C_EV_IRQHandler(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_I2C_EV_IRQHandler(hi2c);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 I²C 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_I2C_EV_IRQHandler(&hi2c1);",
             "families": [
                 "F1",
                 "F4"
@@ -36720,17 +36720,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-geterror",
             "name": "HAL_I2C_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取I²C 错误。",
             "prototype": "uint32_t HAL_I2C_GetError(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_I2C_GetError(hi2c);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取I²C 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_I2C_GetError(&hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -36746,17 +36746,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-getmode",
             "name": "HAL_I2C_GetMode",
             "kind": "function",
-            "brief": "获取I²C 外设。",
+            "brief": "读取I²C 模式。",
             "prototype": "HAL_I2C_ModeTypeDef HAL_I2C_GetMode(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_I2C_GetMode(hi2c);",
+            "notes": "该接口用于读取I²C 模式。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_I2C_GetMode(&hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -36772,17 +36772,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-getstate",
             "name": "HAL_I2C_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取I²C 状态。",
             "prototype": "HAL_I2C_StateTypeDef HAL_I2C_GetState(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_I2C_GetState(hi2c);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取I²C 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_I2C_GetState(&hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -36803,12 +36803,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_I2C_Init(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化I²C 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_I2C_Init(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36824,29 +36824,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-isdeviceready",
             "name": "HAL_I2C_IsDeviceReady",
             "kind": "function",
-            "brief": "读取I²C 外设。",
+            "brief": "执行I²C ISDEVICEREADY操作。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint32_t Trials, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "Trials",
-                    "description": "参数 Trials，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C ISDEVICEREADY使用的 Trials 参数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_I2C_IsDeviceReady(hi2c, DevAddress, Trials, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行I²C ISDEVICEREADY操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_I2C_IsDeviceReady(&hi2c1, devaddress, trials, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36862,17 +36862,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-listencpltcallback",
             "name": "HAL_I2C_ListenCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 监听完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 监听完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_ListenCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    listen_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36888,21 +36888,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-abort-it",
             "name": "HAL_I2C_Master_Abort_IT",
             "kind": "function",
-            "brief": "中止I²C 外设。",
+            "brief": "中止I²C 主机，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Abort_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Master_Abort_IT(hi2c, DevAddress);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止I²C 主机，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Master_Abort_IT(&hi2c1, devaddress) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36918,33 +36918,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-receive",
             "name": "HAL_I2C_Master_Receive",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "以阻塞方式执行I²C 主机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Receive(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2C_Master_Receive(hi2c, DevAddress, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行I²C 主机接收数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_I2C_Master_Receive(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36960,29 +36960,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-receive-dma",
             "name": "HAL_I2C_Master_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动I²C 主机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Master_Receive_DMA(hi2c, DevAddress, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 主机接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Master_Receive_DMA(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -36998,29 +36998,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-receive-it",
             "name": "HAL_I2C_Master_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动I²C 主机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Master_Receive_IT(hi2c, DevAddress, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 主机接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Master_Receive_IT(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37036,33 +37036,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-seq-receive-dma",
             "name": "HAL_I2C_Master_Seq_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动I²C 主机连续帧接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Seq_Receive_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 主机连续帧接收DMA使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Master_Seq_Receive_DMA(hi2c, DevAddress, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 主机连续帧接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Master_Seq_Receive_DMA(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37078,33 +37078,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-seq-receive-it",
             "name": "HAL_I2C_Master_Seq_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动I²C 主机连续帧接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Seq_Receive_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 主机连续帧接收IT使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Master_Seq_Receive_IT(hi2c, DevAddress, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 主机连续帧接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Master_Seq_Receive_IT(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37120,33 +37120,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-seq-transmit-dma",
             "name": "HAL_I2C_Master_Seq_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动I²C 主机连续帧发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Seq_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 主机连续帧发送DMA使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Master_Seq_Transmit_DMA(hi2c, DevAddress, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 主机连续帧发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Master_Seq_Transmit_DMA(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37162,33 +37162,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-seq-transmit-it",
             "name": "HAL_I2C_Master_Seq_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动I²C 主机连续帧发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Seq_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 主机连续帧发送IT使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Master_Seq_Transmit_IT(hi2c, DevAddress, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 主机连续帧发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Master_Seq_Transmit_IT(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37204,33 +37204,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-transmit",
             "name": "HAL_I2C_Master_Transmit",
             "kind": "function",
-            "brief": "以阻塞方式执行发送发送过程。",
+            "brief": "以阻塞方式执行I²C 主机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2C_Master_Transmit(hi2c, DevAddress, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行I²C 主机发送数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_I2C_Master_Transmit(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37246,29 +37246,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-transmit-dma",
             "name": "HAL_I2C_Master_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动I²C 主机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Master_Transmit_DMA(hi2c, DevAddress, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 主机发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Master_Transmit_DMA(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37284,29 +37284,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-master-transmit-it",
             "name": "HAL_I2C_Master_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动I²C 主机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Master_Transmit_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Master_Transmit_IT(hi2c, DevAddress, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 主机发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Master_Transmit_IT(&hi2c1, devaddress, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37322,17 +37322,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-masterrxcpltcallback",
             "name": "HAL_I2C_MasterRxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 主机接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 主机接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    master_rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37348,17 +37348,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mastertxcpltcallback",
             "name": "HAL_I2C_MasterTxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 主机发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 主机发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    master_tx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37374,41 +37374,41 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-read",
             "name": "HAL_I2C_Mem_Read",
             "kind": "function",
-            "brief": "读取I²C 外设。",
+            "brief": "读取I²C MEM。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Read(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMREAD使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_I2C_Mem_Read(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取I²C MEM。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_I2C_Mem_Read(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37424,37 +37424,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-read-dma",
             "name": "HAL_I2C_Mem_Read_DMA",
             "kind": "function",
-            "brief": "读取I²C 外设。",
+            "brief": "读取I²C MEM，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Read_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMREADDMA使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Mem_Read_DMA(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取I²C MEM，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Mem_Read_DMA(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37470,37 +37470,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-read-it",
             "name": "HAL_I2C_Mem_Read_IT",
             "kind": "function",
-            "brief": "读取I²C 外设。",
+            "brief": "读取I²C MEM，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Read_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMREADIT使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Mem_Read_IT(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取I²C MEM，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Mem_Read_IT(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37516,41 +37516,41 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-write",
             "name": "HAL_I2C_Mem_Write",
             "kind": "function",
-            "brief": "写入I²C 外设。",
+            "brief": "写入I²C MEM。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Write(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMWRITE使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2C_Mem_Write(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于写入I²C MEM。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_I2C_Mem_Write(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37566,37 +37566,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-write-dma",
             "name": "HAL_I2C_Mem_Write_DMA",
             "kind": "function",
-            "brief": "写入I²C 外设。",
+            "brief": "写入I²C MEM，使用DMA 方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Write_DMA(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMWRITEDMA使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Mem_Write_DMA(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于写入I²C MEM，使用DMA 方式。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Mem_Write_DMA(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37612,37 +37612,37 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mem-write-it",
             "name": "HAL_I2C_Mem_Write_IT",
             "kind": "function",
-            "brief": "写入I²C 外设。",
+            "brief": "写入I²C MEM，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Mem_Write_IT(I2C_HandleTypeDef *hi2c, uint16_t DevAddress, uint16_t MemAddress, uint16_t MemAddSize, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DevAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddress",
-                    "description": "目标地址或寄存器地址。"
+                    "description": "目标设备地址或外设内部寄存器地址。"
                 },
                 {
                     "name": "MemAddSize",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "I²C MEMWRITEIT使用的 Mem Add Size 参数。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Mem_Write_IT(hi2c, DevAddress, MemAddress, MemAddSize, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于写入I²C MEM，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Mem_Write_IT(&hi2c1, devaddress, memaddress, memaddsize, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37658,17 +37658,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-memrxcpltcallback",
             "name": "HAL_I2C_MemRxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C MEM接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C MEM接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_MemRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    mem_rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37684,17 +37684,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-memtxcpltcallback",
             "name": "HAL_I2C_MemTxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C MEM发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C MEM发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_MemTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    mem_tx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37710,17 +37710,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mspdeinit",
             "name": "HAL_I2C_MspDeInit",
             "kind": "function",
-            "brief": "执行I²C 外设的底层硬件反初始化回调。",
+            "brief": "释放 I²C 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_I2C_MspDeInit(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_I2C_MspDeInit(hi2c);",
+            "notes": "该接口用于释放 I²C 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_I2C_MspDeInit(&hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -37736,17 +37736,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-mspinit",
             "name": "HAL_I2C_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 I²C 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_I2C_MspInit(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_I2C_MspInit(hi2c);",
+            "notes": "该接口用于初始化 I²C 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_I2C_MspInit(&hi2c1);",
             "families": [
                 "F1",
                 "F4",
@@ -37762,21 +37762,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-registeraddrcallback",
             "name": "HAL_I2C_RegisterAddrCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C REGISTER地址事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_RegisterAddrCallback(I2C_HandleTypeDef *hi2c, pI2C_AddrCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_I2C_RegisterAddrCallback(I2C_HandleTypeDef *hi2c, pI2C_AddrCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应I²C REGISTER地址。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_I2C_RegisterAddrCallback(I2C_HandleTypeDef *hi2c, pI2C_AddrCallbackTypeDef pCallback)\n{\n    register_addr_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37792,25 +37792,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-registercallback",
             "name": "HAL_I2C_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "I²C REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_RegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID, pI2C_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_I2C_RegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID, pI2C_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应I²C REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_I2C_RegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID, pI2C_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37826,29 +37826,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-receive",
             "name": "HAL_I2C_Slave_Receive",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "以阻塞方式执行I²C 从机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Receive(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2C_Slave_Receive(hi2c, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行I²C 从机接收数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_I2C_Slave_Receive(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37864,25 +37864,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-receive-dma",
             "name": "HAL_I2C_Slave_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动I²C 从机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Receive_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Slave_Receive_DMA(hi2c, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 从机接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Slave_Receive_DMA(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37898,25 +37898,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-receive-it",
             "name": "HAL_I2C_Slave_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动I²C 从机接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Slave_Receive_IT(hi2c, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 从机接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Slave_Receive_IT(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37932,29 +37932,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-seq-receive-dma",
             "name": "HAL_I2C_Slave_Seq_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动I²C 从机连续帧接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Seq_Receive_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 从机连续帧接收DMA使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Slave_Seq_Receive_DMA(hi2c, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 从机连续帧接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Slave_Seq_Receive_DMA(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -37970,29 +37970,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-seq-receive-it",
             "name": "HAL_I2C_Slave_Seq_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动I²C 从机连续帧接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Seq_Receive_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 从机连续帧接收IT使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Slave_Seq_Receive_IT(hi2c, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 从机连续帧接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Slave_Seq_Receive_IT(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38008,29 +38008,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-seq-transmit-dma",
             "name": "HAL_I2C_Slave_Seq_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动I²C 从机连续帧发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Seq_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 从机连续帧发送DMA使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Slave_Seq_Transmit_DMA(hi2c, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 从机连续帧发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Slave_Seq_Transmit_DMA(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38046,29 +38046,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-seq-transmit-it",
             "name": "HAL_I2C_Slave_Seq_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动I²C 从机连续帧发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Seq_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t XferOptions);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "XferOptions",
-                    "description": "参数 XferOptions，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C 从机连续帧发送IT使用的 Xfer Options 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Slave_Seq_Transmit_IT(hi2c, pData, Size, XferOptions);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 从机连续帧发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Slave_Seq_Transmit_IT(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, xferoptions) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38084,29 +38084,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-transmit",
             "name": "HAL_I2C_Slave_Transmit",
             "kind": "function",
-            "brief": "以阻塞方式执行发送发送过程。",
+            "brief": "以阻塞方式执行I²C 从机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Transmit(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2C_Slave_Transmit(hi2c, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行I²C 从机发送数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_I2C_Slave_Transmit(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38122,25 +38122,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-transmit-dma",
             "name": "HAL_I2C_Slave_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动I²C 从机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Transmit_DMA(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_I2C_Slave_Transmit_DMA(hi2c, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动I²C 从机发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_I2C_Slave_Transmit_DMA(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38156,25 +38156,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slave-transmit-it",
             "name": "HAL_I2C_Slave_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动I²C 从机发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_Slave_Transmit_IT(I2C_HandleTypeDef *hi2c, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_I2C_Slave_Transmit_IT(hi2c, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动I²C 从机发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_I2C_Slave_Transmit_IT(&hi2c1, i2c_buffer, I2C_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38190,17 +38190,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slaverxcpltcallback",
             "name": "HAL_I2C_SlaveRxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 从机接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 从机接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_SlaveRxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    slave_rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38216,17 +38216,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-slavetxcpltcallback",
             "name": "HAL_I2C_SlaveTxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C 从机发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应I²C 从机发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_I2C_SlaveTxCpltCallback(I2C_HandleTypeDef *hi2c)\n{\n    slave_tx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38242,17 +38242,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-unregisteraddrcallback",
             "name": "HAL_I2C_UnRegisterAddrCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "I²C UNREGISTER地址事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应I²C UNREGISTER地址。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_I2C_UnRegisterAddrCallback(I2C_HandleTypeDef *hi2c)\n{\n    un_register_addr_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38268,21 +38268,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2c-unregistercallback",
             "name": "HAL_I2C_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "I²C UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_I2C_UnRegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_I2C_UnRegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应I²C UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_I2C_UnRegisterCallback(I2C_HandleTypeDef *hi2c, HAL_I2C_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38298,21 +38298,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-configanalogfilter",
             "name": "HAL_I2CEx_ConfigAnalogFilter",
             "kind": "function",
-            "brief": "配置过滤器。",
+            "brief": "配置I²C 模拟滤波器。",
             "prototype": "HAL_StatusTypeDef HAL_I2CEx_ConfigAnalogFilter(I2C_HandleTypeDef *hi2c, uint32_t AnalogFilter);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "AnalogFilter",
-                    "description": "参数 AnalogFilter，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C CONFIG模拟滤波器使用的 Analog Filter 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_I2CEx_ConfigAnalogFilter(hi2c, AnalogFilter);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置I²C 模拟滤波器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, analogfilter) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -38326,21 +38326,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-configdigitalfilter",
             "name": "HAL_I2CEx_ConfigDigitalFilter",
             "kind": "function",
-            "brief": "配置过滤器。",
+            "brief": "配置I²C DIGITAL滤波器。",
             "prototype": "HAL_StatusTypeDef HAL_I2CEx_ConfigDigitalFilter(I2C_HandleTypeDef *hi2c, uint32_t DigitalFilter);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 },
                 {
                     "name": "DigitalFilter",
-                    "description": "参数 DigitalFilter，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "I²C CONFIGDIGITAL滤波器使用的 Digital Filter 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_I2CEx_ConfigDigitalFilter(hi2c, DigitalFilter);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置I²C DIGITAL滤波器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, digitalfilter) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -38354,17 +38354,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-disablefastmodeplus",
             "name": "HAL_I2CEx_DisableFastModePlus",
             "kind": "function",
-            "brief": "禁用I²C 外设。",
+            "brief": "禁用I²C FAST模式PLUS。",
             "prototype": "void HAL_I2CEx_DisableFastModePlus(uint32_t ConfigFastModePlus);",
             "params": [
                 {
                     "name": "ConfigFastModePlus",
-                    "description": "配置结构体或配置参数。"
+                    "description": "I²C 工作模式选择值。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2CEx_DisableFastModePlus(ConfigFastModePlus);",
+            "notes": "该接口用于禁用I²C FAST模式PLUS。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "HAL_I2CEx_DisableFastModePlus(configfastmodeplus);",
             "families": [
                 "G4"
             ],
@@ -38376,17 +38376,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-disablewakeup",
             "name": "HAL_I2CEx_DisableWakeUp",
             "kind": "function",
-            "brief": "禁用唤醒定时器。",
+            "brief": "禁用I²C 唤醒UP。",
             "prototype": "HAL_StatusTypeDef HAL_I2CEx_DisableWakeUp(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2CEx_DisableWakeUp(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用I²C 唤醒UP。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_I2CEx_DisableWakeUp(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -38398,17 +38398,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-enablefastmodeplus",
             "name": "HAL_I2CEx_EnableFastModePlus",
             "kind": "function",
-            "brief": "使能I²C 外设。",
+            "brief": "使能I²C FAST模式PLUS。",
             "prototype": "void HAL_I2CEx_EnableFastModePlus(uint32_t ConfigFastModePlus);",
             "params": [
                 {
                     "name": "ConfigFastModePlus",
-                    "description": "配置结构体或配置参数。"
+                    "description": "I²C 工作模式选择值。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2CEx_EnableFastModePlus(ConfigFastModePlus);",
+            "notes": "该接口用于使能I²C FAST模式PLUS。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "HAL_I2CEx_EnableFastModePlus(configfastmodeplus);",
             "families": [
                 "G4"
             ],
@@ -38420,17 +38420,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-i2cex-enablewakeup",
             "name": "HAL_I2CEx_EnableWakeUp",
             "kind": "function",
-            "brief": "使能唤醒定时器。",
+            "brief": "使能I²C 唤醒UP。",
             "prototype": "HAL_StatusTypeDef HAL_I2CEx_EnableWakeUp(I2C_HandleTypeDef *hi2c);",
             "params": [
                 {
                     "name": "hi2c",
-                    "description": "I²C 外设句柄。"
+                    "description": "I²C 句柄指针，例如 &hi2c1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_I2CEx_EnableWakeUp(hi2c);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能I²C 唤醒UP。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_I2CEx_EnableWakeUp(&hi2c1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -38747,12 +38747,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_SPI_Abort(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止SPI 外设。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_SPI_Abort(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38768,17 +38768,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-abort-it",
             "name": "HAL_SPI_Abort_IT",
             "kind": "function",
-            "brief": "中止SPI 外设。",
+            "brief": "中止SPI 外设，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Abort_IT(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_SPI_Abort_IT(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止SPI 外设，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_SPI_Abort_IT(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38794,17 +38794,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-abortcpltcallback",
             "name": "HAL_SPI_AbortCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 中止完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 中止完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_AbortCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    abort_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38825,12 +38825,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_SPI_DeInit(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化SPI 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_SPI_DeInit(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38846,17 +38846,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-dmapause",
             "name": "HAL_SPI_DMAPause",
             "kind": "function",
-            "brief": "提供SPI 外设相关的 HAL 操作接口。",
+            "brief": "执行SPI DMAPAUSE操作。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_DMAPause(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_DMAPause(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行SPI DMAPAUSE操作。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_DMAPause(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38872,17 +38872,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-dmaresume",
             "name": "HAL_SPI_DMAResume",
             "kind": "function",
-            "brief": "恢复SPI 外设。",
+            "brief": "恢复SPI DMA。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_DMAResume(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_DMAResume(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于恢复SPI DMA。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_DMAResume(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38898,17 +38898,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-dmastop",
             "name": "HAL_SPI_DMAStop",
             "kind": "function",
-            "brief": "停止SPI 外设。",
+            "brief": "停止SPI DMA。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_DMAStop(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_DMAStop(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止SPI DMA。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_DMAStop(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38924,17 +38924,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-errorcallback",
             "name": "HAL_SPI_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi)\n{\n    error_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -38950,17 +38950,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-geterror",
             "name": "HAL_SPI_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取SPI 错误。",
             "prototype": "uint32_t HAL_SPI_GetError(const SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_SPI_GetError(hspi);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取SPI 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_SPI_GetError(&hspi1);",
             "families": [
                 "F1",
                 "F4",
@@ -38976,17 +38976,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-getstate",
             "name": "HAL_SPI_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取SPI 状态。",
             "prototype": "HAL_SPI_StateTypeDef HAL_SPI_GetState(const SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_SPI_GetState(hspi);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取SPI 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_SPI_GetState(&hspi1);",
             "families": [
                 "F1",
                 "F4",
@@ -39007,12 +39007,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_SPI_Init(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化SPI 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_SPI_Init(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39028,17 +39028,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-irqhandler",
             "name": "HAL_SPI_IRQHandler",
             "kind": "function",
-            "brief": "处理SPI 外设产生的中断。",
+            "brief": "处理 SPI 外设中断标志并分发对应回调。",
             "prototype": "void HAL_SPI_IRQHandler(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_SPI_IRQHandler(hspi);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 SPI 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_SPI_IRQHandler(&hspi1);",
             "families": [
                 "F1",
                 "F4",
@@ -39054,17 +39054,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-mspdeinit",
             "name": "HAL_SPI_MspDeInit",
             "kind": "function",
-            "brief": "执行SPI 外设的底层硬件反初始化回调。",
+            "brief": "释放 SPI 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_SPI_MspDeInit(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_SPI_MspDeInit(hspi);",
+            "notes": "该接口用于释放 SPI 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_SPI_MspDeInit(&hspi1);",
             "families": [
                 "F1",
                 "F4",
@@ -39080,17 +39080,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-mspinit",
             "name": "HAL_SPI_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 SPI 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_SPI_MspInit(hspi);",
+            "notes": "该接口用于初始化 SPI 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_SPI_MspInit(&hspi1);",
             "families": [
                 "F1",
                 "F4",
@@ -39106,29 +39106,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-receive",
             "name": "HAL_SPI_Receive",
             "kind": "function",
-            "brief": "以阻塞方式执行接收接收过程。",
+            "brief": "以阻塞方式执行SPI 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Receive(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_SPI_Receive(hspi, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行SPI 外设接收数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_SPI_Receive(&hspi1, spi_buffer, SPI_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39144,25 +39144,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-receive-dma",
             "name": "HAL_SPI_Receive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动接收接收过程。",
+            "brief": "以 DMA 方式启动SPI 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Receive_DMA(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_Receive_DMA(hspi, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动SPI 外设接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_Receive_DMA(&hspi1, spi_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39178,25 +39178,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-receive-it",
             "name": "HAL_SPI_Receive_IT",
             "kind": "function",
-            "brief": "以中断方式启动接收接收过程。",
+            "brief": "以 中断方式启动SPI 外设接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Receive_IT(SPI_HandleTypeDef *hspi, uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_SPI_Receive_IT(hspi, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动SPI 外设接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_SPI_Receive_IT(&hspi1, spi_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39212,25 +39212,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-registercallback",
             "name": "HAL_SPI_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "SPI REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应SPI REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_SPI_RegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID, pSPI_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39246,17 +39246,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-rxcpltcallback",
             "name": "HAL_SPI_RxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_RxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39272,17 +39272,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-rxhalfcpltcallback",
             "name": "HAL_SPI_RxHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 接收半传输完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 接收半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_RxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    rx_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39298,29 +39298,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmit",
             "name": "HAL_SPI_Transmit",
             "kind": "function",
-            "brief": "以阻塞方式执行发送发送过程。",
+            "brief": "以阻塞方式执行SPI 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Transmit(SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_SPI_Transmit(hspi, pData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行SPI 外设发送数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_SPI_Transmit(&hspi1, spi_buffer, SPI_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39336,25 +39336,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmit-dma",
             "name": "HAL_SPI_Transmit_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动发送发送过程。",
+            "brief": "以 DMA 方式启动SPI 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Transmit_DMA(SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_Transmit_DMA(hspi, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动SPI 外设发送数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_Transmit_DMA(&hspi1, spi_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39370,25 +39370,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmit-it",
             "name": "HAL_SPI_Transmit_IT",
             "kind": "function",
-            "brief": "以中断方式启动发送发送过程。",
+            "brief": "以 中断方式启动SPI 外设发送数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_Transmit_IT(SPI_HandleTypeDef *hspi, const uint8_t *pData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，异步操作完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_SPI_Transmit_IT(hspi, pData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动SPI 外设发送数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_SPI_Transmit_IT(&hspi1, spi_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39404,33 +39404,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmitreceive",
             "name": "HAL_SPI_TransmitReceive",
             "kind": "function",
-            "brief": "以阻塞方式执行同步收发同步收发。",
+            "brief": "以阻塞方式执行SPI 外设同步发送并接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_TransmitReceive(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pTxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "待发送数据缓冲区指针，异步发送完成前必须保持有效。"
                 },
                 {
                     "name": "pRxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "接收数据缓冲区指针，异步接收完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_SPI_TransmitReceive(hspi, pTxData, pRxData, Size, Timeout);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以阻塞方式执行SPI 外设同步发送并接收数据。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_SPI_TransmitReceive(&hspi1, spi_tx_buffer, spi_rx_buffer, SPI_BUFFER_LENGTH, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39446,29 +39446,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmitreceive-dma",
             "name": "HAL_SPI_TransmitReceive_DMA",
             "kind": "function",
-            "brief": "以 DMA 方式启动同步收发同步收发。",
+            "brief": "以 DMA 方式启动SPI 外设同步发送并接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_TransmitReceive_DMA(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pTxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "待发送数据缓冲区指针，异步发送完成前必须保持有效。"
                 },
                 {
                     "name": "pRxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "接收数据缓冲区指针，异步接收完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须完成 DMA 通道、请求映射和缓冲区配置。传输完成前缓冲区必须持续有效，并应处理 HAL_BUSY、完成回调和错误回调。",
-            "example": "HAL_SPI_TransmitReceive_DMA(hspi, pTxData, pRxData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 DMA 方式启动SPI 外设同步发送并接收数据。调用前必须完成 DMA 请求映射、数据宽度和缓冲区配置；完成前缓冲区必须持续有效，并处理半完成、完成及错误回调。",
+            "example": "if (HAL_SPI_TransmitReceive_DMA(&hspi1, spi_tx_buffer, spi_rx_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39484,29 +39484,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-transmitreceive-it",
             "name": "HAL_SPI_TransmitReceive_IT",
             "kind": "function",
-            "brief": "以中断方式启动同步收发同步收发。",
+            "brief": "以 中断方式启动SPI 外设同步发送并接收数据。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_TransmitReceive_IT(SPI_HandleTypeDef *hspi, const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "pTxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "待发送数据缓冲区指针，异步发送完成前必须保持有效。"
                 },
                 {
                     "name": "pRxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "接收数据缓冲区指针，异步接收完成前必须保持有效。"
                 },
                 {
                     "name": "Size",
-                    "description": "数据项数量或缓冲区长度。"
+                    "description": "本次操作的数据单元数量。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_SPI_TransmitReceive_IT(hspi, pTxData, pRxData, Size);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于以 中断方式启动SPI 外设同步发送并接收数据。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_SPI_TransmitReceive_IT(&hspi1, spi_tx_buffer, spi_rx_buffer, SPI_BUFFER_LENGTH) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39522,17 +39522,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-txcpltcallback",
             "name": "HAL_SPI_TxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 发送完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 发送完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    tx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39548,17 +39548,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-txhalfcpltcallback",
             "name": "HAL_SPI_TxHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 发送半传输完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 发送半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_TxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    tx_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39574,17 +39574,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-txrxcpltcallback",
             "name": "HAL_SPI_TxRxCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 发送接收完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 发送接收完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_TxRxCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    tx_rx_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39600,17 +39600,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-txrxhalfcpltcallback",
             "name": "HAL_SPI_TxRxHalfCpltCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "SPI 发送接收半传输完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应SPI 发送接收半传输完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_SPI_TxRxHalfCpltCallback(SPI_HandleTypeDef *hspi)\n{\n    tx_rx_half_cplt_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39626,21 +39626,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spi-unregistercallback",
             "name": "HAL_SPI_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "SPI UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应SPI UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_SPI_UnRegisterCallback(SPI_HandleTypeDef *hspi, HAL_SPI_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -39656,17 +39656,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-spiex-flushrxfifo",
             "name": "HAL_SPIEx_FlushRxFifo",
             "kind": "function",
-            "brief": "提供FIFO相关的 HAL 操作接口。",
+            "brief": "执行SPI FLUSH接收FIFO操作。",
             "prototype": "HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(const SPI_HandleTypeDef *hspi);",
             "params": [
                 {
                     "name": "hspi",
-                    "description": "SPI 外设句柄。"
+                    "description": "SPI 句柄指针，例如 &hspi1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_SPIEx_FlushRxFifo(hspi);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行SPI FLUSH接收FIFO操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_SPIEx_FlushRxFifo(&hspi1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -39980,21 +39980,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-aborttxrequest",
             "name": "HAL_CAN_AbortTxRequest",
             "kind": "function",
-            "brief": "中止CAN 外设。",
+            "brief": "中止CAN 发送请求。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_AbortTxRequest(CAN_HandleTypeDef *hcan, uint32_t TxMailboxes);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "TxMailboxes",
-                    "description": "参数 TxMailboxes，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN 中止发送请求使用的 Tx Mailboxes 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_AbortTxRequest(hcan, TxMailboxes);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止CAN 发送请求。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_CAN_AbortTxRequest(&hcan1, txmailboxes) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40008,21 +40008,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-activatenotification",
             "name": "HAL_CAN_ActivateNotification",
             "kind": "function",
-            "brief": "启用中断通知。",
+            "brief": "启用CAN 通知。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_ActivateNotification(CAN_HandleTypeDef *hcan, uint32_t ActiveITs);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "ActiveITs",
-                    "description": "参数 ActiveITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN ACTIVATE通知使用的 Active I Ts 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_ActivateNotification(hcan, ActiveITs);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启用CAN 通知。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_CAN_ActivateNotification(&hcan1, activeits) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40036,29 +40036,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-addtxmessage",
             "name": "HAL_CAN_AddTxMessage",
             "kind": "function",
-            "brief": "提供CAN 外设相关的 HAL 操作接口。",
+            "brief": "执行CAN ADD发送报文操作。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_AddTxMessage(CAN_HandleTypeDef *hcan, const CAN_TxHeaderTypeDef *pHeader, const uint8_t aData[], uint32_t *pTxMailbox);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "pHeader",
-                    "description": "报文头配置或输出结构体。"
+                    "description": "CAN ADD发送报文使用的 p Header 参数。"
                 },
                 {
                     "name": "aData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 },
                 {
                     "name": "pTxMailbox",
-                    "description": "参数 pTxMailbox，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN ADD发送报文使用的 p Tx Mailbox 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_AddTxMessage(hcan, pHeader, aData, pTxMailbox);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行CAN ADD发送报文操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_CAN_AddTxMessage(&hcan1, pheader, can_buffer, ptxmailbox) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40072,21 +40072,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-configfilter",
             "name": "HAL_CAN_ConfigFilter",
             "kind": "function",
-            "brief": "配置过滤器。",
+            "brief": "配置CAN 滤波器。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_ConfigFilter(CAN_HandleTypeDef *hcan, const CAN_FilterTypeDef *sFilterConfig);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "sFilterConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "CAN CONFIG滤波器使用的 s Filter Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_CAN_ConfigFilter(hcan, sFilterConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置CAN 滤波器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_CAN_ConfigFilter(&hcan1, sfilterconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40100,21 +40100,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-deactivatenotification",
             "name": "HAL_CAN_DeactivateNotification",
             "kind": "function",
-            "brief": "停用中断通知。",
+            "brief": "停用CAN 通知。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_DeactivateNotification(CAN_HandleTypeDef *hcan, uint32_t InactiveITs);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "InactiveITs",
-                    "description": "参数 InactiveITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN DEACTIVATE通知使用的 Inactive I Ts 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_DeactivateNotification(hcan, InactiveITs);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用CAN 通知。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_CAN_DeactivateNotification(&hcan1, inactiveits) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40133,12 +40133,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_CAN_DeInit(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化CAN 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_CAN_DeInit(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40152,17 +40152,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-errorcallback",
             "name": "HAL_CAN_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)\n{\n    error_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40176,17 +40176,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-geterror",
             "name": "HAL_CAN_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取CAN 错误。",
             "prototype": "uint32_t HAL_CAN_GetError(const CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetError(hcan);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取CAN 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_CAN_GetError(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40200,21 +40200,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-getrxfifofilllevel",
             "name": "HAL_CAN_GetRxFifoFillLevel",
             "kind": "function",
-            "brief": "获取FIFO。",
+            "brief": "读取CAN 接收FIFOFILL电平。",
             "prototype": "uint32_t HAL_CAN_GetRxFifoFillLevel(const CAN_HandleTypeDef *hcan, uint32_t RxFifo);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "RxFifo",
-                    "description": "参数 RxFifo，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN GET接收FIFOFILL电平使用的 Rx Fifo 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetRxFifoFillLevel(hcan, RxFifo);",
+            "notes": "该接口用于读取CAN 接收FIFOFILL电平。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_CAN_GetRxFifoFillLevel(&hcan1, rxfifo);",
             "families": [
                 "F1",
                 "F4"
@@ -40228,29 +40228,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-getrxmessage",
             "name": "HAL_CAN_GetRxMessage",
             "kind": "function",
-            "brief": "获取CAN 外设。",
+            "brief": "读取CAN 接收报文。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_GetRxMessage(CAN_HandleTypeDef *hcan, uint32_t RxFifo, CAN_RxHeaderTypeDef *pHeader, uint8_t aData[]);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "RxFifo",
-                    "description": "参数 RxFifo，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN GET接收报文使用的 Rx Fifo 参数。"
                 },
                 {
                     "name": "pHeader",
-                    "description": "报文头配置或输出结构体。"
+                    "description": "CAN GET接收报文使用的 p Header 参数。"
                 },
                 {
                     "name": "aData",
-                    "description": "数据缓冲区指针。"
+                    "description": "发送或接收数据缓冲区指针，传输完成前必须保持有效。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetRxMessage(hcan, RxFifo, pHeader, aData);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取CAN 接收报文。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_CAN_GetRxMessage(&hcan1, rxfifo, pheader, can_buffer) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40264,17 +40264,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-getstate",
             "name": "HAL_CAN_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取CAN 状态。",
             "prototype": "HAL_CAN_StateTypeDef HAL_CAN_GetState(const CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetState(hcan);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取CAN 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_CAN_GetState(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40288,17 +40288,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-gettxmailboxesfreelevel",
             "name": "HAL_CAN_GetTxMailboxesFreeLevel",
             "kind": "function",
-            "brief": "获取CAN 外设。",
+            "brief": "读取CAN 发送MAILBOXESFREE电平。",
             "prototype": "uint32_t HAL_CAN_GetTxMailboxesFreeLevel(const CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetTxMailboxesFreeLevel(hcan);",
+            "notes": "该接口用于读取CAN 发送MAILBOXESFREE电平。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_CAN_GetTxMailboxesFreeLevel(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40312,21 +40312,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-gettxtimestamp",
             "name": "HAL_CAN_GetTxTimestamp",
             "kind": "function",
-            "brief": "获取时间。",
+            "brief": "读取CAN 发送时间戳。",
             "prototype": "uint32_t HAL_CAN_GetTxTimestamp(const CAN_HandleTypeDef *hcan, uint32_t TxMailbox);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "TxMailbox",
-                    "description": "参数 TxMailbox，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN GET发送时间戳使用的 Tx Mailbox 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_CAN_GetTxTimestamp(hcan, TxMailbox);",
+            "notes": "该接口用于读取CAN 发送时间戳。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_CAN_GetTxTimestamp(&hcan1, txmailbox);",
             "families": [
                 "F1",
                 "F4"
@@ -40345,12 +40345,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_CAN_Init(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化CAN 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_CAN_Init(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40364,17 +40364,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-irqhandler",
             "name": "HAL_CAN_IRQHandler",
             "kind": "function",
-            "brief": "处理CAN 外设产生的中断。",
+            "brief": "处理 CAN 外设中断标志并分发对应回调。",
             "prototype": "void HAL_CAN_IRQHandler(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_CAN_IRQHandler(hcan);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 CAN 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_CAN_IRQHandler(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40388,17 +40388,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-issleepactive",
             "name": "HAL_CAN_IsSleepActive",
             "kind": "function",
-            "brief": "提供CAN 外设相关的 HAL 操作接口。",
+            "brief": "执行CAN ISSLEEPACTIVE操作。",
             "prototype": "uint32_t HAL_CAN_IsSleepActive(const CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_IsSleepActive(hcan);",
+            "notes": "该接口用于执行CAN ISSLEEPACTIVE操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_CAN_IsSleepActive(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40412,21 +40412,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-istxmessagepending",
             "name": "HAL_CAN_IsTxMessagePending",
             "kind": "function",
-            "brief": "提供CAN 外设相关的 HAL 操作接口。",
+            "brief": "执行CAN IS发送报文挂起操作。",
             "prototype": "uint32_t HAL_CAN_IsTxMessagePending(const CAN_HandleTypeDef *hcan, uint32_t TxMailboxes);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "TxMailboxes",
-                    "description": "参数 TxMailboxes，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "CAN IS发送报文挂起使用的 Tx Mailboxes 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_IsTxMessagePending(hcan, TxMailboxes);",
+            "notes": "该接口用于执行CAN IS发送报文挂起操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_CAN_IsTxMessagePending(&hcan1, txmailboxes);",
             "families": [
                 "F1",
                 "F4"
@@ -40440,17 +40440,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-mspdeinit",
             "name": "HAL_CAN_MspDeInit",
             "kind": "function",
-            "brief": "执行CAN 外设的底层硬件反初始化回调。",
+            "brief": "释放 CAN 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_CAN_MspDeInit(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_CAN_MspDeInit(hcan);",
+            "notes": "该接口用于释放 CAN 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_CAN_MspDeInit(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40464,17 +40464,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-mspinit",
             "name": "HAL_CAN_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 CAN 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_CAN_MspInit(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_CAN_MspInit(hcan);",
+            "notes": "该接口用于初始化 CAN 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_CAN_MspInit(&hcan1);",
             "families": [
                 "F1",
                 "F4"
@@ -40488,25 +40488,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-registercallback",
             "name": "HAL_CAN_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "CAN REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_RegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID, void (* pCallback)(CAN_HandleTypeDef *_hcan));",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_CAN_RegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID, void (* pCallback)(CAN_HandleTypeDef *_hcan))\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应CAN REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_CAN_RegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID, void (* pCallback)(CAN_HandleTypeDef *_hcan))\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40520,17 +40520,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-requestsleep",
             "name": "HAL_CAN_RequestSleep",
             "kind": "function",
-            "brief": "提供CAN 外设相关的 HAL 操作接口。",
+            "brief": "执行CAN 请求SLEEP操作。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_RequestSleep(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_RequestSleep(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行CAN 请求SLEEP操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_CAN_RequestSleep(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40544,17 +40544,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-reseterror",
             "name": "HAL_CAN_ResetError",
             "kind": "function",
-            "brief": "复位错误状态。",
+            "brief": "复位CAN 错误。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_ResetError(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_ResetError(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于复位CAN 错误。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_CAN_ResetError(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40568,17 +40568,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-rxfifo0fullcallback",
             "name": "HAL_CAN_RxFifo0FullCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "CAN 接收FIFO0已满事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 接收FIFO0已满。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_RxFifo0FullCallback(CAN_HandleTypeDef *hcan)\n{\n    rx_fifo0_full_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40592,17 +40592,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-rxfifo0msgpendingcallback",
             "name": "HAL_CAN_RxFifo0MsgPendingCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "CAN 接收FIFO0MSG挂起事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 接收FIFO0MSG挂起。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)\n{\n    rx_fifo0_msg_pending_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40616,17 +40616,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-rxfifo1fullcallback",
             "name": "HAL_CAN_RxFifo1FullCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "CAN 接收FIFO1已满事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_RxFifo1FullCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_RxFifo1FullCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 接收FIFO1已满。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_RxFifo1FullCallback(CAN_HandleTypeDef *hcan)\n{\n    rx_fifo1_full_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40640,17 +40640,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-rxfifo1msgpendingcallback",
             "name": "HAL_CAN_RxFifo1MsgPendingCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "CAN 接收FIFO1MSG挂起事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 接收FIFO1MSG挂起。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan)\n{\n    rx_fifo1_msg_pending_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40664,17 +40664,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-sleepcallback",
             "name": "HAL_CAN_SleepCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN SLEEP事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_SleepCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_SleepCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN SLEEP。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_SleepCallback(CAN_HandleTypeDef *hcan)\n{\n    sleep_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40693,12 +40693,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_Start(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动CAN 外设。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_CAN_Start(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40717,12 +40717,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_Stop(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止CAN 外设。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_CAN_Stop(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40736,17 +40736,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox0abortcallback",
             "name": "HAL_CAN_TxMailbox0AbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX0中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox0AbortCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox0AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX0中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox0AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox0_abort_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40760,17 +40760,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox0completecallback",
             "name": "HAL_CAN_TxMailbox0CompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX0完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX0完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox0_complete_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40784,17 +40784,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox1abortcallback",
             "name": "HAL_CAN_TxMailbox1AbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX1中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox1AbortCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox1AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX1中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox1AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox1_abort_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40808,17 +40808,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox1completecallback",
             "name": "HAL_CAN_TxMailbox1CompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX1完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX1完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox1_complete_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40832,17 +40832,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox2abortcallback",
             "name": "HAL_CAN_TxMailbox2AbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX2中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox2AbortCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox2AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX2中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox2AbortCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox2_abort_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40856,17 +40856,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-txmailbox2completecallback",
             "name": "HAL_CAN_TxMailbox2CompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 发送MAILBOX2完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 发送MAILBOX2完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)\n{\n    tx_mailbox2_complete_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40880,21 +40880,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-unregistercallback",
             "name": "HAL_CAN_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "CAN UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_UnRegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_CAN_UnRegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应CAN UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_CAN_UnRegisterCallback(CAN_HandleTypeDef *hcan, HAL_CAN_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40908,17 +40908,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-wakeup",
             "name": "HAL_CAN_WakeUp",
             "kind": "function",
-            "brief": "提供唤醒定时器相关的 HAL 操作接口。",
+            "brief": "执行CAN 唤醒UP操作。",
             "prototype": "HAL_StatusTypeDef HAL_CAN_WakeUp(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_CAN_WakeUp(hcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行CAN 唤醒UP操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_CAN_WakeUp(&hcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -40932,17 +40932,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-can-wakeupfromrxmsgcallback",
             "name": "HAL_CAN_WakeUpFromRxMsgCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "CAN 唤醒UPFROM接收MSG事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_CAN_WakeUpFromRxMsgCallback(CAN_HandleTypeDef *hcan);",
             "params": [
                 {
                     "name": "hcan",
-                    "description": "CAN 外设句柄。"
+                    "description": "CAN 句柄指针，例如 &hcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_CAN_WakeUpFromRxMsgCallback(CAN_HandleTypeDef *hcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应CAN 唤醒UPFROM接收MSG。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_CAN_WakeUpFromRxMsgCallback(CAN_HandleTypeDef *hcan)\n{\n    wake_up_from_rx_msg_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4"
@@ -41122,21 +41122,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-aborttxrequest",
             "name": "HAL_FDCAN_AbortTxRequest",
             "kind": "function",
-            "brief": "中止FDCAN 外设。",
+            "brief": "中止FDCAN 发送请求。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_AbortTxRequest(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndex);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "BufferIndex",
-                    "description": "数据缓冲区指针。"
+                    "description": "FDCAN 中止发送请求使用的 Buffer Index 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_AbortTxRequest(hfdcan, BufferIndex);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于中止FDCAN 发送请求。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_AbortTxRequest(&hfdcan1, bufferindex) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41148,25 +41148,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-activatenotification",
             "name": "HAL_FDCAN_ActivateNotification",
             "kind": "function",
-            "brief": "启用中断通知。",
+            "brief": "启用FDCAN 通知。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ActivateNotification(FDCAN_HandleTypeDef *hfdcan, uint32_t ActiveITs, uint32_t BufferIndexes);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "ActiveITs",
-                    "description": "参数 ActiveITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN ACTIVATE通知使用的 Active I Ts 参数。"
                 },
                 {
                     "name": "BufferIndexes",
-                    "description": "数据缓冲区指针。"
+                    "description": "FDCAN ACTIVATE通知使用的 Buffer Indexes 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_ActivateNotification(hfdcan, ActiveITs, BufferIndexes);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启用FDCAN 通知。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_ActivateNotification(&hfdcan1, activeits, bufferindexes) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41178,25 +41178,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-addmessagetotxfifoq",
             "name": "HAL_FDCAN_AddMessageToTxFifoQ",
             "kind": "function",
-            "brief": "提供FIFO相关的 HAL 操作接口。",
+            "brief": "执行FDCAN ADD报文TO发送FIFOQ操作。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_AddMessageToTxFifoQ(FDCAN_HandleTypeDef *hfdcan, const FDCAN_TxHeaderTypeDef *pTxHeader, const uint8_t *pTxData);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pTxHeader",
-                    "description": "报文头配置或输出结构体。"
+                    "description": "FDCAN ADD报文TO发送FIFOQ使用的 p Tx Header 参数。"
                 },
                 {
                     "name": "pTxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "待发送数据缓冲区指针，异步发送完成前必须保持有效。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_AddMessageToTxFifoQ(hfdcan, pTxHeader, pTxData);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行FDCAN ADD报文TO发送FIFOQ操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, ptxheader, fdcan_tx_buffer) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41208,21 +41208,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configextendedidmask",
             "name": "HAL_FDCAN_ConfigExtendedIdMask",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置FDCAN EXTENDEDIDMASK。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigExtendedIdMask(FDCAN_HandleTypeDef *hfdcan, uint32_t Mask);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "Mask",
-                    "description": "参数 Mask，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGEXTENDEDIDMASK使用的 Mask 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigExtendedIdMask(hfdcan, Mask);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN EXTENDEDIDMASK。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigExtendedIdMask(&hfdcan1, mask) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41234,21 +41234,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configfilter",
             "name": "HAL_FDCAN_ConfigFilter",
             "kind": "function",
-            "brief": "配置过滤器。",
+            "brief": "配置FDCAN 滤波器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigFilter(FDCAN_HandleTypeDef *hfdcan, const FDCAN_FilterTypeDef *sFilterConfig);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "sFilterConfig",
-                    "description": "配置结构体或配置参数。"
+                    "description": "FDCAN CONFIG滤波器使用的 s Filter Config 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigFilter(hfdcan, sFilterConfig);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN 滤波器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigFilter(&hfdcan1, sfilterconfig) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41260,33 +41260,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configglobalfilter",
             "name": "HAL_FDCAN_ConfigGlobalFilter",
             "kind": "function",
-            "brief": "配置过滤器。",
+            "brief": "配置FDCAN GLOBAL滤波器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigGlobalFilter(FDCAN_HandleTypeDef *hfdcan, uint32_t NonMatchingStd, uint32_t NonMatchingExt, uint32_t RejectRemoteStd, uint32_t RejectRemoteExt);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "NonMatchingStd",
-                    "description": "参数 NonMatchingStd，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGGLOBAL滤波器使用的 Non Matching Std 参数。"
                 },
                 {
                     "name": "NonMatchingExt",
-                    "description": "参数 NonMatchingExt，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGGLOBAL滤波器使用的 Non Matching Ext 参数。"
                 },
                 {
                     "name": "RejectRemoteStd",
-                    "description": "参数 RejectRemoteStd，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGGLOBAL滤波器使用的 Reject Remote Std 参数。"
                 },
                 {
                     "name": "RejectRemoteExt",
-                    "description": "参数 RejectRemoteExt，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGGLOBAL滤波器使用的 Reject Remote Ext 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigGlobalFilter(hfdcan, NonMatchingStd, NonMatchingExt, RejectRemoteStd, RejectRemoteExt);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN GLOBAL滤波器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigGlobalFilter(&hfdcan1, nonmatchingstd, nonmatchingext, rejectremotestd, rejectremoteext) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41298,25 +41298,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configinterruptlines",
             "name": "HAL_FDCAN_ConfigInterruptLines",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置FDCAN INTERRUPTLINES。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigInterruptLines(FDCAN_HandleTypeDef *hfdcan, uint32_t ITList, uint32_t InterruptLine);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "ITList",
-                    "description": "参数 ITList，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGINTERRUPTLINES使用的 I T List 参数。"
                 },
                 {
                     "name": "InterruptLine",
-                    "description": "参数 InterruptLine，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIGINTERRUPTLINES使用的 Interrupt Line 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigInterruptLines(hfdcan, ITList, InterruptLine);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN INTERRUPTLINES。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigInterruptLines(&hfdcan1, itlist, interruptline) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41328,21 +41328,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configramwatchdog",
             "name": "HAL_FDCAN_ConfigRamWatchdog",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置FDCAN RAM看门狗。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigRamWatchdog(FDCAN_HandleTypeDef *hfdcan, uint32_t CounterStartValue);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "CounterStartValue",
-                    "description": "待设置的数据或数值。"
+                    "description": "FDCAN CONFIGRAM看门狗使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigRamWatchdog(hfdcan, CounterStartValue);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN RAM看门狗。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigRamWatchdog(&hfdcan1, counterstartvalue) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41354,25 +41354,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configrxfifooverwrite",
             "name": "HAL_FDCAN_ConfigRxFifoOverwrite",
             "kind": "function",
-            "brief": "配置FIFO。",
+            "brief": "配置FDCAN 接收FIFOOVERWRITE。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigRxFifoOverwrite(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo, uint32_t OperationMode);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "RxFifo",
-                    "description": "参数 RxFifo，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIG接收FIFOOVERWRITE使用的 Rx Fifo 参数。"
                 },
                 {
                     "name": "OperationMode",
-                    "description": "工作模式选择。"
+                    "description": "FDCAN 工作模式选择值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigRxFifoOverwrite(hfdcan, RxFifo, OperationMode);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN 接收FIFOOVERWRITE。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigRxFifoOverwrite(&hfdcan1, rxfifo, operationmode) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41384,25 +41384,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configtimeoutcounter",
             "name": "HAL_FDCAN_ConfigTimeoutCounter",
             "kind": "function",
-            "brief": "配置计数器值。",
+            "brief": "配置FDCAN 超时计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigTimeoutCounter(FDCAN_HandleTypeDef *hfdcan, uint32_t TimeoutOperation, uint32_t TimeoutPeriod);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TimeoutOperation",
-                    "description": "最大等待时间。"
+                    "description": "FDCAN CONFIG超时计数器使用的 Timeout Operation 参数。"
                 },
                 {
                     "name": "TimeoutPeriod",
-                    "description": "最大等待时间。"
+                    "description": "FDCAN CONFIG超时计数器使用的 Timeout Period 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigTimeoutCounter(hfdcan, TimeoutOperation, TimeoutPeriod);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN 超时计数器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigTimeoutCounter(&hfdcan1, timeoutoperation, timeoutperiod) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41414,21 +41414,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configtimestampcounter",
             "name": "HAL_FDCAN_ConfigTimestampCounter",
             "kind": "function",
-            "brief": "配置计数器值。",
+            "brief": "配置FDCAN 时间戳计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigTimestampCounter(FDCAN_HandleTypeDef *hfdcan, uint32_t TimestampPrescaler);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TimestampPrescaler",
-                    "description": "参数 TimestampPrescaler，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIG时间戳计数器使用的 Timestamp Prescaler 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigTimestampCounter(hfdcan, TimestampPrescaler);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN 时间戳计数器。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigTimestampCounter(&hfdcan1, timestampprescaler) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41440,25 +41440,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-configtxdelaycompensation",
             "name": "HAL_FDCAN_ConfigTxDelayCompensation",
             "kind": "function",
-            "brief": "配置配置参数。",
+            "brief": "配置FDCAN 发送延时COMPENSATION。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ConfigTxDelayCompensation(FDCAN_HandleTypeDef *hfdcan, uint32_t TdcOffset, uint32_t TdcFilter);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TdcOffset",
-                    "description": "参数 TdcOffset，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIG发送延时COMPENSATION使用的 Tdc Offset 参数。"
                 },
                 {
                     "name": "TdcFilter",
-                    "description": "参数 TdcFilter，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN CONFIG发送延时COMPENSATION使用的 Tdc Filter 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_FDCAN_ConfigTxDelayCompensation(hfdcan, TdcOffset, TdcFilter);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于配置FDCAN 发送延时COMPENSATION。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_FDCAN_ConfigTxDelayCompensation(&hfdcan1, tdcoffset, tdcfilter) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41470,21 +41470,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-deactivatenotification",
             "name": "HAL_FDCAN_DeactivateNotification",
             "kind": "function",
-            "brief": "停用中断通知。",
+            "brief": "停用FDCAN 通知。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DeactivateNotification(FDCAN_HandleTypeDef *hfdcan, uint32_t InactiveITs);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "InactiveITs",
-                    "description": "参数 InactiveITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN DEACTIVATE通知使用的 Inactive I Ts 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DeactivateNotification(hfdcan, InactiveITs);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用FDCAN 通知。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DeactivateNotification(&hfdcan1, inactiveits) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41501,12 +41501,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_FDCAN_DeInit(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化FDCAN 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_FDCAN_DeInit(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41518,17 +41518,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-disableedgefiltering",
             "name": "HAL_FDCAN_DisableEdgeFiltering",
             "kind": "function",
-            "brief": "禁用过滤器。",
+            "brief": "禁用FDCAN EDGEFILTERING。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DisableEdgeFiltering(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DisableEdgeFiltering(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用FDCAN EDGEFILTERING。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DisableEdgeFiltering(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41540,17 +41540,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-disableisomode",
             "name": "HAL_FDCAN_DisableISOMode",
             "kind": "function",
-            "brief": "禁用FDCAN 外设。",
+            "brief": "禁用FDCAN ISO模式。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DisableISOMode(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DisableISOMode(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用FDCAN ISO模式。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DisableISOMode(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41562,17 +41562,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-disabletimeoutcounter",
             "name": "HAL_FDCAN_DisableTimeoutCounter",
             "kind": "function",
-            "brief": "禁用计数器值。",
+            "brief": "禁用FDCAN 超时计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DisableTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DisableTimeoutCounter(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用FDCAN 超时计数器。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DisableTimeoutCounter(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41584,17 +41584,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-disabletimestampcounter",
             "name": "HAL_FDCAN_DisableTimestampCounter",
             "kind": "function",
-            "brief": "禁用计数器值。",
+            "brief": "禁用FDCAN 时间戳计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DisableTimestampCounter(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DisableTimestampCounter(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用FDCAN 时间戳计数器。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DisableTimestampCounter(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41606,17 +41606,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-disabletxdelaycompensation",
             "name": "HAL_FDCAN_DisableTxDelayCompensation",
             "kind": "function",
-            "brief": "禁用FDCAN 外设。",
+            "brief": "禁用FDCAN 发送延时COMPENSATION。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_DisableTxDelayCompensation(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_DisableTxDelayCompensation(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用FDCAN 发送延时COMPENSATION。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_DisableTxDelayCompensation(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41628,17 +41628,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enableedgefiltering",
             "name": "HAL_FDCAN_EnableEdgeFiltering",
             "kind": "function",
-            "brief": "使能过滤器。",
+            "brief": "使能FDCAN EDGEFILTERING。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnableEdgeFiltering(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnableEdgeFiltering(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能FDCAN EDGEFILTERING。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_EnableEdgeFiltering(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41650,17 +41650,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enableisomode",
             "name": "HAL_FDCAN_EnableISOMode",
             "kind": "function",
-            "brief": "使能FDCAN 外设。",
+            "brief": "使能FDCAN ISO模式。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnableISOMode(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnableISOMode(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能FDCAN ISO模式。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_EnableISOMode(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41672,17 +41672,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enabletimeoutcounter",
             "name": "HAL_FDCAN_EnableTimeoutCounter",
             "kind": "function",
-            "brief": "使能计数器值。",
+            "brief": "使能FDCAN 超时计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnableTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnableTimeoutCounter(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能FDCAN 超时计数器。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_EnableTimeoutCounter(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41694,21 +41694,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enabletimestampcounter",
             "name": "HAL_FDCAN_EnableTimestampCounter",
             "kind": "function",
-            "brief": "使能计数器值。",
+            "brief": "使能FDCAN 时间戳计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnableTimestampCounter(FDCAN_HandleTypeDef *hfdcan, uint32_t TimestampOperation);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TimestampOperation",
-                    "description": "参数 TimestampOperation，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN ENABLE时间戳计数器使用的 Timestamp Operation 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnableTimestampCounter(hfdcan, TimestampOperation);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能FDCAN 时间戳计数器。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_EnableTimestampCounter(&hfdcan1, timestampoperation) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41720,17 +41720,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enabletxdelaycompensation",
             "name": "HAL_FDCAN_EnableTxDelayCompensation",
             "kind": "function",
-            "brief": "使能FDCAN 外设。",
+            "brief": "使能FDCAN 发送延时COMPENSATION。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnableTxDelayCompensation(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnableTxDelayCompensation(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能FDCAN 发送延时COMPENSATION。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_EnableTxDelayCompensation(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41742,17 +41742,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-enterpowerdownmode",
             "name": "HAL_FDCAN_EnterPowerDownMode",
             "kind": "function",
-            "brief": "提供FDCAN 外设相关的 HAL 操作接口。",
+            "brief": "进入FDCAN 电源DOWN模式。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_EnterPowerDownMode(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_EnterPowerDownMode(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于进入FDCAN 电源DOWN模式。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_EnterPowerDownMode(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41764,17 +41764,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-errorcallback",
             "name": "HAL_FDCAN_ErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_ErrorCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    error_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -41786,21 +41786,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-errorstatuscallback",
             "name": "HAL_FDCAN_ErrorStatusCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 错误STATUS事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "ErrorStatusITs",
-                    "description": "参数 ErrorStatusITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要处理或返回的 FDCAN 错误码。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 错误STATUS。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_ErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t ErrorStatusITs)\n{\n    error_status_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -41812,17 +41812,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-exitpowerdownmode",
             "name": "HAL_FDCAN_ExitPowerDownMode",
             "kind": "function",
-            "brief": "提供FDCAN 外设相关的 HAL 操作接口。",
+            "brief": "退出FDCAN 电源DOWN模式。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ExitPowerDownMode(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_ExitPowerDownMode(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于退出FDCAN 电源DOWN模式。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_ExitPowerDownMode(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41834,17 +41834,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-exitrestrictedoperationmode",
             "name": "HAL_FDCAN_ExitRestrictedOperationMode",
             "kind": "function",
-            "brief": "提供FDCAN 外设相关的 HAL 操作接口。",
+            "brief": "退出FDCAN RESTRICTEDOPERATION模式。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ExitRestrictedOperationMode(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_ExitRestrictedOperationMode(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于退出FDCAN RESTRICTEDOPERATION模式。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_ExitRestrictedOperationMode(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41856,17 +41856,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-geterror",
             "name": "HAL_FDCAN_GetError",
             "kind": "function",
-            "brief": "获取错误码错误状态。",
+            "brief": "读取FDCAN 错误。",
             "prototype": "uint32_t HAL_FDCAN_GetError(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetError(hfdcan);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取FDCAN 错误。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_FDCAN_GetError(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -41878,21 +41878,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-geterrorcounters",
             "name": "HAL_FDCAN_GetErrorCounters",
             "kind": "function",
-            "brief": "获取错误码计数器值。",
+            "brief": "读取FDCAN 错误COUNTERS。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_GetErrorCounters(const FDCAN_HandleTypeDef *hfdcan, FDCAN_ErrorCountersTypeDef *ErrorCounters);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "ErrorCounters",
-                    "description": "参数 ErrorCounters，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要处理或返回的 FDCAN 错误码。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetErrorCounters(hfdcan, ErrorCounters);",
+            "returns": "返回 HAL 句柄中累计的错误码位掩码；无错误时为 HAL_ERROR_NONE。",
+            "notes": "该接口用于读取FDCAN 错误COUNTERS。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_FDCAN_GetErrorCounters(&hfdcan1, errorcounters);",
             "families": [
                 "G4"
             ],
@@ -41904,21 +41904,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-gethighprioritymessagestatus",
             "name": "HAL_FDCAN_GetHighPriorityMessageStatus",
             "kind": "function",
-            "brief": "获取FDCAN 外设。",
+            "brief": "读取FDCAN HIGHPRIORITY报文STATUS。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_GetHighPriorityMessageStatus(const FDCAN_HandleTypeDef *hfdcan, FDCAN_HpMsgStatusTypeDef *HpMsgStatus);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "HpMsgStatus",
-                    "description": "参数 HpMsgStatus，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN GETHIGHPRIORITY报文STATUS使用的 Hp Msg Status 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetHighPriorityMessageStatus(hfdcan, HpMsgStatus);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取FDCAN HIGHPRIORITY报文STATUS。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_FDCAN_GetHighPriorityMessageStatus(&hfdcan1, hpmsgstatus) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41930,17 +41930,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-getlatesttxfifoqrequestbuffer",
             "name": "HAL_FDCAN_GetLatestTxFifoQRequestBuffer",
             "kind": "function",
-            "brief": "获取FIFO。",
+            "brief": "读取FDCAN LATEST发送FIFOQ请求缓冲区。",
             "prototype": "uint32_t HAL_FDCAN_GetLatestTxFifoQRequestBuffer(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetLatestTxFifoQRequestBuffer(hfdcan);",
+            "notes": "该接口用于读取FDCAN LATEST发送FIFOQ请求缓冲区。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_FDCAN_GetLatestTxFifoQRequestBuffer(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -41952,21 +41952,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-getprotocolstatus",
             "name": "HAL_FDCAN_GetProtocolStatus",
             "kind": "function",
-            "brief": "获取FDCAN 外设。",
+            "brief": "读取FDCAN PROTOCOLSTATUS。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_GetProtocolStatus(const FDCAN_HandleTypeDef *hfdcan, FDCAN_ProtocolStatusTypeDef *ProtocolStatus);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "ProtocolStatus",
-                    "description": "参数 ProtocolStatus，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN GETPROTOCOLSTATUS使用的 Protocol Status 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetProtocolStatus(hfdcan, ProtocolStatus);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取FDCAN PROTOCOLSTATUS。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_FDCAN_GetProtocolStatus(&hfdcan1, protocolstatus) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -41978,21 +41978,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-getrxfifofilllevel",
             "name": "HAL_FDCAN_GetRxFifoFillLevel",
             "kind": "function",
-            "brief": "获取FIFO。",
+            "brief": "读取FDCAN 接收FIFOFILL电平。",
             "prototype": "uint32_t HAL_FDCAN_GetRxFifoFillLevel(const FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "RxFifo",
-                    "description": "参数 RxFifo，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN GET接收FIFOFILL电平使用的 Rx Fifo 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetRxFifoFillLevel(hfdcan, RxFifo);",
+            "notes": "该接口用于读取FDCAN 接收FIFOFILL电平。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_FDCAN_GetRxFifoFillLevel(&hfdcan1, rxfifo);",
             "families": [
                 "G4"
             ],
@@ -42004,29 +42004,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-getrxmessage",
             "name": "HAL_FDCAN_GetRxMessage",
             "kind": "function",
-            "brief": "获取FDCAN 外设。",
+            "brief": "读取FDCAN 接收报文。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_GetRxMessage(FDCAN_HandleTypeDef *hfdcan, uint32_t RxLocation, FDCAN_RxHeaderTypeDef *pRxHeader, uint8_t *pRxData);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "RxLocation",
-                    "description": "参数 RxLocation，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN GET接收报文使用的 Rx Location 参数。"
                 },
                 {
                     "name": "pRxHeader",
-                    "description": "报文头配置或输出结构体。"
+                    "description": "FDCAN GET接收报文使用的 p Rx Header 参数。"
                 },
                 {
                     "name": "pRxData",
-                    "description": "待设置的数据或数值。"
+                    "description": "接收数据缓冲区指针，异步接收完成前必须保持有效。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetRxMessage(hfdcan, RxLocation, pRxHeader, pRxData);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取FDCAN 接收报文。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_FDCAN_GetRxMessage(&hfdcan1, rxlocation, prxheader, fdcan_rx_buffer) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42038,17 +42038,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-getstate",
             "name": "HAL_FDCAN_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取FDCAN 状态。",
             "prototype": "HAL_FDCAN_StateTypeDef HAL_FDCAN_GetState(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetState(hfdcan);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取FDCAN 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "uint32_t value = HAL_FDCAN_GetState(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42060,17 +42060,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-gettimeoutcounter",
             "name": "HAL_FDCAN_GetTimeoutCounter",
             "kind": "function",
-            "brief": "获取计数器值。",
+            "brief": "读取FDCAN 超时计数器。",
             "prototype": "uint16_t HAL_FDCAN_GetTimeoutCounter(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetTimeoutCounter(hfdcan);",
+            "notes": "该接口用于读取FDCAN 超时计数器。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_FDCAN_GetTimeoutCounter(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42082,17 +42082,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-gettimestampcounter",
             "name": "HAL_FDCAN_GetTimestampCounter",
             "kind": "function",
-            "brief": "获取计数器值。",
+            "brief": "读取FDCAN 时间戳计数器。",
             "prototype": "uint16_t HAL_FDCAN_GetTimestampCounter(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetTimestampCounter(hfdcan);",
+            "notes": "该接口用于读取FDCAN 时间戳计数器。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_FDCAN_GetTimestampCounter(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42104,21 +42104,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-gettxevent",
             "name": "HAL_FDCAN_GetTxEvent",
             "kind": "function",
-            "brief": "获取FDCAN 外设。",
+            "brief": "读取FDCAN 发送事件。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_GetTxEvent(FDCAN_HandleTypeDef *hfdcan, FDCAN_TxEventFifoTypeDef *pTxEvent);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pTxEvent",
-                    "description": "参数 pTxEvent，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要轮询或处理的 FDCAN 事件类型。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetTxEvent(hfdcan, pTxEvent);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取FDCAN 发送事件。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_FDCAN_GetTxEvent(&hfdcan1, FDCAN_EVENT) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42130,17 +42130,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-gettxfifofreelevel",
             "name": "HAL_FDCAN_GetTxFifoFreeLevel",
             "kind": "function",
-            "brief": "获取FIFO。",
+            "brief": "读取FDCAN 发送FIFOFREE电平。",
             "prototype": "uint32_t HAL_FDCAN_GetTxFifoFreeLevel(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_FDCAN_GetTxFifoFreeLevel(hfdcan);",
+            "notes": "该接口用于读取FDCAN 发送FIFOFREE电平。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_FDCAN_GetTxFifoFreeLevel(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42152,17 +42152,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-highprioritymessagecallback",
             "name": "HAL_FDCAN_HighPriorityMessageCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN HIGHPRIORITY报文事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_HighPriorityMessageCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_HighPriorityMessageCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN HIGHPRIORITY报文。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_HighPriorityMessageCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    high_priority_message_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42179,12 +42179,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_FDCAN_Init(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化FDCAN 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_FDCAN_Init(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42196,17 +42196,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-irqhandler",
             "name": "HAL_FDCAN_IRQHandler",
             "kind": "function",
-            "brief": "处理FDCAN 外设产生的中断。",
+            "brief": "处理 FDCAN 外设中断标志并分发对应回调。",
             "prototype": "void HAL_FDCAN_IRQHandler(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_FDCAN_IRQHandler(hfdcan);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 FDCAN 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_FDCAN_IRQHandler(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42218,17 +42218,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-isrestrictedoperationmode",
             "name": "HAL_FDCAN_IsRestrictedOperationMode",
             "kind": "function",
-            "brief": "提供FDCAN 外设相关的 HAL 操作接口。",
+            "brief": "执行FDCAN ISRESTRICTEDOPERATION模式操作。",
             "prototype": "uint32_t HAL_FDCAN_IsRestrictedOperationMode(const FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_IsRestrictedOperationMode(hfdcan);",
+            "notes": "该接口用于执行FDCAN ISRESTRICTEDOPERATION模式操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_FDCAN_IsRestrictedOperationMode(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42240,21 +42240,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-istxbuffermessagepending",
             "name": "HAL_FDCAN_IsTxBufferMessagePending",
             "kind": "function",
-            "brief": "提供FDCAN 外设相关的 HAL 操作接口。",
+            "brief": "执行FDCAN IS发送缓冲区报文挂起操作。",
             "prototype": "uint32_t HAL_FDCAN_IsTxBufferMessagePending(const FDCAN_HandleTypeDef *hfdcan, uint32_t TxBufferIndex);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TxBufferIndex",
-                    "description": "数据缓冲区指针。"
+                    "description": "FDCAN IS发送缓冲区报文挂起使用的 Tx Buffer Index 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_IsTxBufferMessagePending(hfdcan, TxBufferIndex);",
+            "notes": "该接口用于执行FDCAN IS发送缓冲区报文挂起操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_FDCAN_IsTxBufferMessagePending(&hfdcan1, txbufferindex);",
             "families": [
                 "G4"
             ],
@@ -42266,17 +42266,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-mspdeinit",
             "name": "HAL_FDCAN_MspDeInit",
             "kind": "function",
-            "brief": "执行FDCAN 外设的底层硬件反初始化回调。",
+            "brief": "释放 FDCAN 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_FDCAN_MspDeInit(hfdcan);",
+            "notes": "该接口用于释放 FDCAN 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_FDCAN_MspDeInit(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42288,17 +42288,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-mspinit",
             "name": "HAL_FDCAN_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 FDCAN 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_FDCAN_MspInit(hfdcan);",
+            "notes": "该接口用于初始化 FDCAN 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_FDCAN_MspInit(&hfdcan1);",
             "families": [
                 "G4"
             ],
@@ -42310,25 +42310,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registercallback",
             "name": "HAL_FDCAN_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "FDCAN REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID, void (* pCallback)(FDCAN_HandleTypeDef *_hFDCAN));",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID, void (* pCallback)(FDCAN_HandleTypeDef *_hFDCAN))\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID, void (* pCallback)(FDCAN_HandleTypeDef *_hFDCAN))\n{\n    register_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42340,21 +42340,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registererrorstatuscallback",
             "name": "HAL_FDCAN_RegisterErrorStatusCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN REGISTER错误STATUS事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_ErrorStatusCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_ErrorStatusCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER错误STATUS。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_ErrorStatusCallbackTypeDef pCallback)\n{\n    register_error_status_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42366,21 +42366,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registerrxfifo0callback",
             "name": "HAL_FDCAN_RegisterRxFifo0Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN REGISTER接收FIFO0事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo0CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo0CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER接收FIFO0。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo0CallbackTypeDef pCallback)\n{\n    register_rx_fifo0_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42392,21 +42392,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registerrxfifo1callback",
             "name": "HAL_FDCAN_RegisterRxFifo1Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN REGISTER接收FIFO1事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo1CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo1CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER接收FIFO1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_RxFifo1CallbackTypeDef pCallback)\n{\n    register_rx_fifo1_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42418,21 +42418,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registertxbufferabortcallback",
             "name": "HAL_FDCAN_RegisterTxBufferAbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN REGISTER发送缓冲区中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferAbortCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferAbortCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER发送缓冲区中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferAbortCallbackTypeDef pCallback)\n{\n    register_tx_buffer_abort_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42444,21 +42444,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registertxbuffercompletecallback",
             "name": "HAL_FDCAN_RegisterTxBufferCompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN REGISTER发送缓冲区完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferCompleteCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferCompleteCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER发送缓冲区完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxBufferCompleteCallbackTypeDef pCallback)\n{\n    register_tx_buffer_complete_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42470,21 +42470,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-registertxeventfifocallback",
             "name": "HAL_FDCAN_RegisterTxEventFifoCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN REGISTER发送事件FIFO事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxEventFifoCallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxEventFifoCallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN REGISTER发送事件FIFO。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_RegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, pFDCAN_TxEventFifoCallbackTypeDef pCallback)\n{\n    register_tx_event_fifo_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42496,17 +42496,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-resettimeoutcounter",
             "name": "HAL_FDCAN_ResetTimeoutCounter",
             "kind": "function",
-            "brief": "复位计数器值。",
+            "brief": "复位FDCAN 超时计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ResetTimeoutCounter(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_ResetTimeoutCounter(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于复位FDCAN 超时计数器。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_ResetTimeoutCounter(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42518,17 +42518,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-resettimestampcounter",
             "name": "HAL_FDCAN_ResetTimestampCounter",
             "kind": "function",
-            "brief": "复位计数器值。",
+            "brief": "复位FDCAN 时间戳计数器。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_ResetTimestampCounter(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_ResetTimestampCounter(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于复位FDCAN 时间戳计数器。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_FDCAN_ResetTimestampCounter(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42540,21 +42540,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-rxfifo0callback",
             "name": "HAL_FDCAN_RxFifo0Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN 接收FIFO0事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "RxFifo0ITs",
-                    "description": "参数 RxFifo0ITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN 接收FIFO0CALLBACK使用的 Rx Fifo0 I Ts 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 接收FIFO0。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo0ITs)\n{\n    rx_fifo0_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42566,21 +42566,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-rxfifo1callback",
             "name": "HAL_FDCAN_RxFifo1Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN 接收FIFO1事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "RxFifo1ITs",
-                    "description": "参数 RxFifo1ITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "FDCAN 接收FIFO1CALLBACK使用的 Rx Fifo1 I Ts 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 接收FIFO1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_RxFifo1Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t RxFifo1ITs)\n{\n    rx_fifo1_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42597,12 +42597,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_Start(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于启动FDCAN 外设。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_FDCAN_Start(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42619,12 +42619,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_FDCAN_Stop(hfdcan);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停止FDCAN 外设。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_FDCAN_Stop(&hfdcan1) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -42636,17 +42636,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-timeoutoccurredcallback",
             "name": "HAL_FDCAN_TimeoutOccurredCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 超时OCCURRED事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 超时OCCURRED。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TimeoutOccurredCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    timeout_occurred_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42658,17 +42658,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-timestampwraparoundcallback",
             "name": "HAL_FDCAN_TimestampWraparoundCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 时间戳WRAPAROUND事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TimestampWraparoundCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TimestampWraparoundCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 时间戳WRAPAROUND。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TimestampWraparoundCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    timestamp_wraparound_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42680,21 +42680,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-txbufferabortcallback",
             "name": "HAL_FDCAN_TxBufferAbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 发送缓冲区中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "BufferIndexes",
-                    "description": "数据缓冲区指针。"
+                    "description": "FDCAN 发送缓冲区中止CALLBACK使用的 Buffer Indexes 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 发送缓冲区中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)\n{\n    tx_buffer_abort_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42706,21 +42706,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-txbuffercompletecallback",
             "name": "HAL_FDCAN_TxBufferCompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN 发送缓冲区完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "BufferIndexes",
-                    "description": "数据缓冲区指针。"
+                    "description": "FDCAN 发送缓冲区完成CALLBACK使用的 Buffer Indexes 参数。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 发送缓冲区完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t BufferIndexes)\n{\n    tx_buffer_complete_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42732,21 +42732,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-txeventfifocallback",
             "name": "HAL_FDCAN_TxEventFifoCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN 发送事件FIFO事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "TxEventFifoITs",
-                    "description": "参数 TxEventFifoITs，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "要轮询或处理的 FDCAN 事件类型。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 发送事件FIFO。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan, uint32_t TxEventFifoITs)\n{\n    tx_event_fifo_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42758,17 +42758,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-txfifoemptycallback",
             "name": "HAL_FDCAN_TxFifoEmptyCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN 发送FIFOEMPTY事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应FDCAN 发送FIFOEMPTY。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_FDCAN_TxFifoEmptyCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    tx_fifo_empty_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42780,21 +42780,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregistercallback",
             "name": "HAL_FDCAN_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "FDCAN UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterCallback(FDCAN_HandleTypeDef *hfdcan, HAL_FDCAN_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42806,17 +42806,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregistererrorstatuscallback",
             "name": "HAL_FDCAN_UnRegisterErrorStatusCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN UNREGISTER错误STATUS事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER错误STATUS。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterErrorStatusCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_error_status_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42828,17 +42828,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregisterrxfifo0callback",
             "name": "HAL_FDCAN_UnRegisterRxFifo0Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN UNREGISTER接收FIFO0事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER接收FIFO0。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo0Callback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_rx_fifo0_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42850,17 +42850,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregisterrxfifo1callback",
             "name": "HAL_FDCAN_UnRegisterRxFifo1Callback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN UNREGISTER接收FIFO1事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER接收FIFO1。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterRxFifo1Callback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_rx_fifo1_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42872,17 +42872,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregistertxbufferabortcallback",
             "name": "HAL_FDCAN_UnRegisterTxBufferAbortCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN UNREGISTER发送缓冲区中止事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER发送缓冲区中止。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferAbortCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_tx_buffer_abort_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42894,17 +42894,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregistertxbuffercompletecallback",
             "name": "HAL_FDCAN_UnRegisterTxBufferCompleteCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "FDCAN UNREGISTER发送缓冲区完成事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER发送缓冲区完成。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxBufferCompleteCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_tx_buffer_complete_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -42916,17 +42916,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-fdcan-unregistertxeventfifocallback",
             "name": "HAL_FDCAN_UnRegisterTxEventFifoCallback",
             "kind": "function",
-            "brief": "处理FIFO对应的回调事件。",
+            "brief": "FDCAN UNREGISTER发送事件FIFO事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan);",
             "params": [
                 {
                     "name": "hfdcan",
-                    "description": "FDCAN 外设句柄。"
+                    "description": "FDCAN 句柄指针，例如 &hfdcan1。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应FDCAN UNREGISTER发送事件FIFO。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_FDCAN_UnRegisterTxEventFifoCallback(FDCAN_HandleTypeDef *hfdcan)\n{\n    un_register_tx_event_fifo_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -43144,17 +43144,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-alarmaeventcallback",
             "name": "HAL_RTC_AlarmAEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 闹钟A事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 闹钟A事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTC_AlarmAEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    alarm_aevent_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43170,17 +43170,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-alarmirqhandler",
             "name": "HAL_RTC_AlarmIRQHandler",
             "kind": "function",
-            "brief": "处理闹钟产生的中断。",
+            "brief": "处理 RTC 闹钟中断标志并分发对应回调。",
             "prototype": "void HAL_RTC_AlarmIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTC_AlarmIRQHandler(hrtc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTC_AlarmIRQHandler(&hrtc);",
             "families": [
                 "F1",
                 "F4",
@@ -43196,21 +43196,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-deactivatealarm",
             "name": "HAL_RTC_DeactivateAlarm",
             "kind": "function",
-            "brief": "停用闹钟。",
+            "brief": "停用RTC 闹钟。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_DeactivateAlarm(RTC_HandleTypeDef *hrtc, uint32_t Alarm);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Alarm",
-                    "description": "参数 Alarm，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC DEACTIVATE闹钟使用的 Alarm 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTC_DeactivateAlarm(hrtc, Alarm);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC 闹钟。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTC_DeactivateAlarm(&hrtc, alarm) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43231,12 +43231,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_RTC_DeInit(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于反初始化RTC 外设。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "if (HAL_RTC_DeInit(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43252,33 +43252,33 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-dst-add1hour",
             "name": "HAL_RTC_DST_Add1Hour",
             "kind": "function",
-            "brief": "提供RTC 外设相关的 HAL 操作接口。",
+            "brief": "执行RTC DSTADD1HOUR操作。",
             "prototype": "void HAL_RTC_DST_Add1Hour(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Value",
-                    "description": "待设置的数据或数值。"
+                    "description": "RTC DSTADD1HOUR使用的数据值。"
                 },
                 {
                     "name": "Value",
-                    "description": "待设置的数据或数值。"
+                    "description": "RTC DSTADD1HOUR使用的数据值。"
                 },
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTC_DST_Add1Hour(hrtc, hrtc, Value, Value, hrtc);",
+            "notes": "该接口用于执行RTC DSTADD1HOUR操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RTC_DST_Add1Hour(&hrtc, &hrtc, value, value, &hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -43292,17 +43292,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-dst-clearstoreoperation",
             "name": "HAL_RTC_DST_ClearStoreOperation",
             "kind": "function",
-            "brief": "清除RTC 外设。",
+            "brief": "执行RTC DSTCLEARSTOREOPERATION操作。",
             "prototype": "void HAL_RTC_DST_ClearStoreOperation(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTC_DST_ClearStoreOperation(hrtc);",
+            "notes": "该接口用于执行RTC DSTCLEARSTOREOPERATION操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RTC_DST_ClearStoreOperation(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -43316,17 +43316,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-dst-readstoreoperation",
             "name": "HAL_RTC_DST_ReadStoreOperation",
             "kind": "function",
-            "brief": "读取RTC 外设。",
+            "brief": "执行RTC DSTREADSTOREOPERATION操作。",
             "prototype": "uint32_t HAL_RTC_DST_ReadStoreOperation(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTC_DST_ReadStoreOperation(hrtc);",
+            "notes": "该接口用于执行RTC DSTREADSTOREOPERATION操作。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "HAL_RTC_DST_ReadStoreOperation(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -43340,17 +43340,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-dst-setstoreoperation",
             "name": "HAL_RTC_DST_SetStoreOperation",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "执行RTC DSTSETSTOREOPERATION操作。",
             "prototype": "void HAL_RTC_DST_SetStoreOperation(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTC_DST_SetStoreOperation(hrtc);",
+            "notes": "该接口用于执行RTC DSTSETSTOREOPERATION操作。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "HAL_RTC_DST_SetStoreOperation(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -43364,17 +43364,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-dst-sub1hour",
             "name": "HAL_RTC_DST_Sub1Hour",
             "kind": "function",
-            "brief": "提供RTC 外设相关的 HAL 操作接口。",
+            "brief": "执行RTC DSTSUB1HOUR操作。",
             "prototype": "void HAL_RTC_DST_Sub1Hour(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTC_DST_Sub1Hour(hrtc);",
+            "notes": "该接口用于执行RTC DSTSUB1HOUR操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RTC_DST_Sub1Hour(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -43388,29 +43388,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-getalarm",
             "name": "HAL_RTC_GetAlarm",
             "kind": "function",
-            "brief": "获取闹钟。",
+            "brief": "读取RTC 闹钟。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_GetAlarm(RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm, uint32_t Alarm, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sAlarm",
-                    "description": "参数 sAlarm，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET闹钟使用的 s Alarm 参数。"
                 },
                 {
                     "name": "Alarm",
-                    "description": "参数 Alarm，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET闹钟使用的 Alarm 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET闹钟使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTC_GetAlarm(hrtc, sAlarm, Alarm, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取RTC 闹钟。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTC_GetAlarm(&hrtc, salarm, alarm, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43426,25 +43426,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-getdate",
             "name": "HAL_RTC_GetDate",
             "kind": "function",
-            "brief": "获取日期。",
+            "brief": "读取RTC 日期。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_GetDate(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDate, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sDate",
-                    "description": "参数 sDate，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET日期使用的 s Date 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET日期使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTC_GetDate(hrtc, sDate, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取RTC 日期。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTC_GetDate(&hrtc, sdate, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43460,17 +43460,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-getstate",
             "name": "HAL_RTC_GetState",
             "kind": "function",
-            "brief": "获取运行状态运行状态。",
+            "brief": "读取RTC 状态。",
             "prototype": "HAL_RTCStateTypeDef HAL_RTC_GetState(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTC_GetState(hrtc);",
+            "returns": "返回 HAL 句柄状态枚举或状态位掩码。",
+            "notes": "该接口用于读取RTC 状态。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "uint32_t value = HAL_RTC_GetState(&hrtc);",
             "families": [
                 "F1",
                 "F4",
@@ -43486,25 +43486,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-gettime",
             "name": "HAL_RTC_GetTime",
             "kind": "function",
-            "brief": "获取时间。",
+            "brief": "读取RTC 时间。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_GetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sTime",
-                    "description": "参数 sTime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET时间使用的 s Time 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET时间使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTC_GetTime(hrtc, sTime, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取RTC 时间。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTC_GetTime(&hrtc, stime, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43525,12 +43525,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_RTC_Init(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化RTC 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_RTC_Init(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43546,17 +43546,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-mspdeinit",
             "name": "HAL_RTC_MspDeInit",
             "kind": "function",
-            "brief": "执行RTC 外设的底层硬件反初始化回调。",
+            "brief": "释放 RTC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。",
             "prototype": "void HAL_RTC_MspDeInit(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "用于停止并复位该功能相关的软件状态和外设配置。是否关闭外设时钟、GPIO 或 DMA，取决于对应 MSP 反初始化实现。",
-            "example": "HAL_RTC_MspDeInit(hrtc);",
+            "notes": "该接口用于释放 RTC 外设 使用的 GPIO、DMA、NVIC 和时钟等底层资源。调用前应停止正在进行的传输；GPIO、DMA、NVIC 和时钟是否释放取决于对应 MSP 反初始化实现。",
+            "example": "HAL_RTC_MspDeInit(&hrtc);",
             "families": [
                 "F1",
                 "F4",
@@ -43572,17 +43572,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-mspinit",
             "name": "HAL_RTC_MspInit",
             "kind": "function",
-            "brief": "执行引脚的底层硬件初始化回调。",
+            "brief": "初始化 RTC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。",
             "prototype": "void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_RTC_MspInit(hrtc);",
+            "notes": "该接口用于初始化 RTC 外设 使用的时钟、GPIO、DMA 和 NVIC 等底层资源。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "HAL_RTC_MspInit(&hrtc);",
             "families": [
                 "F1",
                 "F4",
@@ -43598,21 +43598,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-pollforalarmaevent",
             "name": "HAL_RTC_PollForAlarmAEvent",
             "kind": "function",
-            "brief": "轮询等待闹钟。",
+            "brief": "轮询等待RTC 闹钟A事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_PollForAlarmAEvent(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTC_PollForAlarmAEvent(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC 闹钟A事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTC_PollForAlarmAEvent(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43628,25 +43628,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-registercallback",
             "name": "HAL_RTC_RegisterCallback",
             "kind": "function",
-            "brief": "注册回调函数的用户回调函数。",
+            "brief": "RTC REGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_RegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID, pRTC_CallbackTypeDef pCallback);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 },
                 {
                     "name": "pCallback",
-                    "description": "用户回调函数指针。"
+                    "description": "用户回调函数指针；函数签名必须与对应回调类型一致。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_RTC_RegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID, pRTC_CallbackTypeDef pCallback)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应RTC REGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_RTC_RegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID, pRTC_CallbackTypeDef pCallback)\n{\n    register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43662,25 +43662,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-setalarm",
             "name": "HAL_RTC_SetAlarm",
             "kind": "function",
-            "brief": "设置闹钟。",
+            "brief": "设置RTC 闹钟。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_SetAlarm(RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sAlarm",
-                    "description": "参数 sAlarm，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET闹钟使用的 s Alarm 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET闹钟使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTC_SetAlarm(hrtc, sAlarm, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 闹钟。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTC_SetAlarm(&hrtc, salarm, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43696,25 +43696,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-setalarm-it",
             "name": "HAL_RTC_SetAlarm_IT",
             "kind": "function",
-            "brief": "设置闹钟。",
+            "brief": "设置RTC 闹钟，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_SetAlarm_IT(RTC_HandleTypeDef *hrtc, RTC_AlarmTypeDef *sAlarm, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sAlarm",
-                    "description": "参数 sAlarm，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET闹钟IT使用的 s Alarm 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET闹钟IT使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_RTC_SetAlarm_IT(hrtc, sAlarm, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 闹钟，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_RTC_SetAlarm_IT(&hrtc, salarm, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43730,25 +43730,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-setdate",
             "name": "HAL_RTC_SetDate",
             "kind": "function",
-            "brief": "设置日期。",
+            "brief": "设置RTC 日期。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_SetDate(RTC_HandleTypeDef *hrtc, RTC_DateTypeDef *sDate, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sDate",
-                    "description": "参数 sDate，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET日期使用的 s Date 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET日期使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTC_SetDate(hrtc, sDate, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 日期。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTC_SetDate(&hrtc, sdate, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43764,25 +43764,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-settime",
             "name": "HAL_RTC_SetTime",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 时间。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_SetTime(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTime, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sTime",
-                    "description": "参数 sTime，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间使用的 s Time 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTC_SetTime(hrtc, sTime, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 时间。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTC_SetTime(&hrtc, stime, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43798,21 +43798,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-unregistercallback",
             "name": "HAL_RTC_UnRegisterCallback",
             "kind": "function",
-            "brief": "取消注册回调函数的用户回调函数。",
+            "brief": "RTC UNREGISTER事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "CallbackID",
-                    "description": "用户回调函数指针。"
+                    "description": "要注册或取消的回调类型标识。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该回调对应RTC UNREGISTER。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "HAL_StatusTypeDef HAL_RTC_UnRegisterCallback(RTC_HandleTypeDef *hrtc, HAL_RTC_CallbackIDTypeDef CallbackID)\n{\n    un_register_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43828,17 +43828,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtc-waitforsynchro",
             "name": "HAL_RTC_WaitForSynchro",
             "kind": "function",
-            "brief": "提供RTC 外设相关的 HAL 操作接口。",
+            "brief": "执行RTC WAITFORSYNCHRO操作。",
             "prototype": "HAL_StatusTypeDef HAL_RTC_WaitForSynchro(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTC_WaitForSynchro(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行RTC WAITFORSYNCHRO操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_RTC_WaitForSynchro(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -43854,17 +43854,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-alarmbeventcallback",
             "name": "HAL_RTCEx_AlarmBEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 闹钟B事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 闹钟B事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_AlarmBEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    alarm_bevent_flag = 1;\n}",
             "families": [
                 "F4",
                 "G4"
@@ -43878,21 +43878,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-bkupread",
             "name": "HAL_RTCEx_BKUPRead",
             "kind": "function",
-            "brief": "读取RTC 外设。",
+            "brief": "读取RTC BKUP。",
             "prototype": "uint32_t HAL_RTCEx_BKUPRead(RTC_HandleTypeDef *hrtc, uint32_t BackupRegister);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "BackupRegister",
-                    "description": "参数 BackupRegister，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC BKUPREAD使用的 Backup Register 参数。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RTCEx_BKUPRead(hrtc, BackupRegister);",
+            "notes": "该接口用于读取RTC BKUP。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RTCEx_BKUPRead(&hrtc, backupregister);",
             "families": [
                 "F1",
                 "F4",
@@ -43908,25 +43908,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-bkupwrite",
             "name": "HAL_RTCEx_BKUPWrite",
             "kind": "function",
-            "brief": "写入RTC 外设。",
+            "brief": "写入RTC BKUP。",
             "prototype": "void HAL_RTCEx_BKUPWrite(RTC_HandleTypeDef *hrtc, uint32_t BackupRegister, uint32_t Data);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "BackupRegister",
-                    "description": "参数 BackupRegister，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC BKUPWRITE使用的 Backup Register 参数。"
                 },
                 {
                     "name": "Data",
-                    "description": "待设置的数据或数值。"
+                    "description": "RTC BKUPWRITE使用的数据值。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_BKUPWrite(hrtc, BackupRegister, Data);",
+            "notes": "该接口用于写入RTC BKUP。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "HAL_RTCEx_BKUPWrite(&hrtc, backupregister, data);",
             "families": [
                 "F1",
                 "F4",
@@ -43942,17 +43942,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatecalibrationoutput",
             "name": "HAL_RTCEx_DeactivateCalibrationOutPut",
             "kind": "function",
-            "brief": "停用RTC 外设。",
+            "brief": "停用RTC 校准越界PUT。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateCalibrationOutPut(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateCalibrationOutPut(hrtc);",
+            "returns": "HAL_OK 表示校准操作成功；ADC 状态不允许或校准失败时返回 HAL_ERROR。",
+            "notes": "该接口用于停用RTC 校准越界PUT。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateCalibrationOutPut(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -43966,17 +43966,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatecoarsecalib",
             "name": "HAL_RTCEx_DeactivateCoarseCalib",
             "kind": "function",
-            "brief": "停用RTC 外设。",
+            "brief": "停用RTC COARSECALIB。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateCoarseCalib(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateCoarseCalib(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC COARSECALIB。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateCoarseCalib(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -43988,21 +43988,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivateinternaltamper",
             "name": "HAL_RTCEx_DeactivateInternalTamper",
             "kind": "function",
-            "brief": "停用RTC 外设。",
+            "brief": "停用RTC 内部TAMPER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateInternalTamper(RTC_HandleTypeDef *hrtc, uint32_t IntTamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "IntTamper",
-                    "description": "参数 IntTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC DEACTIVATE内部TAMPER使用的 Int Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateInternalTamper(hrtc, IntTamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC 内部TAMPER。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateInternalTamper(&hrtc, inttamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44014,17 +44014,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivateinternaltimestamp",
             "name": "HAL_RTCEx_DeactivateInternalTimeStamp",
             "kind": "function",
-            "brief": "停用时间。",
+            "brief": "停用RTC 内部时间STAMP。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateInternalTimeStamp(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateInternalTimeStamp(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC 内部时间STAMP。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateInternalTimeStamp(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44036,17 +44036,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivaterefclock",
             "name": "HAL_RTCEx_DeactivateRefClock",
             "kind": "function",
-            "brief": "停用时钟。",
+            "brief": "停用RTC REF时钟。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateRefClock(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateRefClock(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC REF时钟。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateRefClock(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44060,17 +44060,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatesecond",
             "name": "HAL_RTCEx_DeactivateSecond",
             "kind": "function",
-            "brief": "停用RTC 外设。",
+            "brief": "停用RTC SECOND。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateSecond(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
-                    "name": "hrtc:",
-                    "description": "RTC 外设句柄。"
+                    "name": "hrtc",
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateSecond(hrtc:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC SECOND。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateSecond(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1"
             ],
@@ -44082,21 +44082,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatetamper",
             "name": "HAL_RTCEx_DeactivateTamper",
             "kind": "function",
-            "brief": "停用RTC 外设。",
+            "brief": "停用RTC TAMPER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateTamper(RTC_HandleTypeDef *hrtc, uint32_t Tamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Tamper",
-                    "description": "参数 Tamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC DEACTIVATETAMPER使用的 Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateTamper(hrtc, Tamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC TAMPER。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateTamper(&hrtc, tamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -44112,17 +44112,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatetimestamp",
             "name": "HAL_RTCEx_DeactivateTimeStamp",
             "kind": "function",
-            "brief": "停用时间。",
+            "brief": "停用RTC 时间STAMP。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateTimeStamp(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateTimeStamp(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC 时间STAMP。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateTimeStamp(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44136,17 +44136,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-deactivatewakeuptimer",
             "name": "HAL_RTCEx_DeactivateWakeUpTimer",
             "kind": "function",
-            "brief": "停用时间。",
+            "brief": "停用RTC 唤醒UPTIMER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DeactivateWakeUpTimer(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DeactivateWakeUpTimer(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于停用RTC 唤醒UPTIMER。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DeactivateWakeUpTimer(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44160,17 +44160,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-disablebypassshadow",
             "name": "HAL_RTCEx_DisableBypassShadow",
             "kind": "function",
-            "brief": "禁用RTC 外设。",
+            "brief": "禁用RTC BYPASSSHADOW。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_DisableBypassShadow(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_DisableBypassShadow(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于禁用RTC BYPASSSHADOW。停止前应确认是否还有关联通道、DMA 或从属操作正在运行，并在返回后检查句柄状态和残留标志。",
+            "example": "if (HAL_RTCEx_DisableBypassShadow(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44184,17 +44184,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-enablebypassshadow",
             "name": "HAL_RTCEx_EnableBypassShadow",
             "kind": "function",
-            "brief": "使能RTC 外设。",
+            "brief": "使能RTC BYPASSSHADOW。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_EnableBypassShadow(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_RTCEx_EnableBypassShadow(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于使能RTC BYPASSSHADOW。启动前应完成相关通道、触发源和中断或 DMA 配置；若返回 HAL_BUSY，应先结束或中止上一操作。",
+            "example": "if (HAL_RTCEx_EnableBypassShadow(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44208,29 +44208,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-gettimestamp",
             "name": "HAL_RTCEx_GetTimeStamp",
             "kind": "function",
-            "brief": "获取时间。",
+            "brief": "读取RTC 时间STAMP。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_GetTimeStamp(RTC_HandleTypeDef *hrtc, RTC_TimeTypeDef *sTimeStamp, RTC_DateTypeDef *sTimeStampDate, uint32_t Format);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sTimeStamp",
-                    "description": "参数 sTimeStamp，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET时间STAMP使用的 s Time Stamp 参数。"
                 },
                 {
                     "name": "sTimeStampDate",
-                    "description": "参数 sTimeStampDate，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET时间STAMP使用的 s Time Stamp Date 参数。"
                 },
                 {
                     "name": "Format",
-                    "description": "参数 Format，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC GET时间STAMP使用的 Format 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RTCEx_GetTimeStamp(hrtc, sTimeStamp, sTimeStampDate, Format);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于读取RTC 时间STAMP。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "if (HAL_RTCEx_GetTimeStamp(&hrtc, stimestamp, stimestampdate, format) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44244,17 +44244,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-getwakeuptimer",
             "name": "HAL_RTCEx_GetWakeUpTimer",
             "kind": "function",
-            "brief": "获取时间。",
+            "brief": "读取RTC 唤醒UPTIMER。",
             "prototype": "uint32_t HAL_RTCEx_GetWakeUpTimer(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "返回对应的状态、计数值或数据，具体含义以函数原型和当前系列头文件为准。",
-            "notes": "读取结果的单位、有效位宽和清零行为取决于具体外设配置；连续读取前应确认是否需要等待状态标志或处理寄存器锁存。",
-            "example": "HAL_RTCEx_GetWakeUpTimer(hrtc);",
+            "notes": "该接口用于读取RTC 唤醒UPTIMER。返回值是原始寄存器值或 HAL 状态编码；单位、有效位宽与读取后的清零行为由当前外设配置决定。",
+            "example": "HAL_RTCEx_GetWakeUpTimer(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -44268,17 +44268,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper1eventcallback",
             "name": "HAL_RTCEx_InternalTamper1EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER1事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper1EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper1EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER1事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper1EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper1_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44290,17 +44290,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper2eventcallback",
             "name": "HAL_RTCEx_InternalTamper2EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER2事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper2EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper2EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER2事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper2EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper2_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44312,17 +44312,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper3eventcallback",
             "name": "HAL_RTCEx_InternalTamper3EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER3事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper3EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper3EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER3事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper3EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper3_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44334,17 +44334,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper4eventcallback",
             "name": "HAL_RTCEx_InternalTamper4EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER4事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper4EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper4EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER4事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper4EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper4_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44356,17 +44356,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper5eventcallback",
             "name": "HAL_RTCEx_InternalTamper5EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER5事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper5EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper5EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER5事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper5EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper5_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44378,17 +44378,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper6eventcallback",
             "name": "HAL_RTCEx_InternalTamper6EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER6事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper6EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper6EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER6事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper6EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper6_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44400,17 +44400,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-internaltamper7eventcallback",
             "name": "HAL_RTCEx_InternalTamper7EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 内部TAMPER7事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_InternalTamper7EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_InternalTamper7EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 内部TAMPER7事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_InternalTamper7EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    internal_tamper7_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -44422,21 +44422,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollforalarmbevent",
             "name": "HAL_RTCEx_PollForAlarmBEvent",
             "kind": "function",
-            "brief": "轮询等待闹钟。",
+            "brief": "轮询等待RTC 闹钟B事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForAlarmBEvent(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForAlarmBEvent(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC 闹钟B事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForAlarmBEvent(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44450,25 +44450,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollforinternaltamperevent",
             "name": "HAL_RTCEx_PollForInternalTamperEvent",
             "kind": "function",
-            "brief": "轮询等待RTC 外设。",
+            "brief": "轮询等待RTC 内部TAMPER事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForInternalTamperEvent(RTC_HandleTypeDef *hrtc, uint32_t IntTamper, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "IntTamper",
-                    "description": "参数 IntTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC POLLFOR内部TAMPER事件使用的 Int Tamper 参数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForInternalTamperEvent(hrtc, IntTamper, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC 内部TAMPER事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForInternalTamperEvent(&hrtc, inttamper, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44480,21 +44480,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollfortamper1event",
             "name": "HAL_RTCEx_PollForTamper1Event",
             "kind": "function",
-            "brief": "轮询等待RTC 外设。",
+            "brief": "轮询等待RTC TAMPER1事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForTamper1Event(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForTamper1Event(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC TAMPER1事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForTamper1Event(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4"
@@ -44508,21 +44508,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollfortamper2event",
             "name": "HAL_RTCEx_PollForTamper2Event",
             "kind": "function",
-            "brief": "轮询等待RTC 外设。",
+            "brief": "轮询等待RTC TAMPER2事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForTamper2Event(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForTamper2Event(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC TAMPER2事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForTamper2Event(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -44534,25 +44534,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollfortamperevent",
             "name": "HAL_RTCEx_PollForTamperEvent",
             "kind": "function",
-            "brief": "轮询等待RTC 外设。",
+            "brief": "轮询等待RTC TAMPER事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForTamperEvent(RTC_HandleTypeDef *hrtc, uint32_t Tamper, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Tamper",
-                    "description": "参数 Tamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC POLLFORTAMPER事件使用的 Tamper 参数。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForTamperEvent(hrtc, Tamper, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC TAMPER事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForTamperEvent(&hrtc, tamper, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44564,21 +44564,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollfortimestampevent",
             "name": "HAL_RTCEx_PollForTimeStampEvent",
             "kind": "function",
-            "brief": "轮询等待时间。",
+            "brief": "轮询等待RTC 时间STAMP事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForTimeStampEvent(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForTimeStampEvent(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC 时间STAMP事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForTimeStampEvent(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44592,21 +44592,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-pollforwakeuptimerevent",
             "name": "HAL_RTCEx_PollForWakeUpTimerEvent",
             "kind": "function",
-            "brief": "轮询等待时间。",
+            "brief": "轮询等待RTC 唤醒UPTIMER事件。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_PollForWakeUpTimerEvent(RTC_HandleTypeDef *hrtc, uint32_t Timeout);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "Timeout",
-                    "description": "最大等待时间。"
+                    "description": "最大阻塞等待时间，单位 ms；HAL_MAX_DELAY 表示持续等待。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "该接口会阻塞等待事件或超时，不适合放在高频中断和严格实时控制环中。超时时间通常基于 HAL_GetTick() 计算。",
-            "example": "HAL_RTCEx_PollForWakeUpTimerEvent(hrtc, Timeout);",
+            "returns": "HAL_OK 表示目标事件已发生；HAL_TIMEOUT 表示等待超时；硬件或状态异常时返回 HAL_ERROR。",
+            "notes": "该接口用于轮询等待RTC 唤醒UPTIMER事件。调用线程会阻塞到事件发生或超时，Timeout 通常以 ms 计，不应放在中断服务函数或高频实时控制环中。",
+            "example": "if (HAL_RTCEx_PollForWakeUpTimerEvent(&hrtc, 100U) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44620,17 +44620,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-rtceventcallback",
             "name": "HAL_RTCEx_RTCEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
-                    "name": "hrtc:",
-                    "description": "RTC 外设句柄。"
+                    "name": "hrtc",
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_RTCEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    rtcevent_flag = 1;\n}",
             "families": [
                 "F1"
             ],
@@ -44642,17 +44642,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-rtceventerrorcallback",
             "name": "HAL_RTCEx_RTCEventErrorCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC事件错误事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_RTCEventErrorCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
-                    "name": "hrtc:",
-                    "description": "RTC 外设句柄。"
+                    "name": "hrtc",
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_RTCEventErrorCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC事件错误。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_RTCEventErrorCallback(RTC_HandleTypeDef *hrtc)\n{\n    rtcevent_error_flag = 1;\n}",
             "families": [
                 "F1"
             ],
@@ -44664,17 +44664,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-rtcirqhandler",
             "name": "HAL_RTCEx_RTCIRQHandler",
             "kind": "function",
-            "brief": "处理RTC 外设产生的中断。",
+            "brief": "处理 RTC中断标志并分发对应回调。",
             "prototype": "void HAL_RTCEx_RTCIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
-                    "name": "hrtc:",
-                    "description": "RTC 外设句柄。"
+                    "name": "hrtc",
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTCEx_RTCIRQHandler(hrtc:);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTCEx_RTCIRQHandler(&hrtc);",
             "families": [
                 "F1"
             ],
@@ -44686,21 +44686,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setcalibrationoutput",
             "name": "HAL_RTCEx_SetCalibrationOutPut",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC 校准越界PUT。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetCalibrationOutPut(RTC_HandleTypeDef *hrtc, uint32_t CalibOutput);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "CalibOutput",
-                    "description": "参数 CalibOutput，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET校准越界PUT使用的 Calib Output 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetCalibrationOutPut(hrtc, CalibOutput);",
+            "returns": "HAL_OK 表示校准操作成功；ADC 状态不允许或校准失败时返回 HAL_ERROR。",
+            "notes": "该接口用于设置RTC 校准越界PUT。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetCalibrationOutPut(&hrtc, caliboutput) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44714,25 +44714,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setcoarsecalib",
             "name": "HAL_RTCEx_SetCoarseCalib",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC COARSECALIB。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetCoarseCalib(RTC_HandleTypeDef *hrtc, uint32_t CalibSign, uint32_t Value);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "CalibSign",
-                    "description": "参数 CalibSign，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETCOARSECALIB使用的 Calib Sign 参数。"
                 },
                 {
                     "name": "Value",
-                    "description": "待设置的数据或数值。"
+                    "description": "RTC SETCOARSECALIB使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetCoarseCalib(hrtc, CalibSign, Value);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC COARSECALIB。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetCoarseCalib(&hrtc, calibsign, value) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4"
             ],
@@ -44744,21 +44744,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setinternaltamper",
             "name": "HAL_RTCEx_SetInternalTamper",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC 内部TAMPER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetInternalTamper(RTC_HandleTypeDef *hrtc, RTC_InternalTamperTypeDef *sIntTamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sIntTamper",
-                    "description": "参数 sIntTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET内部TAMPER使用的 s Int Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetInternalTamper(hrtc, sIntTamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 内部TAMPER。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetInternalTamper(&hrtc, sinttamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44770,21 +44770,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setinternaltamper-it",
             "name": "HAL_RTCEx_SetInternalTamper_IT",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC 内部TAMPER，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetInternalTamper_IT(RTC_HandleTypeDef *hrtc, RTC_InternalTamperTypeDef *sIntTamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sIntTamper",
-                    "description": "参数 sIntTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET内部TAMPERIT使用的 s Int Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_RTCEx_SetInternalTamper_IT(hrtc, sIntTamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 内部TAMPER，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_RTCEx_SetInternalTamper_IT(&hrtc, sinttamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44796,17 +44796,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setinternaltimestamp",
             "name": "HAL_RTCEx_SetInternalTimeStamp",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 内部时间STAMP。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetInternalTimeStamp(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetInternalTimeStamp(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 内部时间STAMP。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetInternalTimeStamp(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "G4"
             ],
@@ -44818,17 +44818,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setrefclock",
             "name": "HAL_RTCEx_SetRefClock",
             "kind": "function",
-            "brief": "设置时钟。",
+            "brief": "设置RTC REF时钟。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetRefClock(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetRefClock(hrtc);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC REF时钟。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetRefClock(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44842,17 +44842,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setsecond-it",
             "name": "HAL_RTCEx_SetSecond_IT",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC SECOND，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetSecond_IT(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
-                    "name": "hrtc:",
-                    "description": "RTC 外设句柄。"
+                    "name": "hrtc",
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_RTCEx_SetSecond_IT(hrtc:);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC SECOND，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_RTCEx_SetSecond_IT(&hrtc) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1"
             ],
@@ -44864,29 +44864,29 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setsmoothcalib",
             "name": "HAL_RTCEx_SetSmoothCalib",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC SMOOTHCALIB。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetSmoothCalib(RTC_HandleTypeDef *hrtc, uint32_t SmoothCalibPeriod, uint32_t SmoothCalibPlusPulses, uint32_t SmoothCalibMinusPulsesValue);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "SmoothCalibPeriod",
-                    "description": "参数 SmoothCalibPeriod，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETSMOOTHCALIB使用的 Smooth Calib Period 参数。"
                 },
                 {
                     "name": "SmoothCalibPlusPulses",
-                    "description": "参数 SmoothCalibPlusPulses，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETSMOOTHCALIB使用的 Smooth Calib Plus Pulses 参数。"
                 },
                 {
                     "name": "SmoothCalibMinusPulsesValue",
-                    "description": "待设置的数据或数值。"
+                    "description": "RTC SETSMOOTHCALIB使用的数据值。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTCEx_SetSmoothCalib(hrtc, SmoothCalibPeriod, SmoothCalibPlusPulses, SmoothCalibMinusPulsesValue);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC SMOOTHCALIB。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTCEx_SetSmoothCalib(&hrtc, smoothcalibperiod, smoothcalibpluspulses, smoothcalibminuspulsesvalue) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -44902,25 +44902,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setsynchroshift",
             "name": "HAL_RTCEx_SetSynchroShift",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC SYNCHROSHIFT。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetSynchroShift(RTC_HandleTypeDef *hrtc, uint32_t ShiftAdd1S, uint32_t ShiftSubFS);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "ShiftAdd1S",
-                    "description": "参数 ShiftAdd1S，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETSYNCHROSHIFT使用的 Shift Add1 S 参数。"
                 },
                 {
                     "name": "ShiftSubFS",
-                    "description": "参数 ShiftSubFS，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETSYNCHROSHIFT使用的 Shift Sub F S 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetSynchroShift(hrtc, ShiftAdd1S, ShiftSubFS);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC SYNCHROSHIFT。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetSynchroShift(&hrtc, shiftadd1s, shiftsubfs) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -44934,21 +44934,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-settamper",
             "name": "HAL_RTCEx_SetTamper",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC TAMPER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetTamper(RTC_HandleTypeDef *hrtc, RTC_TamperTypeDef *sTamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sTamper",
-                    "description": "参数 sTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETTAMPER使用的 s Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetTamper(hrtc, sTamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC TAMPER。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetTamper(&hrtc, stamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -44964,21 +44964,21 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-settamper-it",
             "name": "HAL_RTCEx_SetTamper_IT",
             "kind": "function",
-            "brief": "设置RTC 外设。",
+            "brief": "设置RTC TAMPER，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetTamper_IT(RTC_HandleTypeDef *hrtc, RTC_TamperTypeDef *sTamper);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "sTamper",
-                    "description": "参数 sTamper，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SETTAMPERIT使用的 s Tamper 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_RTCEx_SetTamper_IT(hrtc, sTamper);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC TAMPER，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_RTCEx_SetTamper_IT(&hrtc, stamper) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -44994,25 +44994,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-settimestamp",
             "name": "HAL_RTCEx_SetTimeStamp",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 时间STAMP。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetTimeStamp(RTC_HandleTypeDef *hrtc, uint32_t RTC_TimeStampEdge, uint32_t RTC_TimeStampPin);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "RTC_TimeStampEdge",
-                    "description": "参数 RTC_TimeStampEdge，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间STAMP使用的 R T C_ Time Stamp Edge 参数。"
                 },
                 {
                     "name": "RTC_TimeStampPin",
-                    "description": "参数 RTC_TimeStampPin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间STAMP使用的 R T C_ Time Stamp Pin 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTCEx_SetTimeStamp(hrtc, RTC_TimeStampEdge, RTC_TimeStampPin);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 时间STAMP。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTCEx_SetTimeStamp(&hrtc, rtc_timestampedge, rtc_timestamppin) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45026,25 +45026,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-settimestamp-it",
             "name": "HAL_RTCEx_SetTimeStamp_IT",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 时间STAMP，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetTimeStamp_IT(RTC_HandleTypeDef *hrtc, uint32_t RTC_TimeStampEdge, uint32_t RTC_TimeStampPin);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "RTC_TimeStampEdge",
-                    "description": "参数 RTC_TimeStampEdge，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间STAMPIT使用的 R T C_ Time Stamp Edge 参数。"
                 },
                 {
                     "name": "RTC_TimeStampPin",
-                    "description": "参数 RTC_TimeStampPin，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET时间STAMPIT使用的 R T C_ Time Stamp Pin 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
-            "example": "HAL_RTCEx_SetTimeStamp_IT(hrtc, RTC_TimeStampEdge, RTC_TimeStampPin);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 时间STAMP，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。 F1、F4、G4 的原型存在差异，移植时需要核对当前工程头文件。",
+            "example": "if (HAL_RTCEx_SetTimeStamp_IT(&hrtc, rtc_timestampedge, rtc_timestamppin) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45058,25 +45058,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setwakeuptimer",
             "name": "HAL_RTCEx_SetWakeUpTimer",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 唤醒UPTIMER。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetWakeUpTimer(RTC_HandleTypeDef *hrtc, uint32_t WakeUpCounter, uint32_t WakeUpClock);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "WakeUpCounter",
-                    "description": "参数 WakeUpCounter，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET唤醒UPTIMER使用的 Wake Up Counter 参数。"
                 },
                 {
                     "name": "WakeUpClock",
-                    "description": "参数 WakeUpClock，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET唤醒UPTIMER使用的 Wake Up Clock 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "修改运行中外设配置前，应确认当前句柄状态允许该操作。部分寄存器使用预装载机制，新配置会在更新事件或下一次传输时生效。",
-            "example": "HAL_RTCEx_SetWakeUpTimer(hrtc, WakeUpCounter, WakeUpClock);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 唤醒UPTIMER。修改前应确认句柄状态允许写配置；带锁定或预装载的寄存器可能要在停止外设或下一次更新事件后生效。",
+            "example": "if (HAL_RTCEx_SetWakeUpTimer(&hrtc, wakeupcounter, wakeupclock) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45090,25 +45090,25 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-setwakeuptimer-it",
             "name": "HAL_RTCEx_SetWakeUpTimer_IT",
             "kind": "function",
-            "brief": "设置时间。",
+            "brief": "设置RTC 唤醒UPTIMER，使用中断方式。",
             "prototype": "HAL_StatusTypeDef HAL_RTCEx_SetWakeUpTimer_IT(RTC_HandleTypeDef *hrtc, uint32_t WakeUpCounter, uint32_t WakeUpClock);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 },
                 {
                     "name": "WakeUpCounter",
-                    "description": "参数 WakeUpCounter，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET唤醒UPTIMERIT使用的 Wake Up Counter 参数。"
                 },
                 {
                     "name": "WakeUpClock",
-                    "description": "参数 WakeUpClock，具体含义以当前系列 HAL 头文件为准。"
+                    "description": "RTC SET唤醒UPTIMERIT使用的 Wake Up Clock 参数。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前必须正确配置外设中断源和 NVIC。操作完成后由对应 HAL 回调通知结果；再次启动前应确认句柄不处于忙状态。",
-            "example": "HAL_RTCEx_SetWakeUpTimer_IT(hrtc, WakeUpCounter, WakeUpClock);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于设置RTC 唤醒UPTIMER，使用中断方式。必须配置对应 NVIC IRQ 和优先级；操作结果由匹配的 HAL 完成或错误回调通知，再次启动前应确认句柄不忙。",
+            "example": "if (HAL_RTCEx_SetWakeUpTimer_IT(&hrtc, wakeupcounter, wakeupclock) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45122,17 +45122,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-tamper1eventcallback",
             "name": "HAL_RTCEx_Tamper1EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC TAMPER1事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_Tamper1EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_Tamper1EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC TAMPER1事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_Tamper1EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    tamper1_event_flag = 1;\n}",
             "families": [
                 "F1",
                 "F4",
@@ -45148,17 +45148,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-tamper2eventcallback",
             "name": "HAL_RTCEx_Tamper2EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC TAMPER2事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_Tamper2EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_Tamper2EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC TAMPER2事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_Tamper2EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    tamper2_event_flag = 1;\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45172,17 +45172,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-tamper3eventcallback",
             "name": "HAL_RTCEx_Tamper3EventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC TAMPER3事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_Tamper3EventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_Tamper3EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC TAMPER3事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_Tamper3EventCallback(RTC_HandleTypeDef *hrtc)\n{\n    tamper3_event_flag = 1;\n}",
             "families": [
                 "G4"
             ],
@@ -45194,17 +45194,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-tamperirqhandler",
             "name": "HAL_RTCEx_TamperIRQHandler",
             "kind": "function",
-            "brief": "处理RTC 外设产生的中断。",
+            "brief": "处理 RTC TAMPER中断标志并分发对应回调。",
             "prototype": "void HAL_RTCEx_TamperIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTCEx_TamperIRQHandler(hrtc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTCEx_TamperIRQHandler(&hrtc);",
             "families": [
                 "F1",
                 "G4"
@@ -45218,17 +45218,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-tampertimestampirqhandler",
             "name": "HAL_RTCEx_TamperTimeStampIRQHandler",
             "kind": "function",
-            "brief": "处理时间产生的中断。",
+            "brief": "处理 RTC TAMPER时间STAMP中断标志并分发对应回调。",
             "prototype": "void HAL_RTCEx_TamperTimeStampIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTCEx_TamperTimeStampIRQHandler(hrtc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTCEx_TamperTimeStampIRQHandler(&hrtc);",
             "families": [
                 "F4"
             ],
@@ -45240,17 +45240,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-timestampeventcallback",
             "name": "HAL_RTCEx_TimeStampEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 时间STAMP事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_TimeStampEventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_TimeStampEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 时间STAMP事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_TimeStampEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    time_stamp_event_flag = 1;\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45264,17 +45264,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-timestampirqhandler",
             "name": "HAL_RTCEx_TimeStampIRQHandler",
             "kind": "function",
-            "brief": "处理时间产生的中断。",
+            "brief": "处理 RTC 时间STAMP中断标志并分发对应回调。",
             "prototype": "void HAL_RTCEx_TimeStampIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTCEx_TimeStampIRQHandler(hrtc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTCEx_TimeStampIRQHandler(&hrtc);",
             "families": [
                 "G4"
             ],
@@ -45286,17 +45286,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-wakeuptimereventcallback",
             "name": "HAL_RTCEx_WakeUpTimerEventCallback",
             "kind": "function",
-            "brief": "处理回调函数对应的回调事件。",
+            "brief": "RTC 唤醒UPTIMER事件事件回调，由 HAL 中断或 DMA 处理流程调用。",
             "prototype": "void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    // 在此处理对应事件，保持回调短小\n}",
+            "notes": "该回调对应RTC 唤醒UPTIMER事件。函数运行在中断或 DMA 回调上下文，应只读取必要数据、更新短状态或设置任务标志，避免延时和阻塞式通信。",
+            "example": "void HAL_RTCEx_WakeUpTimerEventCallback(RTC_HandleTypeDef *hrtc)\n{\n    wake_up_timer_event_flag = 1;\n}",
             "families": [
                 "F4",
                 "G4"
@@ -45310,17 +45310,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-rtcex-wakeuptimerirqhandler",
             "name": "HAL_RTCEx_WakeUpTimerIRQHandler",
             "kind": "function",
-            "brief": "处理时间产生的中断。",
+            "brief": "处理 RTC 唤醒UPTIMER中断标志并分发对应回调。",
             "prototype": "void HAL_RTCEx_WakeUpTimerIRQHandler(RTC_HandleTypeDef *hrtc);",
             "params": [
                 {
                     "name": "hrtc",
-                    "description": "RTC 外设句柄。"
+                    "description": "RTC 句柄指针，例如 &hrtc。"
                 }
             ],
             "returns": "无。",
-            "notes": "应在对应外设的 IRQHandler 中调用。该函数会检查并清除中断标志，再分发完成、错误等回调；用户回调应保持短小，避免阻塞操作。",
-            "example": "HAL_RTCEx_WakeUpTimerIRQHandler(hrtc);",
+            "notes": "应在对应 IRQHandler 中调用本函数。它会检查 RTC 中断源与状态标志，并分发完成、错误等具体回调。",
+            "example": "HAL_RTCEx_WakeUpTimerIRQHandler(&hrtc);",
             "families": [
                 "F4",
                 "G4"
@@ -48261,12 +48261,12 @@ window.HAL_GENERATED_CATALOG = {
             "params": [
                 {
                     "name": "hiwdg",
-                    "description": "独立看门狗 外设句柄。"
+                    "description": "独立看门狗 句柄指针，例如 &hiwdg。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应准备句柄和初始化结构体，并确保外设时钟、GPIO、DMA 与中断资源配置一致。失败时应检查参数断言和句柄错误状态。",
-            "example": "HAL_IWDG_Init(hiwdg);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于初始化独立看门狗 外设。调用前应填写句柄初始化结构体，并确保时钟、GPIO、DMA 与中断资源同当前模式一致。",
+            "example": "if (HAL_IWDG_Init(&hiwdg) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",
@@ -48282,17 +48282,17 @@ window.HAL_GENERATED_CATALOG = {
             "id": "catalog-hal-iwdg-refresh",
             "name": "HAL_IWDG_Refresh",
             "kind": "function",
-            "brief": "提供独立看门狗 外设相关的 HAL 操作接口。",
+            "brief": "执行独立看门狗 REFRESH操作。",
             "prototype": "HAL_StatusTypeDef HAL_IWDG_Refresh(IWDG_HandleTypeDef *hiwdg);",
             "params": [
                 {
                     "name": "hiwdg",
-                    "description": "独立看门狗 外设句柄。"
+                    "description": "独立看门狗 句柄指针，例如 &hiwdg。"
                 }
             ],
-            "returns": "HAL 状态：HAL_OK、HAL_ERROR、HAL_BUSY 或 HAL_TIMEOUT，实际范围由该接口决定。",
-            "notes": "调用前应确认外设时钟已开启、句柄已初始化且参数与当前工作模式一致。异步操作必须结合完成回调、错误回调和句柄忙状态使用。",
-            "example": "HAL_IWDG_Refresh(hiwdg);",
+            "returns": "HAL_OK 表示操作成功；参数或硬件状态不允许时返回 HAL_ERROR，资源占用时部分接口返回 HAL_BUSY。",
+            "notes": "该接口用于执行独立看门狗 REFRESH操作。调用前应确认外设时钟已开启、句柄已初始化，且参数与当前硬件工作模式一致。",
+            "example": "if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK) {\n    // 记录错误，并根据应用状态决定是否重试\n}",
             "families": [
                 "F1",
                 "F4",

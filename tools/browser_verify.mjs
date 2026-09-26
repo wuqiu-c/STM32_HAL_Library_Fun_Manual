@@ -137,5 +137,50 @@ if (process.argv[3]) {
     fs.writeFileSync(process.argv[3], Buffer.from(macroScreenshot.result.data, "base64"));
 }
 
-console.log(JSON.stringify({ callbackResult, detailResult, broadResult, naturalQueryResult, macroResult }, null, 2));
+await evaluate(`new Promise(resolve => {
+    const input = document.querySelector('#searchInput');
+    input.value = 'ADCEx Start';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    setTimeout(() => {
+        const names = new Set(['HAL_ADCEx_Calibration_Start', 'HAL_ADCEx_InjectedStart']);
+        for (const card of document.querySelectorAll('.function-card')) {
+            if (names.has(card.querySelector('.function-name')?.textContent)) {
+                card.open = true;
+            }
+        }
+        const calibration = [...document.querySelectorAll('.function-card')].find(
+            card => card.querySelector('.function-name')?.textContent === 'HAL_ADCEx_Calibration_Start'
+        );
+        calibration?.scrollIntoView({ block: 'start' });
+        setTimeout(resolve, 200);
+    }, 350);
+})`);
+const adcResult = await evaluate(`(() => {
+    const readCard = name => {
+        const card = [...document.querySelectorAll('.function-card')].find(
+            item => item.querySelector('.function-name')?.textContent === name
+        );
+        return {
+            brief: card?.querySelector('.function-brief')?.textContent,
+            notes: [...(card?.querySelectorAll('.detail-cell.is-wide') || [])].find(
+                cell => cell.querySelector('h4')?.textContent === '@NOTES'
+            )?.querySelector('p')?.textContent,
+            example: card?.querySelector('.example-code')?.textContent
+        };
+    };
+    return {
+        countText: document.querySelector('#resultCount')?.textContent,
+        calibration: readCard('HAL_ADCEx_Calibration_Start'),
+        injectedStart: readCard('HAL_ADCEx_InjectedStart')
+    };
+})()`);
+if (process.argv[4]) {
+    const adcScreenshot = await send("Page.captureScreenshot", {
+        format: "png",
+        captureBeyondViewport: false
+    });
+    fs.writeFileSync(process.argv[4], Buffer.from(adcScreenshot.result.data, "base64"));
+}
+
+console.log(JSON.stringify({ callbackResult, detailResult, broadResult, naturalQueryResult, macroResult, adcResult }, null, 2));
 socket.close();
